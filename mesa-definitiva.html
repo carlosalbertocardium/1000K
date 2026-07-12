@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Mesa de Trading — Multi Prop Firm</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #080d1a; --surface: #0f1628; --border: rgba(255,255,255,0.07);
+    --text: #e2e8f0; --muted: #64748b; --dim: #334155;
+    --ftmo: #00d4aa; --the5: #a78bfa; --wsf: #fb923c; --fn: #38bdf8;
+    --gold: #f59e0b; --red: #ef4444; --green: #22d3ee;
+    --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; padding-bottom: 60px; }
+
+  .header { background: linear-gradient(180deg, rgba(0,212,170,0.07) 0%, transparent 100%); border-bottom: 1px solid var(--border); padding: 36px 28px 0; }
+  .header-inner { max-width: 1160px; margin: 0 auto; }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 20px; margin-bottom: 28px; }
+  .header-label { font-size: 10px; font-weight: 700; letter-spacing: 3px; color: var(--ftmo); margin-bottom: 10px; }
+  h1 { font-family: var(--mono); font-size: 26px; color: #f1f5f9; margin-bottom: 6px; }
+  .header-sub { font-size: 13px; color: var(--muted); }
+  .stats { display: flex; gap: 28px; flex-wrap: wrap; align-items: flex-end; }
+  .stat { text-align: right; }
+  .stat-label { font-size: 10px; color: var(--dim); letter-spacing: 0.5px; margin-bottom: 4px; }
+  .stat-value { font-family: var(--mono); font-size: 22px; font-weight: 700; }
+
+  .tabs { display: flex; gap: 2px; margin-top: 4px; flex-wrap: wrap; }
+  .tab { background: none; border: none; border-bottom: 2px solid transparent; padding: 14px 18px; font-size: 13px; font-weight: 600; font-family: var(--sans); color: var(--muted); cursor: pointer; transition: all .2s; margin-bottom: -1px; -webkit-appearance: none; appearance: none; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; -webkit-user-select: none; min-height: 44px; position: relative; z-index: 5; }
+  .tab.active { color: var(--ftmo); border-bottom-color: var(--ftmo); }
+  .tab:hover:not(.active) { color: var(--text); }
+
+  .main { max-width: 1160px; margin: 0 auto; padding: 28px; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .notice { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.2); border-radius: 10px; padding: 12px 16px; font-size: 12px; color: #94a3b8; margin-bottom: 22px; line-height: 1.6; }
+  .notice strong { color: #f1f5f9; }
+  .notice .hl { color: var(--gold); font-weight: 700; }
+
+  .accounts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(265px, 1fr)); gap: 18px; }
+
+  .card { background: linear-gradient(145deg, rgba(255,255,255,0.035), rgba(255,255,255,0.01)); border-radius: 16px; padding: 22px; position: relative; overflow: hidden; transition: transform .2s; }
+  .card:hover { transform: translateY(-2px); }
+  .card-glow { position: absolute; top: -20px; right: -20px; width: 140px; height: 140px; border-radius: 50%; pointer-events: none; }
+  .card-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 16px; }
+  .card-name { font-family: var(--mono); font-size: 16px; font-weight: 700; margin-bottom: 5px; }
+  .card-badge { font-size: 9px; font-weight: 700; letter-spacing: 1px; padding: 3px 9px; border-radius: 99px; margin-left: 8px; vertical-align: middle; }
+  .card-capital { font-family: var(--mono); font-size: 26px; font-weight: 800; color: #f1f5f9; }
+  .card-risk-label { font-size: 10px; color: var(--muted); margin-bottom: 4px; }
+  .card-risk-val { font-family: var(--mono); font-size: 15px; font-weight: 700; color: var(--gold); }
+
+  .alert-box { border-radius: 10px; padding: 10px 13px; margin-bottom: 12px; }
+  .alert-box .alert-title { font-size: 10px; font-weight: 700; margin-bottom: 4px; }
+  .alert-box .alert-text { font-size: 11px; color: #94a3b8; line-height: 1.5; }
+
+  .mini-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .mini-cell { background: rgba(255,255,255,0.04); border-radius: 8px; padding: 9px; text-align: center; }
+  .mini-cell .mc-label { font-size: 9px; color: var(--muted); margin-bottom: 3px; }
+  .mini-cell .mc-val { font-family: var(--mono); font-size: 13px; font-weight: 700; }
+
+  .prog-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; }
+  .prog-row .prog-label { color: var(--muted); }
+  .prog-bar { background: rgba(255,255,255,0.06); border-radius: 99px; height: 5px; margin-bottom: 12px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 99px; transition: width .5s ease; }
+
+  .pnl-label { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .pnl-input { width: 100%; background: rgba(255,255,255,0.05); border-radius: 8px; padding: 9px 13px; font-family: var(--mono); font-size: 15px; font-weight: 700; outline: none; margin-bottom: 14px; transition: border-color .2s; }
+
+  .best-label { font-size: 10px; font-weight: 700; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 7px; }
+  .best-item { font-size: 12px; color: #94a3b8; margin-bottom: 4px; padding-left: 12px; position: relative; }
+  .best-item::before { content: "▸"; position: absolute; left: 0; }
+
+  .strategy-text { font-size: 11px; color: #475569; line-height: 1.65; border-top: 1px solid var(--border); padding-top: 12px; margin-top: 12px; }
+
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+  .tag { font-size: 9px; font-weight: 700; letter-spacing: 0.5px; padding: 3px 9px; border-radius: 99px; }
+
+  /* NOTICIAS */
+  .news-section { margin-top: 24px; }
+  .news-title { font-size: 12px; font-weight: 700; color: #94a3b8; letter-spacing: 0.5px; margin-bottom: 14px; }
+  .news-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+  .news-card { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 14px; }
+  .news-firm { font-size: 10px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; }
+  .news-ref { font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+  .news-item { font-size: 11px; color: #64748b; margin-bottom: 4px; padding-left: 12px; position: relative; line-height: 1.5; }
+  .news-item::before { content: "▸"; position: absolute; left: 0; }
+  .news-window { display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 99px; margin-bottom: 8px; }
+
+  /* SCALING */
+  .scaling-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin-bottom: 24px; }
+  .scaling-card { border-radius: 14px; padding: 18px; }
+  .sc-name { font-size: 13px; font-weight: 700; margin-bottom: 12px; }
+  .sc-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; font-size: 12px; }
+  .sc-label { color: var(--muted); }
+  .sc-val { font-family: var(--mono); font-size: 12px; font-weight: 700; }
+  .sc-max { font-family: var(--mono); font-size: 18px; font-weight: 800; margin-top: 10px; }
+  .sc-max-label { font-size: 10px; color: var(--muted); margin-bottom: 2px; }
+
+  /* MATRIZ */
+  .matrix-wrap { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 24px; }
+  .matrix-table { min-width: 760px; }
+  .matrix-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  .matrix-table th { padding: 12px 16px; font-weight: 700; font-family: var(--mono); font-size: 11px; letter-spacing: 0.5px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .matrix-table th:first-child { text-align: left; color: var(--muted); }
+  .matrix-table td { padding: 10px 16px; text-align: center; font-family: var(--mono); font-size: 11px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  .matrix-table td:first-child { text-align: left; color: #94a3b8; font-family: var(--sans); font-size: 12px; font-weight: 600; }
+  .matrix-table tr:nth-child(even) { background: rgba(255,255,255,0.015); }
+  .matrix-table .section-head td { background: rgba(255,255,255,0.03); color: var(--muted) !important; font-size: 10px !important; letter-spacing: 1px; font-weight: 700 !important; font-family: var(--sans) !important; text-transform: uppercase; }
+
+  .key-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
+  .key-card { border-radius: 12px; padding: 16px; }
+  .key-icon { font-size: 20px; margin-bottom: 8px; }
+  .key-title { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .key-desc { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+  /* SESIONES */
+  .sessions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .session-card { background: rgba(255,255,255,0.025); border-radius: 14px; padding: 20px; }
+  .session-name { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+  .session-time { font-family: var(--mono); font-size: 20px; font-weight: 800; color: #f1f5f9; margin-bottom: 2px; }
+  .session-gmt { font-size: 10px; color: var(--dim); margin-bottom: 14px; }
+  .ins-list { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .ins-chip { font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 6px; font-family: var(--mono); }
+  .ins-chip.cond { border: 1px dashed rgba(245,158,11,0.4); background: rgba(245,158,11,0.08); color: var(--gold); }
+  .session-note { font-size: 11px; color: var(--muted); line-height: 1.6; }
+
+  .instruments-wrap { background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+  .instruments-title { font-size: 12px; font-weight: 700; color: #94a3b8; letter-spacing: 0.5px; margin-bottom: 18px; }
+  .instruments-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; }
+  .ins-cat-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; margin-bottom: 8px; }
+  .ins-cat-item { font-size: 12px; color: var(--muted); margin-bottom: 4px; padding-left: 12px; position: relative; }
+  .ins-cat-item::before { content: "▸"; position: absolute; left: 0; }
+
+  /* CHECKLIST */
+  .checklist { display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; }
+  .check-item { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: 12px; cursor: pointer; transition: all .2s; user-select: none; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); }
+  .check-item.done { background: rgba(0,212,170,0.05); border-color: rgba(0,212,170,0.2); }
+  .check-box { width: 22px; height: 22px; border-radius: 6px; border: 2px solid rgba(255,255,255,0.15); background: transparent; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 13px; font-weight: 900; color: var(--bg); transition: all .2s; }
+  .check-item.done .check-box { border-color: var(--ftmo); background: var(--ftmo); }
+  .check-label { font-size: 13px; color: var(--text); transition: all .2s; }
+  .check-item.done .check-label { color: var(--muted); text-decoration: line-through; }
+
+  .stop-box { background: rgba(239,68,68,0.06); border: 1px solid rgba(239,68,68,0.2); border-radius: 14px; padding: 20px; }
+  .stop-title { font-size: 13px; font-weight: 700; color: var(--red); margin-bottom: 12px; }
+  .stop-item { font-size: 12px; color: #94a3b8; margin-bottom: 7px; line-height: 1.6; padding-left: 14px; position: relative; }
+  .stop-item::before { content: "▸"; position: absolute; left: 0; color: var(--red); }
+
+  /* PENDIENTES */
+  .pending-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; }
+  .pending-card { background: rgba(255,255,255,0.02); border-radius: 14px; padding: 18px; }
+  .pending-firm { font-size: 11px; font-weight: 700; letter-spacing: 1px; margin-bottom: 12px; }
+  .pending-item { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 12px; color: #64748b; line-height: 1.5; }
+  .pending-item input[type=checkbox] { margin-top: 2px; flex-shrink: 0; accent-color: var(--ftmo); width: 14px; height: 14px; cursor: pointer; }
+  .pending-item.resolved { color: #94a3b8; text-decoration: line-through; opacity: 0.5; }
+
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 99px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <div class="header-label">MESA DE TRABAJO // MULTI-PROP FIRM — v4</div>
+        <h1>Trading Dashboard</h1>
+        <p class="header-sub">Objetivo: $1,000,000 USD en capital fondeado simultáneo · 4 firmas activas en Fase 1</p>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-label">CAPITAL EN CHALLENGE</div>
+          <div class="stat-value" style="color:var(--ftmo)">$650K</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">TECHO MÁXIMO PLAN</div>
+          <div class="stat-value" style="color:var(--the5)">$8M+</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">P&L COMBINADO HOY</div>
+          <div class="stat-value" id="total-pnl" style="color:var(--green)">$0</div>
+        </div>
+      </div>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('cuentas',this)">Cuentas</button>
+      <button class="tab" onclick="switchTab('reglas',this)">Matriz de Reglas</button>
+      <button class="tab" onclick="switchTab('noticias',this)">Noticias</button>
+      <button class="tab" onclick="switchTab('scaling',this)">Escalabilidad</button>
+      <button class="tab" onclick="switchTab('sesiones',this)">Sesiones</button>
+      <button class="tab" onclick="switchTab('checklist',this)">Pre-Trade</button>
+      <button class="tab" onclick="switchTab('pendientes',this)">Pendientes</button>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ══ CUENTAS ══ -->
+<div id="panel-cuentas" class="panel active">
+  <div class="notice">
+    <span class="hl">Estado:</span> Los <strong>5 challenges están activos simultáneamente en Fase 1.</strong>
+    FT Swing $200K · FT Scalp $200K · The5%ers $100K · WSF $100K · FundedNext $50K. Cap FTMO combinado: $400K (techo alcanzado).
+    Techo de escalabilidad: FTMO $2M · The5ers $4M · WSF $2M · FundedNext $4M.
+  </div>
+  <div class="accounts-grid">
+
+    <!-- FTMO -->
+    <div class="card" style="border:1px solid rgba(0,212,170,0.2)">
+      <div class="card-glow" style="background:radial-gradient(circle,rgba(0,212,170,0.15) 0%,transparent 70%)"></div>
+      <div class="card-head">
+        <div>
+          <div class="card-name" style="color:var(--ftmo)">FT Swing <span class="card-badge" style="background:rgba(0,212,170,0.15);color:var(--ftmo);border:1px solid rgba(0,212,170,0.3)">CHALLENGE F1</span></div>
+          <div class="card-capital">$200K</div>
+        </div>
+        <div><div class="card-risk-label">Stop diario personal</div><div class="card-risk-val">$5,000</div></div>
+      </div>
+      <div class="alert-box" style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2)">
+        <div class="alert-title" style="color:var(--red)">⚡ EQUITY REAL-TIME + BEST DAY RULE</div>
+        <div class="alert-text">Flotantes cuentan al instante. Ningún día puede concentrar ≥50% del profit total acumulado. Distribuir ganancias en al menos 4 días.</div>
+      </div>
+      <div class="mini-grid">
+        <div class="mini-cell"><div class="mc-label">Target F1</div><div class="mc-val" style="color:var(--ftmo)">$20,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Target F2</div><div class="mc-val" style="color:var(--ftmo)">$10,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Límite diario</div><div class="mc-val" style="color:var(--gold)">$10,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Riesgo/trade</div><div class="mc-val" style="color:var(--ftmo)">$1,000</div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Progreso F1</span><span class="prog-val" id="ftsw-prog-label" style="color:var(--ftmo)">$0 / $20,000</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="ftsw-f1-bar" style="width:0%;background:var(--ftmo)"></div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Stop personal usado</span><span class="prog-val" id="ftsw-daily-pct" style="color:var(--muted)">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="ftsw-daily-bar" style="width:0%;background:var(--green)"></div></div>
+      </div>
+      <div class="pnl-label">P&L del día (USD)</div>
+      <input class="pnl-input" id="pnl-ftsw" type="number" value="0" style="border:1px solid rgba(0,212,170,0.3);color:var(--ftmo)" oninput="updatePnL('ftsw',this.value)">
+      <div class="best-label">MEJOR PARA</div>
+      <div class="best-item">Scalping EUR/GBP apertura Londres</div>
+      <div class="best-item">Gold/Plata intraday con SL rápido</div>
+      <div class="best-item">DAX/CAC apertura EU</div>
+      <div class="strategy-text">Equity real-time = máxima vigilancia. Best Day Rule obliga a distribuir el profit — no concentrar en un solo día. Noticias libres en challenge; en fondeada aplican restricciones ±2 min. Inactividad: cualquier trade abierto rompe el contador de 30 días. Límites escalan con el balance en cada scale-up.</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25)">Equity real-time ⚡</span>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.25)">Best Day Rule ⚠️</span>
+        <span class="tag" style="background:rgba(0,212,170,0.1);color:var(--ftmo);border:1px solid rgba(0,212,170,0.2)">4 días mínimo</span>
+        <span class="tag" style="background:rgba(0,212,170,0.1);color:var(--ftmo);border:1px solid rgba(0,212,170,0.2)">Techo $2M</span>
+      </div>
+    </div>
+
+    <!-- FTMO SCALP -->
+    <div class="card" style="border:1px solid rgba(0,184,148,0.2)">
+      <div class="card-glow" style="background:radial-gradient(circle,rgba(0,184,148,0.13) 0%,transparent 70%)"></div>
+      <div class="card-head">
+        <div>
+          <div class="card-name" style="color:#00B894">FT Scalp <span class="card-badge" style="background:rgba(0,184,148,0.15);color:#00B894;border:1px solid rgba(0,184,148,0.3)">CHALLENGE F1</span></div>
+          <div class="card-capital">$200K</div>
+        </div>
+        <div><div class="card-risk-label">Stop diario personal</div><div class="card-risk-val">$5,000</div></div>
+      </div>
+      <div class="alert-box" style="background:rgba(0,184,148,0.07);border:1px solid rgba(0,184,148,0.2)">
+        <div class="alert-title" style="color:#00B894">⚡ STANDARD · EQUITY RT · NO REPLICAR SWING · COMISIONES</div>
+        <div class="alert-text">Cuenta Standard — leverage 1:100. NO copiar el mismo trade de FT Swing (riesgo estrategia idéntica). Comisiones de scalping acumuladas cuentan contra el DD diario — monitorear P&L neto. En funded: restricción news ±2 min + cerrar antes del fin de semana. Cap combinado $400K alcanzado.</div>
+      </div>
+      <div class="mini-grid">
+        <div class="mini-cell"><div class="mc-label">Target F1</div><div class="mc-val" style="color:#00B894">$20,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Target F2</div><div class="mc-val" style="color:#00B894">$10,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Límite diario</div><div class="mc-val" style="color:var(--gold)">$10,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Riesgo/trade</div><div class="mc-val" style="color:#00B894">$1,000</div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Progreso F1</span><span class="prog-val" id="ftsc-prog-label" style="color:#00B894">$0 / $20,000</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="ftsc-f1-bar" style="width:0%;background:#00B894"></div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Stop personal usado</span><span class="prog-val" id="ftsc-daily-pct" style="color:var(--muted)">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="ftsc-daily-bar" style="width:0%;background:var(--green)"></div></div>
+      </div>
+      <div class="pnl-label">P&L del día (USD)</div>
+      <input class="pnl-input" id="pnl-ftsc" type="number" value="0" style="border:1px solid rgba(0,184,148,0.3);color:#00B894" oninput="updatePnL('ftsc',this.value)">
+      <div class="best-label">MEJOR PARA</div>
+      <div class="best-item">Scalping apertura Londres EUR/GBP/AUX — entries rápidos</div>
+      <div class="best-item">SL ajustado 3–5 pips con leverage 1:100</div>
+      <div class="best-item">Momentum primeros 30 min — duración de minutos</div>
+      <div class="strategy-text">Cuenta Standard $200K para scalping activo. Leverage 1:100 permite SL muy ajustados con sizing suficiente. Parada operativa: cuando P&L neto (incluidas comisiones) llegue a −$4,500 — buffer de $500 antes del stop personal. En funded: no dejar posiciones abiertas el viernes ni en rollover ≥2h. Challenge: noticias libres igual que FT Swing.</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25)">Equity real-time ⚡</span>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.25)">Best Day Rule ⚠️</span>
+        <span class="tag" style="background:rgba(0,184,148,0.12);color:#00B894;border:1px solid rgba(0,184,148,0.25)">Leverage 1:100</span>
+        <span class="tag" style="background:rgba(0,184,148,0.12);color:#00B894;border:1px solid rgba(0,184,148,0.25)">No replicar Swing ⚠️</span>
+        <span class="tag" style="background:rgba(0,184,148,0.1);color:#00B894;border:1px solid rgba(0,184,148,0.2)">Cap $400K ⚠️</span>
+      </div>
+    </div>
+
+    <!-- THE5ERS -->
+    <div class="card" style="border:1px solid rgba(167,139,250,0.2)">
+      <div class="card-glow" style="background:radial-gradient(circle,rgba(167,139,250,0.12) 0%,transparent 70%)"></div>
+      <div class="card-head">
+        <div>
+          <div class="card-name" style="color:var(--the5)">The5%ers <span class="card-badge" style="background:rgba(167,139,250,0.15);color:var(--the5);border:1px solid rgba(167,139,250,0.3)">CHALLENGE F1</span></div>
+          <div class="card-capital">$100K</div>
+        </div>
+        <div><div class="card-risk-label">Stop diario personal</div><div class="card-risk-val">$2,500</div></div>
+      </div>
+      <div class="alert-box" style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2)">
+        <div class="alert-title" style="color:var(--red)">⚠️ DÍAS RENTABLES $500 · SOFT BREACH NOTICIAS</div>
+        <div class="alert-text">Necesitas 3 días con ≥$500 neto cerrado cada uno. Soft breach noticias en ±2 min Forex Factory — deduce profit pero NO termina cuenta. WTI leverage 1:5. Rollover 18:00 Colombia (GMT+3 verano). Plataforma: cTrader. Profit split 80%.</div>
+      </div>
+      <div class="mini-grid">
+        <div class="mini-cell"><div class="mc-label">Target F1</div><div class="mc-val" style="color:var(--the5)">$10,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Target F2</div><div class="mc-val" style="color:var(--the5)">$5,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Límite diario</div><div class="mc-val" style="color:var(--gold)">$5,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Riesgo/trade</div><div class="mc-val" style="color:var(--the5)">$500</div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Progreso F1</span><span class="prog-val" id="the5-prog-label" style="color:var(--the5)">$0 / $10,000</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="the5-f1-bar" style="width:0%;background:var(--the5)"></div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Stop personal usado</span><span class="prog-val" id="the5-daily-pct" style="color:var(--muted)">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="the5-daily-bar" style="width:0%;background:var(--green)"></div></div>
+      </div>
+      <div class="pnl-label">P&L del día (USD)</div>
+      <input class="pnl-input" id="pnl-the5" type="number" value="0" style="border:1px solid rgba(167,139,250,0.3);color:var(--the5)" oninput="updatePnL('the5',this.value)">
+      <div class="best-label">MEJOR PARA</div>
+      <div class="best-item">Días de momentum claro — sin regla de consistencia</div>
+      <div class="best-item">Swing intraday GBP/USD y BTC/DASH</div>
+      <div class="best-item">Mayor techo: $4M con scaling</div>
+      <div class="strategy-text">Challenge High Stakes $100K. Fase 1: $10,000 (10%) con mínimo 3 días rentables ≥$500 c/u. EOD. Sin regla de consistencia. Sin límite de tiempo. Soft breach noticias ±2 min Forex Factory — deduce profit pero NO termina la cuenta. Drawdown absoluto desde $100K — las ganancias no protegen el floor. WTI leverage 1:5 también en F1/F2.</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.25)">Umbral $500/día ⚠️</span>
+        <span class="tag" style="background:rgba(34,211,238,0.1);color:var(--green);border:1px solid rgba(34,211,238,0.2)">Soft breach ±2min</span>
+        <span class="tag" style="background:rgba(167,139,250,0.1);color:var(--the5);border:1px solid rgba(167,139,250,0.2)">3 días rent/fase</span>
+        <span class="tag" style="background:rgba(167,139,250,0.1);color:var(--the5);border:1px solid rgba(167,139,250,0.2)">Techo $4M</span>
+      </div>
+    </div>
+
+    <!-- WSF -->
+    <div class="card" style="border:1px solid rgba(251,146,60,0.2)">
+      <div class="card-glow" style="background:radial-gradient(circle,rgba(251,146,60,0.12) 0%,transparent 70%)"></div>
+      <div class="card-head">
+        <div>
+          <div class="card-name" style="color:var(--wsf)">Wall Street Funded <span class="card-badge" style="background:rgba(251,146,60,0.15);color:var(--wsf);border:1px solid rgba(251,146,60,0.3)">CHALLENGE F1</span></div>
+          <div class="card-capital">$100K</div>
+        </div>
+        <div><div class="card-risk-label">Stop diario personal</div><div class="card-risk-val">$2,500</div></div>
+      </div>
+      <div class="alert-box" style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2)">
+        <div class="alert-title" style="color:var(--red)">🛑 SL OBLIGATORIO 2 MIN · IDEA TRADING $2,500 · DURACIÓN ≥60s</div>
+        <div class="alert-text">SL obligatorio en 2 min (3 softbreaches = cuenta eliminada). Idea de trading: mismo activo + dirección + &lt;30 min entre trades = una idea. Máx $2,500 acumulado y 35 lotes Forex / 7 metales / 70 índices. Trades &lt;60 seg PROHIBIDOS. DD reinicia 16:00 Bogotá.</div>
+      </div>
+      <div class="mini-grid">
+        <div class="mini-cell"><div class="mc-label">Target F1</div><div class="mc-val" style="color:var(--wsf)">$10,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Target F2</div><div class="mc-val" style="color:var(--wsf)">$5,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Límite diario</div><div class="mc-val" style="color:var(--gold)">$5,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Riesgo/trade</div><div class="mc-val" style="color:var(--wsf)">$500</div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Progreso F1</span><span class="prog-val" id="wsf-prog-label" style="color:var(--wsf)">$0 / $10,000</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="wsf-f1-bar" style="width:0%;background:var(--wsf)"></div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Stop personal usado</span><span class="prog-val" id="wsf-daily-pct" style="color:var(--muted)">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="wsf-daily-bar" style="width:0%;background:var(--green)"></div></div>
+      </div>
+      <div class="pnl-label">P&L del día (USD)</div>
+      <input class="pnl-input" id="pnl-wsf" type="number" value="0" style="border:1px solid rgba(251,146,60,0.3);color:var(--wsf)" oninput="updatePnL('wsf',this.value)">
+      <div class="best-label">MEJOR PARA</div>
+      <div class="best-item">Setups con nivel técnico pre-marcado</div>
+      <div class="best-item">Gold y WTI con SL definido antes de entrar</div>
+      <div class="best-item">cTrader nativo — $4/lote comisión</div>
+      <div class="strategy-text">Challenge Ultra 2-Step $100K. Fase 1: $10,000 (10%) en mínimo 4 días. SL obligatorio en 2 minutos. Riesgo máx por idea de trading $2,500 (mismo activo + dirección + &lt;30 min). Duración mínima 60 seg. DD reinicia 16:00 Bogotá — trades tarde/noche acumulan contra el mismo límite diario.</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25)">SL obligatorio 2min 🛑</span>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--wsf);border:1px solid rgba(251,146,60,0.25)">Idea $2,500 máx ⚠</span>
+        <span class="tag" style="background:rgba(251,146,60,0.12);color:var(--wsf);border:1px solid rgba(251,146,60,0.25)">≥60s duración</span>
+        <span class="tag" style="background:rgba(251,146,60,0.1);color:var(--wsf);border:1px solid rgba(251,146,60,0.2)">Corte 16:00 Bogotá</span>
+      </div>
+    </div>
+
+    <!-- FUNDEDNEXT -->
+    <div class="card" style="border:1px solid rgba(56,189,248,0.25)">
+      <div class="card-glow" style="background:radial-gradient(circle,rgba(56,189,248,0.1) 0%,transparent 70%)"></div>
+      <div class="card-head">
+        <div>
+          <div class="card-name" style="color:var(--fn)">FundedNext <span class="card-badge" style="background:rgba(56,189,248,0.15);color:var(--fn);border:1px solid rgba(56,189,248,0.3)">CHALLENGE F1</span></div>
+          <div class="card-capital">$50K</div>
+        </div>
+        <div><div class="card-risk-label">Stop diario personal</div><div class="card-risk-val">$1,250</div></div>
+      </div>
+      <div class="alert-box" style="background:rgba(239,68,68,0.07);border:1px solid rgba(239,68,68,0.2)">
+        <div class="alert-title" style="color:var(--red)">🚫 QUICK STRIKE · RIESGO SIMULTÁNEO · MENSAJES</div>
+        <div class="alert-text">Trades &lt;30 seg no pueden ser ≥30% del profit. Riesgo simultáneo máx $1,500 (3%). Máx 2,000 mensajes/día (SL/TP modifications cuentan). Solo manual.</div>
+      </div>
+      <div class="mini-grid">
+        <div class="mini-cell"><div class="mc-label">Target F1</div><div class="mc-val" style="color:var(--fn)">$4,000</div></div>
+        <div class="mini-cell"><div class="mc-label">Target F2</div><div class="mc-val" style="color:var(--fn)">$2,500</div></div>
+        <div class="mini-cell"><div class="mc-label">Límite diario</div><div class="mc-val" style="color:var(--gold)">$2,500</div></div>
+        <div class="mini-cell"><div class="mc-label">Riesgo/trade</div><div class="mc-val" style="color:var(--fn)">$250</div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Progreso F1</span><span class="prog-val" id="fn-prog-label" style="color:var(--fn)">$0 / $4,000</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="fn-f1-bar" style="width:0%;background:var(--fn)"></div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Stop personal usado</span><span class="prog-val" id="fn-daily-pct" style="color:var(--muted)">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="fn-daily-bar" style="width:0%;background:var(--green)"></div></div>
+      </div>
+      <div class="pnl-label">P&L del día (USD)</div>
+      <input class="pnl-input" id="pnl-fn" type="number" value="0" style="border:1px solid rgba(56,189,248,0.3);color:var(--fn)" oninput="updatePnL('fn',this.value)">
+      <div class="best-label">MEJOR PARA</div>
+      <div class="best-item">Price action manual puro con trades &gt;30 seg</div>
+      <div class="best-item">5 días activos semanales — consistencia operativa</div>
+      <div class="best-item">Techo $4M · KYC 72h · Payout mínimo $20</div>
+      <div class="strategy-text">Manual estricto. Quick Strike: durar más de 30 seg en cada trade. Swap triple miércoles (XAU/WTI/Forex) y viernes (índices/crypto) descuenta del daily limit. KYC debe iniciarse en el mismo día que se aprueba F2 — plazo máximo 30 días.</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(56,189,248,0.1);color:var(--fn);border:1px solid rgba(56,189,248,0.2)">Solo manual 🤚</span>
+        <span class="tag" style="background:rgba(56,189,248,0.1);color:var(--fn);border:1px solid rgba(56,189,248,0.2)">5 días mínimo</span>
+        <span class="tag" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2)">Quick Strike 🚫</span>
+        <span class="tag" style="background:rgba(56,189,248,0.1);color:var(--fn);border:1px solid rgba(56,189,248,0.2)">Techo $4M</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ REGLAS ══ -->
+<div id="panel-reglas" class="panel">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Comparativa directa — actualizada con todos los datos confirmados de los documentos oficiales.</p>
+  <div class="matrix-wrap">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>PARÁMETRO</th>
+          <th style="color:var(--ftmo)">FT Swing $200K</th><th style="color:#00B894">FT Scalp $200K</th>
+          <th style="color:var(--the5)">The5ers $100K</th>
+          <th style="color:var(--wsf)">WSF $100K</th>
+          <th style="color:var(--fn)">FundedNext $50K</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="section-head"><td colspan="6">MEDICIÓN Y LÍMITES</td></tr>
+        <tr><td>Medición pérdida diaria</td><td style="color:var(--red)">Equity real-time ⚡</td><td style="color:var(--red)">Equity real-time ⚡</td><td style="color:var(--green)">EOD (snapshot 00:00)</td><td style="color:var(--gold)">EOD* / RT con flotante</td><td style="color:var(--fn)">Real-time (balance+flotante)</td></tr>
+        <tr><td>Tipo de drawdown overall</td><td>Trailing EOD</td><td>Trailing EOD</td><td style="color:var(--green)">Absoluto desde $100K</td><td style="color:var(--green)">Estático desde $100K</td><td style="color:var(--green)">Estático desde $50K</td></tr>
+        <tr><td>Target Fase 1</td><td style="color:var(--ftmo)">$20,000 (10%)</td><td style="color:#00B894">$20,000 (10%)</td><td style="color:var(--the5)">$10,000 (10%)</td><td style="color:var(--wsf)">$10,000 (10%)</td><td style="color:var(--fn)">$4,000 (8%)</td></tr>
+        <tr><td>Target Fase 2</td><td style="color:var(--ftmo)">$10,000 (5%)</td><td style="color:#00B894">$10,000 (5%)</td><td style="color:var(--the5)">$5,000 (5%)</td><td style="color:var(--wsf)">$5,000 (5%)</td><td style="color:var(--fn)">$2,500 (5%)</td></tr>
+        <tr><td>Límite diario (firma)</td><td>$10,000 (5%)</td><td>$10,000 (5%)</td><td>$5,000 (5%)</td><td>$5,000 (5%)</td><td>$2,500 (5%)</td></tr>
+        <tr><td>Overall loss máximo</td><td>$20,000 (10%)</td><td>$20,000 (10%)</td><td>$10,000 (10%)</td><td>$10,000 (10%)</td><td>$5,000 (10%)</td></tr>
+        <tr><td>Stop personal (50%)</td><td style="color:var(--gold)">$5,000</td><td style="color:var(--gold)">$5,000</td><td style="color:var(--gold)">$2,500</td><td style="color:var(--gold)">$2,500</td><td style="color:var(--gold)">$1,250</td></tr>
+        <tr><td>Riesgo por trade (0.5%)</td><td style="color:var(--ftmo)">$1,000</td><td style="color:#00B894">$1,000</td><td style="color:var(--the5)">$500</td><td style="color:var(--wsf)">$500</td><td style="color:var(--fn)">$250</td></tr>
+        <tr class="section-head"><td colspan="6">REGLAS OPERATIVAS</td></tr>
+        <tr><td>Días mínimos</td><td>4 días operados</td><td>4 días operados</td><td>3 días rentables ≥$500</td><td>4 días operados</td><td>5 días operados</td></tr>
+        <tr><td>Regla de consistencia</td><td style="color:var(--gold)">Best Day ≤50% ⚠️</td><td style="color:var(--gold)">Best Day ≤50% ⚠️</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td></tr>
+        <tr><td>SL obligatorio</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td><td style="color:var(--red)">SÍ — 2 min 🛑</td><td style="color:var(--gold)">Recomendado (sin SL = 100% en riesgo)</td></tr>
+        <tr><td>Solo trading manual</td><td style="color:var(--green)">NO (EAs permitidos)</td><td style="color:var(--green)">NO (EAs permitidos)</td><td style="color:var(--gold)">EA propio con código fuente</td><td style="color:var(--gold)">EA propio permitido</td><td style="color:var(--red)">SÍ — solo manual 🤚</td></tr>
+        <tr><td>Riesgo simultáneo máx.</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--red)">3% = $1,500 🚫</td></tr>
+        <tr><td>Scalping corto</td><td style="color:var(--green)">Permitido</td><td style="color:var(--green)">Permitido</td><td style="color:var(--green)">Permitido</td><td style="color:var(--green)">Permitido</td><td style="color:var(--red)">Quick Strike: &gt;30 seg 🚫</td></tr>
+        <tr><td>Tiempo límite del challenge</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td></tr>
+        <tr><td>Inactividad máxima</td><td>30 días</td><td>30 días</td><td>30 días</td><td>30 días</td><td>30 días</td></tr>
+        <tr class="section-head"><td colspan="6">NOTICIAS</td></tr>
+        <tr><td>Noticias en challenge</td><td style="color:var(--green)">Libre ✅</td><td style="color:var(--green)">Libre ✅</td><td style="color:var(--gold)">Soft breach ±2 min ⚠️</td><td style="color:var(--green)">Libre ✅</td><td style="color:var(--green)">Libre ✅</td></tr>
+        <tr><td>Noticias en fondeada</td><td style="color:var(--green)">Sin restricción ✅</td><td style="color:var(--red)">±2 min 🚫</td><td style="color:var(--red)">±2 min 🚫</td><td style="color:var(--red)">±4 min 🚫</td><td style="color:var(--gold)">Regla 40/60 ⚠️</td></tr>
+        <tr><td>Referencia calendario</td><td>ftmo.com/es/calendar/</td><td>ftmo.com/es/calendar/</td><td>Forex Factory</td><td>Dashboard WSF</td><td>Calendario interno FN</td></tr>
+        <tr class="section-head"><td colspan="6">FONDEO Y PAGOS</td></tr>
+        <tr><td>Profit split inicial</td><td style="color:var(--ftmo)">80% → 90%</td><td style="color:#00B894">80% → 90%</td><td style="color:var(--the5)">80% → 100%</td><td style="color:var(--wsf)">80% → 95%</td><td style="color:var(--fn)">80% → 90%</td></tr>
+        <tr><td>Primer pago</td><td>Desde día 14</td><td>Desde día 14</td><td>Desde día 14 (bi-semanal)</td><td>A los 15 días</td><td>Ciclos 21/14 días</td></tr>
+        <tr><td>Mínimo de retiro</td><td>No especificado</td><td>No especificado</td><td>$1,500 (Rise) / cripto libre</td><td>$100 USD</td><td>$20 USD</td></tr>
+        <tr><td>Activación cuenta funded</td><td>1-2 días hábiles</td><td>1-2 días hábiles</td><td>Proceso estándar</td><td style="color:var(--gold)">Solo miérc / dom ⚠️</td><td>48-72 horas</td></tr>
+        <tr><td>KYC plazo máximo</td><td>Sin plazo definido</td><td>Sin plazo definido</td><td>5 días hábiles post-solicitud</td><td>No especificado</td><td style="color:var(--red)">30 días desde aprobación F2</td></tr>
+        <tr><td>Techo máximo de capital</td><td style="color:var(--ftmo)">$2,000,000</td><td style="color:#00B894">$2,000,000</td><td style="color:var(--the5)">$4,000,000</td><td style="color:var(--wsf)">$2,000,000</td><td style="color:var(--fn)">$4,000,000</td></tr>
+        <tr><td>Fusión de cuentas</td><td>Sí — máx $400K combinado</td><td>Sí — máx $400K combinado</td><td>Copy entre cuentas propias</td><td>Sí — máx $400K</td><td>Sí (condiciones pendientes)</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="key-grid">
+    <div class="key-card" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18)">
+      <div class="key-icon">⚡</div><div class="key-title" style="color:var(--ftmo)">FT Swing — Equity real-time + Best Day</div>
+      <div class="key-desc">Flotantes cuentan al instante. Ningún día puede representar ≥50% del profit total — distribuir en mínimo 4 días positivos. Leverage 1:30. Fondeada: sin restricción de noticias ni fin de semana.</div>
+    </div>
+    <div class="key-card" style="background:rgba(0,184,148,0.06);border:1px solid rgba(0,184,148,0.18)">
+      <div class="key-icon">⚡</div><div class="key-title" style="color:#00B894">FT Scalp — Standard + comisiones</div>
+      <div class="key-desc">Mismas reglas base que FT Swing pero leverage 1:100. Comisiones de scalping cuentan contra el DD — parar en −$4,500 neto. Fondeada: SÍ restricción news ±2 min y cierre antes del fin de semana.</div>
+    </div>
+    <div class="key-card" style="background:rgba(167,139,250,0.06);border:1px solid rgba(167,139,250,0.18)">
+      <div class="key-icon">📅</div><div class="key-title" style="color:var(--the5)">The5ers — Días rentables con umbral</div>
+      <div class="key-desc">Cada día rentable debe tener ≥$500 netos cerrados. $499 no cuenta. WTI con leverage 1:5 incluso en evaluación. Referencia: Forex Factory.</div>
+    </div>
+    <div class="key-card" style="background:rgba(251,146,60,0.06);border:1px solid rgba(251,146,60,0.18)">
+      <div class="key-icon">🛑</div><div class="key-title" style="color:var(--wsf)">WSF — SL 2 min + Funded miérc/dom</div>
+      <div class="key-desc">SL en 120 seg obligatorio. Con flotante abierto, el DD diario es real-time. La cuenta funded solo se activa miércoles y domingos — planificar el timing.</div>
+    </div>
+    <div class="key-card" style="background:rgba(56,189,248,0.05);border:1px solid rgba(56,189,248,0.15)">
+      <div class="key-icon">🚫</div><div class="key-title" style="color:var(--fn)">FundedNext — Quick Strike + $1,500 simultáneo</div>
+      <div class="key-desc">Trades &lt;30 seg no pueden ser ≥30% del profit. Riesgo simultáneo máx $1,500. KYC en máx 30 días. Solo manual.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ NOTICIAS ══ -->
+<div id="panel-noticias" class="panel">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Reglas de noticias por firma — challenge vs. cuenta fondeada. Las restricciones aplican <strong style="color:#f1f5f9">solo al fondear</strong>, excepto The5ers (soft breach desde el challenge).</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-bottom:28px">
+
+    <div class="news-card">
+      <div class="news-firm" style="color:var(--ftmo)">FTMO</div>
+      <span class="news-window" style="background:rgba(0,212,170,0.1);color:var(--ftmo)">CHALLENGE: LIBRE ✅</span>
+      <span class="news-window" style="background:rgba(239,68,68,0.1);color:var(--red);margin-left:4px">FONDEADA: ±2 MIN 🚫</span>
+      <div class="news-ref" style="color:var(--muted)">📅 Referencia: <strong style="color:#f1f5f9">ftmo.com/es/calendar/</strong> — marcados como "Restricted event"</div>
+      <div style="font-size:10px;color:var(--muted);margin-bottom:6px;font-weight:700">NOTICIAS RESTRINGIDAS EN FONDEADA:</div>
+      <div class="news-item"><strong style="color:#94a3b8">USD</strong> — Fed Rate, NFP, Unemployment+Wages, GDP q/q, FOMC Minutes, CPI y/y → afecta TODO Forex USD, XAU, índices US, DXY</div>
+      <div class="news-item"><strong style="color:#94a3b8">EUR</strong> — Main Refinancing Rate</div>
+      <div class="news-item"><strong style="color:#94a3b8">GBP</strong> — Bank Rate + MPC Votes · CPI y/y</div>
+      <div class="news-item"><strong style="color:#94a3b8">CAD</strong> — BOC Rate · CPI m/m · Employment</div>
+      <div class="news-item"><strong style="color:#94a3b8">AUD</strong> — RBA Rate · Employment · CPI q/q · GDP q/q</div>
+      <div class="news-item"><strong style="color:#94a3b8">NZD</strong> — RBNZ Rate · Employment · CPI q/q · GDP q/q</div>
+      <div class="news-item"><strong style="color:#94a3b8">CHF</strong> — SNB Policy Rate</div>
+      <div class="news-item"><strong style="color:#94a3b8">Petróleo</strong> — Crude Oil Inventories</div>
+      <div style="margin-top:10px;font-size:11px;color:var(--green);background:rgba(34,211,238,0.06);border-radius:8px;padding:8px">✅ Durante NFP puedes operar EURGBP o AUDNZD — pero NO tocar USDJPY, GBPUSD, XAU ni índices US</div>
+    </div>
+
+    <div class="news-card">
+      <div class="news-firm" style="color:var(--the5)">The5ers</div>
+      <span class="news-window" style="background:rgba(245,158,11,0.1);color:var(--gold)">CHALLENGE: SOFT BREACH ±2 MIN ⚠️</span>
+      <span class="news-window" style="background:rgba(239,68,68,0.1);color:var(--red);margin-left:4px">FONDEADA: ±2 MIN 🚫</span>
+      <div class="news-ref" style="color:var(--muted)">📅 Referencia: <strong style="color:#f1f5f9">Forex Factory</strong> — noticias en rojo de alta importancia</div>
+      <div style="font-size:11px;color:#94a3b8;margin-bottom:8px;line-height:1.6">El soft breach NO termina la cuenta. Consecuencia: el profit de ese trade se deduce del resultado. Es una penalización económica, no una descalificación.</div>
+      <div style="background:rgba(245,158,11,0.06);border-radius:8px;padding:10px;font-size:11px;color:#94a3b8;line-height:1.6">
+        <div style="color:var(--gold);font-weight:700;font-size:10px;margin-bottom:6px">DIFERENCIA CLAVE</div>
+        "Hold over news" (tener trade abierto que atraviesa la noticia) ✅ PERMITIDO<br>
+        "Trade during news" (abrir nueva orden en ±2 min) ⚠️ SOFT BREACH
+      </div>
+    </div>
+
+    <div class="news-card">
+      <div class="news-firm" style="color:var(--wsf)">Wall Street Funded</div>
+      <span class="news-window" style="background:rgba(0,212,170,0.1);color:var(--ftmo)">CHALLENGE: LIBRE ✅</span>
+      <span class="news-window" style="background:rgba(239,68,68,0.1);color:var(--red);margin-left:4px">FONDEADA: ±4 MIN 🚫</span>
+      <div class="news-ref" style="color:var(--muted)">📅 Referencia: <strong style="color:#f1f5f9">Dashboard WSF</strong> — calendario integrado en "Herramientas de trading"</div>
+      <div style="background:rgba(251,146,60,0.06);border-radius:8px;padding:10px;font-size:11px;color:#94a3b8;line-height:1.6">
+        <div style="color:var(--wsf);font-weight:700;font-size:10px;margin-bottom:6px">VENTANA MÁS AMPLIA DEL PORTFOLIO</div>
+        ±4 minutos = 8 minutos totales por evento. La ventana más restrictiva de las 4 firmas. En fondéada, también se prohíbe eliminar el SL en esa ventana.
+      </div>
+    </div>
+
+    <div class="news-card">
+      <div class="news-firm" style="color:var(--fn)">FundedNext</div>
+      <span class="news-window" style="background:rgba(0,212,170,0.1);color:var(--ftmo)">CHALLENGE: LIBRE ✅</span>
+      <span class="news-window" style="background:rgba(245,158,11,0.1);color:var(--gold);margin-left:4px">FONDEADA: REGLA 40/60 ⚠️</span>
+      <div class="news-ref" style="color:var(--muted)">📅 Referencia: <strong style="color:#f1f5f9">Calendario interno FundedNext</strong> — clasificación propia de eventos high impact</div>
+      <div style="background:rgba(56,189,248,0.06);border-radius:8px;padding:10px;font-size:11px;color:#94a3b8;line-height:1.6;margin-bottom:8px">
+        <div style="color:var(--fn);font-weight:700;font-size:10px;margin-bottom:6px">REGLA 40/60 — VENTANA ±5 MIN</div>
+        Si más del 60% del profit de un ciclo viene de operaciones en ventana de noticias → payout ajustado proporcionalmente. El ajuste se calcula al final del ciclo (no se ve en tiempo real). Llevar registro propio de trades en ventanas de noticias.
+      </div>
+      <div style="font-size:11px;color:var(--gold)">⚠️ Dos noticias con &lt;10 min de diferencia = ventanas superpuestas = ventana continua más larga</div>
+    </div>
+  </div>
+
+  <div style="background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:14px;padding:18px">
+    <div style="font-size:12px;font-weight:700;color:#94a3b8;margin-bottom:12px;letter-spacing:0.5px">RESUMEN OPERATIVO — NOTICIAS DURANTE EL CHALLENGE</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:12px">
+      <div style="color:#94a3b8"><span style="color:var(--ftmo);font-weight:700">FTMO:</span> Operar libremente. Aprovechar volatilidad de NFP, CPI sin restricción.</div>
+      <div style="color:#94a3b8"><span style="color:var(--the5);font-weight:700">The5ers:</span> Evitar abrir nuevas órdenes en ±2 min de noticias Forex Factory rojas. Mantener trades abiertos sí está permitido.</div>
+      <div style="color:#94a3b8"><span style="color:var(--wsf);font-weight:700">WSF:</span> Operar libremente. Noticias solo restringidas en la cuenta fondeada (±4 min).</div>
+      <div style="color:#94a3b8"><span style="color:var(--fn);font-weight:700">FundedNext:</span> Operar libremente. En fondeada llevar registro propio de trades en ventanas de noticias para controlar la regla 40/60.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCALING ══ -->
+<div id="panel-scaling" class="panel">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Plan de escalabilidad confirmado por documentos oficiales. Techo total del portfolio: <strong style="color:#f1f5f9">$12,000,000 USD</strong>.</p>
+  <div class="scaling-grid">
+
+    <div class="scaling-card" style="background:rgba(0,212,170,0.04);border:1px solid rgba(0,212,170,0.18)">
+      <div class="sc-name" style="color:var(--ftmo)">FTMO — Scaling Plan</div>
+      <div class="sc-row"><span class="sc-label">Condición</span><span class="sc-val">4 meses + 10% ganancia + 2 rewards</span></div>
+      <div class="sc-row"><span class="sc-label">Incremento por etapa</span><span class="sc-val" style="color:var(--ftmo)">+25% del capital inicial</span></div>
+      <div class="sc-row"><span class="sc-label">Profit split tras scale</span><span class="sc-val" style="color:var(--ftmo)">80% → 90%</span></div>
+      <div class="sc-row"><span class="sc-label">Frecuencia</span><span class="sc-val">Cada 4 meses cumpliendo condiciones</span></div>
+      <div class="sc-row"><span class="sc-label">Fusión de cuentas</span><span class="sc-val">Sí — máx $400K combinado</span></div>
+      <div class="sc-max-label">TECHO MÁXIMO</div>
+      <div class="sc-max" style="color:var(--ftmo)">$2,000,000</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">Inicio: $200K · Incrementos de $50K c/4 meses · Premium Programme: Prime → Supreme</div>
+    </div>
+
+    <div class="scaling-card" style="background:rgba(167,139,250,0.04);border:1px solid rgba(167,139,250,0.18)">
+      <div class="sc-name" style="color:var(--the5)">The5ers — Scaling Programme</div>
+      <div class="sc-row"><span class="sc-label">Condición</span><span class="sc-val">Milestone de ganancia por etapa</span></div>
+      <div class="sc-row"><span class="sc-label">Copy entre cuentas propias</span><span class="sc-val" style="color:var(--the5)">Permitido ✅</span></div>
+      <div class="sc-row"><span class="sc-label">Cuentas simultáneas máx.</span><span class="sc-val" style="color:var(--the5)">11 cuentas (New High Stakes)</span></div>
+      <div class="sc-row"><span class="sc-label">Profit split escalable</span><span class="sc-val" style="color:var(--the5)">80% → 100%</span></div>
+      <div class="sc-row"><span class="sc-label">Pago mínimo retiro</span><span class="sc-val">$1,500 Rise / cripto libre</span></div>
+      <div class="sc-max-label">TECHO MÁXIMO</div>
+      <div class="sc-max" style="color:var(--the5)">$4,000,000</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">Mayor techo individual del portfolio. Copy propio entre cuentas = ventaja operativa sin duplicar análisis.</div>
+    </div>
+
+    <div class="scaling-card" style="background:rgba(251,146,60,0.04);border:1px solid rgba(251,146,60,0.18)">
+      <div class="sc-name" style="color:var(--wsf)">WSF — Scaling Plan</div>
+      <div class="sc-row"><span class="sc-label">Condición</span><span class="sc-val">15% ganancia en 3 meses + 3 retiros</span></div>
+      <div class="sc-row"><span class="sc-label">Incremento por etapa</span><span class="sc-val" style="color:var(--wsf)">+25% del capital</span></div>
+      <div class="sc-row"><span class="sc-label">Profit split tras scale</span><span class="sc-val" style="color:var(--wsf)">80% → 95%</span></div>
+      <div class="sc-row"><span class="sc-label">Fusión de cuentas</span><span class="sc-val">Sí — máx $400K combinado</span></div>
+      <div class="sc-row"><span class="sc-label">Mínimo retiro</span><span class="sc-val">$100 USD</span></div>
+      <div class="sc-max-label">TECHO MÁXIMO</div>
+      <div class="sc-max" style="color:var(--wsf)">$2,000,000</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">Activación funded solo miérc/dom. Pagos: Rise (≥$500) o crypto. Comisión cTrader: $4/lote.</div>
+    </div>
+
+    <div class="scaling-card" style="background:rgba(56,189,248,0.04);border:1px solid rgba(56,189,248,0.18)">
+      <div class="sc-name" style="color:var(--fn)">FundedNext — Scale-Up Pro</div>
+      <div class="sc-row"><span class="sc-label">Condición</span><span class="sc-val">4 ciclos ≥4% ganancia en 2 meses</span></div>
+      <div class="sc-row"><span class="sc-label">Profit split tras scale</span><span class="sc-val" style="color:var(--fn)">80% → 90%</span></div>
+      <div class="sc-row"><span class="sc-label">Mínimo retiro</span><span class="sc-val">$20 USD (máx $2,000/solicitud)</span></div>
+      <div class="sc-row"><span class="sc-label">KYC plazo</span><span class="sc-val" style="color:var(--red)">Máx 30 días desde F2 🚫</span></div>
+      <div class="sc-row"><span class="sc-label">Passing Reward</span><span class="sc-val">15% sobre ganancias del challenge</span></div>
+      <div class="sc-max-label">TECHO MÁXIMO</div>
+      <div class="sc-max" style="color:var(--fn)">$4,000,000</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px">cTrader no disponible en $100K/$200K — planificar cambio de plataforma al escalar. KYC: cédula + posible comprobante domicilio. Revisión 72h.</div>
+    </div>
+  </div>
+
+  <div style="background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.2);border-radius:14px;padding:18px">
+    <div style="font-size:12px;font-weight:700;color:var(--gold);margin-bottom:12px">📈 HOJA DE RUTA HACIA $1,000,000 — SOLO CON ESTAS 4 FIRMAS</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;font-size:12px;color:#94a3b8">
+      <div><strong style="color:var(--ftmo)">FTMO:</strong> $200K fondeado → scale a $250K → $300K... hasta $2M. Split sube a 90%.</div>
+      <div><strong style="color:var(--the5)">The5ers:</strong> $100K fondeado → copy entre cuentas propias → hasta $4M. Split hasta 100%.</div>
+      <div><strong style="color:var(--wsf)">WSF:</strong> $100K fondeado → +25% cada 3 meses con 3 retiros → hasta $2M. Split hasta 95%.</div>
+      <div><strong style="color:var(--fn)">FundedNext:</strong> $50K fondeado → 4 ciclos ≥4% → Scale-Up Pro → hasta $4M. Split hasta 90%.</div>
+    </div>
+    <div style="margin-top:14px;font-size:11px;color:var(--muted)">⚠️ FundedNext: cTrader no disponible en $100K/$200K — prever cambio de plataforma al escalar más allá del tamaño actual.</div>
+  </div>
+</div>
+
+<!-- ══ SESIONES ══ -->
+<div id="panel-sesiones" class="panel">
+  <div class="sessions-grid">
+    <div class="session-card" style="border:1px solid rgba(167,139,250,0.2)">
+      <div class="session-name" style="color:var(--the5)">Pre-Asia</div>
+      <div class="session-time">21:00 – 22:00</div>
+      <div class="session-gmt">GMT-5 · Colombia</div>
+      <div class="ins-list">
+        <span class="ins-chip" style="background:rgba(167,139,250,0.12);color:var(--the5)">JPY</span>
+        <span class="ins-chip" style="background:rgba(167,139,250,0.12);color:var(--the5)">AUD</span>
+        <span class="ins-chip" style="background:rgba(167,139,250,0.12);color:var(--the5)">NZD</span>
+        <span class="ins-chip" style="background:rgba(167,139,250,0.12);color:var(--the5)">BTC</span>
+        <span class="ins-chip" style="background:rgba(167,139,250,0.12);color:var(--the5)">DASH</span>
+        <span class="ins-chip cond">US30 ●</span><span class="ins-chip cond">US100 ●</span><span class="ins-chip cond">US500 ●</span>
+      </div>
+      <div class="session-note">Análisis y bias del día siguiente. Índices US: solo scalping rápido condicional — sizing reducido, spreads amplios, sin noticias Asia pendientes. Rollover The5ers: 18:00 Colombia (GMT+3 verano).</div>
+    </div>
+    <div class="session-card" style="border:1px solid rgba(0,212,170,0.25)">
+      <div class="session-name" style="color:var(--ftmo)">Apertura Londres — SESIÓN PRINCIPAL</div>
+      <div class="session-time">05:30 – 07:00</div>
+      <div class="session-gmt">GMT-5 · Colombia</div>
+      <div class="ins-list">
+        <span class="ins-chip" style="background:rgba(0,212,170,0.12);color:var(--ftmo)">EUR</span>
+        <span class="ins-chip" style="background:rgba(0,212,170,0.12);color:var(--ftmo)">GBP</span>
+        <span class="ins-chip" style="background:rgba(0,212,170,0.12);color:var(--ftmo)">CAD</span>
+        <span class="ins-chip" style="background:rgba(0,212,170,0.12);color:var(--ftmo)">DAX</span>
+        <span class="ins-chip" style="background:rgba(0,212,170,0.12);color:var(--ftmo)">CAC</span>
+        <span class="ins-chip" style="background:rgba(0,212,170,0.12);color:var(--ftmo)">FTSE</span>
+        <span class="ins-chip" style="background:rgba(0,212,170,0.12);color:var(--ftmo)">AUX</span>
+        <span class="ins-chip" style="background:rgba(0,212,170,0.12);color:var(--ftmo)">AGX</span>
+        <span class="ins-chip" style="background:rgba(0,212,170,0.12);color:var(--ftmo)">WTI</span>
+      </div>
+      <div class="session-note">Sesión principal. Scalping activo e intraday. Verificar noticias EU antes de entrar — especialmente The5ers (Forex Factory). WTI: recordar leverage 1:5 en The5ers. FundedNext: trades deben durar &gt;30 segundos.</div>
+    </div>
+    <div class="session-card" style="border:1px solid rgba(251,146,60,0.2)">
+      <div class="session-name" style="color:var(--wsf)">Overlap Londres / NY</div>
+      <div class="session-time">10:30 – 11:00</div>
+      <div class="session-gmt">GMT-5 · Colombia</div>
+      <div class="ins-list">
+        <span class="ins-chip cond">US30 ●</span><span class="ins-chip cond">US100 ●</span><span class="ins-chip cond">US500 ●</span>
+      </div>
+      <div class="session-note">Gestión de posiciones abiertas. Ajustar SL a breakeven o trailing. No abrir nuevas posiciones salvo setup muy claro en índices US. WSF: confirmar que SL esté colocado en todas las posiciones abiertas.</div>
+    </div>
+  </div>
+  <div class="instruments-wrap">
+    <div class="instruments-title">INSTRUMENTOS POR CATEGORÍA</div>
+    <div class="instruments-grid">
+      <div><div class="ins-cat-label" style="color:var(--ftmo)">FOREX</div><div class="ins-cat-item">EURUSD</div><div class="ins-cat-item">GBPUSD</div><div class="ins-cat-item">USDJPY</div><div class="ins-cat-item">USDCAD</div><div class="ins-cat-item">AUDUSD</div><div class="ins-cat-item">NZDUSD</div></div>
+      <div><div class="ins-cat-label" style="color:var(--gold)">MATERIAS PRIMAS</div><div class="ins-cat-item">AUX — Oro</div><div class="ins-cat-item">AGX — Plata</div><div class="ins-cat-item">WTI — Petróleo ⚠️1:5 The5ers</div></div>
+      <div><div class="ins-cat-label" style="color:var(--the5)">ÍNDICES EU</div><div class="ins-cat-item">DAX</div><div class="ins-cat-item">CAC</div><div class="ins-cat-item">FTSE</div></div>
+      <div><div class="ins-cat-label" style="color:var(--wsf)">ÍNDICES US</div><div class="ins-cat-item">US30</div><div class="ins-cat-item">US100</div><div class="ins-cat-item">US500</div></div>
+      <div><div class="ins-cat-label" style="color:var(--fn)">CRIPTO</div><div class="ins-cat-item">BTC</div><div class="ins-cat-item">DASH</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CHECKLIST ══ -->
+<div id="panel-checklist" class="panel">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Completa este checklist antes de abrir la primera posición del día.</p>
+  <div class="checklist">
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Revisé el calendario de noticias — FTMO calendar + Forex Factory (The5ers)</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Definí el bias del día (alcista / bajista / lateral) por instrumento</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Marqué niveles clave en todos los instrumentos activos de la sesión</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Calculé el sizing: FT-SW $1,000 · FT-SC $1,000 · The5%ers $1,000 · WSF $500 · FN $250 por trade</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FT Scalp: P&L neto del día (incluyendo comisiones) — parar si llega a −$4,500</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FT Scalp: el trade de hoy es claramente diferente al de FT Swing — no replicar mismo instrumento + dirección</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Journal del día anterior completado — todas las cuentas</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FTMO: revisé equity actual — sin flotantes grandes sin SL ajustado</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FTMO: el P&L de hoy no puede concentrar ≥50% del profit total acumulado (Best Day Rule)</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">WSF: tengo el nivel de SL definido ANTES de cada entrada — máx 2 min para colocarlo</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">WSF: ningún trade durará menos de 60 segundos — esperar aunque el TP se toque antes</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">WSF: el DD del día reinicia a las 16:00 Bogotá — calcular margen disponible desde esa hora</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FundedNext: mis trades durarán más de 30 segundos — Quick Strike activo</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FundedNext: riesgo simultáneo total no superará $1,500 (6 posiciones máx a $250)</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">The5ers: revisar Forex Factory — en ±2 min de noticia roja NO abrir nuevas órdenes (soft breach deduce profit)</span></div>
+  </div>
+  <div class="stop-box">
+    <div class="stop-title">🚨 PROTOCOLO DE PARADA</div>
+    <div class="stop-item">3 pérdidas consecutivas → pausar el día en TODAS las cuentas</div>
+    <div class="stop-item">P&L llega al -50% del límite diario de cualquier cuenta → cerrar todo en esa cuenta</div>
+    <div class="stop-item">FTMO: equity flotante se acerca al límite → cerrar posiciones, no esperar</div>
+    <div class="stop-item">WSF: posición sin SL pasados 2 min → cerrar manualmente de inmediato</div>
+    <div class="stop-item">FundedNext: riesgo simultáneo supera $1,500 → cerrar la posición más reciente</div>
+    <div class="stop-item">Noticias de alto impacto inesperadas → reducir sizing o cerrar posiciones abiertas</div>
+    <div class="stop-item">FT Scalp: P&L neto (con comisiones) llega a −$4,500 → detener trading en esa cuenta</div>
+    <div class="stop-item">The5ers: no abrir órdenes en ±2 min de noticias Forex Factory rojas — soft breach deduce profit del ciclo</div>
+  </div>
+</div>
+
+<!-- ══ PENDIENTES ══ -->
+<div id="panel-pendientes" class="panel">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Pendientes activos. Marcar al resolver — el contador se actualiza automáticamente.</p>
+
+  <!-- RESUELTAS -->
+  <div style="background:rgba(0,212,170,0.04);border:1px solid rgba(0,212,170,0.15);border-radius:14px;padding:18px;margin-bottom:20px">
+    <div style="font-size:11px;font-weight:700;color:var(--ftmo);letter-spacing:1px;margin-bottom:14px">✅ RESUELTAS</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;font-size:11px;color:#64748b">
+      <div><strong style="color:var(--ftmo)">FTMO:</strong> Límites escalan con el balance tras cada scale-up · Cualquier trade rompe inactividad · Discipline Score informativo</div>
+      <div><strong style="color:var(--the5)">The5ers:</strong> Profit split 80% · cTrader confirmado · WTI 1:5 en F1/F2 · Forex Factory como referencia · Rollover 18:00 Colombia</div>
+      <div><strong style="color:var(--wsf)">WSF:</strong> Scaling confirmado (15%+3 retiros→+25%) · Fusión hasta $400K · Mínimo retiro $100 · Rise + crypto para Colombia</div>
+      <div><strong style="color:var(--fn)">FundedNext:</strong> Target F1 $4,000 (8%) · KYC 72h · Mínimo retiro $20 · Scale-Up Pro 4 ciclos ≥4% · Rise+Wise compatible</div>
+    </div>
+  </div>
+
+  <div class="pending-grid">
+    <div class="pending-card" style="border:1px solid rgba(251,146,60,0.2)">
+      <div class="pending-firm" style="color:var(--wsf)">Wall Street Funded</div>
+      <div class="pending-item"><input type="checkbox" onchange="updatePendingCount()"><span>¿Hay plazo máximo para completar el KYC una vez notificado?</span></div>
+      <div class="pending-item"><input type="checkbox" onchange="updatePendingCount()"><span>¿Qué ocurre si se opera desde distintas IPs? ¿Hay protocolo de notificación previa?</span></div>
+    </div>
+    <div class="pending-card" style="border:1px solid rgba(255,255,255,0.08)">
+      <div class="pending-firm" style="color:var(--muted)">Generales</div>
+      <div class="pending-item"><input type="checkbox" onchange="updatePendingCount()"><span>FundedNext: definir plataforma de reemplazo al escalar a $100K/$200K (cTrader no disponible)</span></div>
+      <div class="pending-item"><input type="checkbox" onchange="updatePendingCount()"><span>Asesor fiscal Colombia — activar solo cuando se decida repatriar utilidades de Binance/Wise</span></div>
+    </div>
+  </div>
+
+  <div style="margin-top:18px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px">
+    <div style="font-size:24px;font-family:var(--mono);font-weight:800;color:var(--gold)" id="pending-count">4</div>
+    <div>
+      <div style="font-size:11px;font-weight:700;color:#94a3b8">PENDIENTES ACTIVOS</div>
+      <div style="font-size:11px;color:var(--muted)">Marca cada uno al resolverlo</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<script>
+  function switchTab(id, btn) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('panel-' + id).classList.add('active');
+    btn.classList.add('active');
+    window.scrollTo(0, window.scrollY); // fuerza repaint en iOS Safari
+  }
+  // Fallback táctil para iPad/iOS Safari donde el onclick inline a veces no dispara
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.tab').forEach(function (btn) {
+      btn.addEventListener('touchend', function (e) {
+        e.preventDefault();
+        btn.click();
+      }, { passive: false });
+    });
+  });
+  function toggleCheck(el) {
+    el.classList.toggle('done');
+    el.querySelector('.check-box').textContent = el.classList.contains('done') ? '✓' : '';
+  }
+  const config = {
+    ftsw: { target: 20000, dailyStop: 5000 },
+    ftsc: { target: 20000, dailyStop: 5000 },
+    the5: { target: 10000, dailyStop: 2500 },
+    wsf:  { target: 10000, dailyStop: 2500 },
+    fn:   { target: 4000,  dailyStop: 1250 },
+  };
+  function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+  function updatePnL(firm, rawVal) {
+    const val = parseFloat(rawVal) || 0;
+    const cfg = config[firm];
+    const colors = { ftsw: 'var(--ftmo)', ftsc: '#00B894', the5: 'var(--the5)', wsf: 'var(--wsf)', fn: 'var(--fn)' };
+    document.getElementById('pnl-' + firm).style.color = val >= 0 ? colors[firm] : 'var(--red)';
+    const f1Pct = clamp((Math.max(0, val) / cfg.target) * 100, 0, 100);
+    document.getElementById(firm + '-f1-bar').style.width = f1Pct + '%';
+    document.getElementById(firm + '-prog-label').textContent = '$' + Math.max(0, val).toLocaleString() + ' / $' + cfg.target.toLocaleString();
+    const dailyUsed = Math.max(0, -val);
+    const dailyPct = clamp((dailyUsed / cfg.dailyStop) * 100, 0, 100);
+    const bar = document.getElementById(firm + '-daily-bar');
+    bar.style.width = dailyPct + '%';
+    bar.style.background = dailyPct > 70 ? 'var(--red)' : dailyPct > 40 ? 'var(--gold)' : 'var(--green)';
+    document.getElementById(firm + '-daily-pct').style.color = dailyPct > 70 ? 'var(--red)' : 'var(--muted)';
+    document.getElementById(firm + '-daily-pct').textContent = dailyPct.toFixed(0) + '%';
+    updateTotal();
+  }
+  function updateTotal() {
+    const total = ['ftsw','ftsc','the5','wsf','fn'].reduce((acc, f) => acc + (parseFloat(document.getElementById('pnl-' + f).value) || 0), 0);
+    const el = document.getElementById('total-pnl');
+    el.textContent = (total >= 0 ? '+' : '') + '$' + total.toLocaleString();
+    el.style.color = total >= 0 ? 'var(--green)' : 'var(--red)';
+  }
+  function updatePendingCount() {
+    const total = document.querySelectorAll('#panel-pendientes .pending-item input[type=checkbox]').length;
+    const checked = document.querySelectorAll('#panel-pendientes .pending-item input[type=checkbox]:checked').length;
+    const el = document.getElementById('pending-count');
+    if (el) { el.textContent = total - checked; el.style.color = (total-checked) === 0 ? 'var(--ftmo)' : 'var(--gold)'; }
+  }
+</script>
+</body>
+</html>
