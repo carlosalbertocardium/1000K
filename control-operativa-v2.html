@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Control Operativa">
 <title>Control Operativa v2</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
@@ -228,7 +231,20 @@
     </div>
     <div class="check-items" id="check-items"></div>
     <button class="btn-reset-check" onclick="resetCheck()">Reiniciar checklist para nueva sesión</button>
-    <button class="btn-reset-check" style="margin-top:6px;color:#EF4444;border-color:rgba(239,68,68,0.25)" onclick="vaciarTodo()">Vaciar todos los datos guardados (operaciones, P&L, historial)</button>
+
+    <div style="margin-top:18px;padding:14px;border-radius:10px;background:rgba(0,212,170,0.05);border:0.5px solid rgba(0,212,170,0.2)">
+      <div style="font-size:11px;font-weight:700;color:#00D4AA;letter-spacing:0.4px;margin-bottom:4px">RESPALDO AUTOMÁTICO</div>
+      <div style="font-size:11px;color:#94A3B8;line-height:1.5;margin-bottom:8px">Se genera solo una vez al día, la primera vez que abres la app después de las 15:55 — sin que tengas que hacer nada.</div>
+      <div id="respaldo-status" style="font-size:11px;font-weight:600;margin-bottom:10px">Verificando…</div>
+      <div style="font-size:10px;color:#64748B;margin-bottom:8px">Botones de rescate — solo si necesitas respaldar en otro momento o restaurar:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn-reset-check" style="margin-top:0;color:#00D4AA;border-color:rgba(0,212,170,0.3)" onclick="exportarRespaldo()">⬇ Exportar ahora</button>
+        <button class="btn-reset-check" style="margin-top:0;color:#00D4AA;border-color:rgba(0,212,170,0.3)" onclick="document.getElementById('input-importar').click()">⬆ Importar respaldo</button>
+      </div>
+      <input type="file" id="input-importar" accept="application/json" style="display:none" onchange="importarRespaldo(event)">
+    </div>
+
+    <button class="btn-reset-check" style="margin-top:10px;color:#EF4444;border-color:rgba(239,68,68,0.25)" onclick="vaciarTodo()">Vaciar todos los datos guardados (operaciones, P&L, historial)</button>
   </div>
 
   <!-- PANEL HISTORIAL -->
@@ -827,6 +843,52 @@ function vaciarTodo() {
   renderHist();
 }
 
+// ── RESPALDO MANUAL (exportar / importar) ────────────────────────────────────
+// Salvaguarda independiente de localStorage: iOS puede purgar el almacenamiento
+// de apps agregadas a pantalla de inicio sin aviso. Exportar guarda un archivo
+// .json descargable; importar lo restaura por completo.
+function exportarRespaldo() {
+  const data = { ops, pnlDia, histAyer, historico, lastReset, checkState, exportadoEn: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const fecha = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `respaldo-control-operativa-${fecha}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importarRespaldo(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(!confirm("¿Reemplazar los datos actuales con este respaldo? Se perderá lo que no esté guardado en el respaldo.")) return;
+      ops        = data.ops        || [];
+      pnlDia     = data.pnlDia     || {FS:0,FC:0,WS:0,FN:0,T5:0};
+      histAyer   = data.histAyer   || {};
+      historico  = data.historico  || [];
+      checkState = data.checkState || {};
+      lastReset  = data.lastReset  || {};
+      FIRM_KEYS.forEach(k => { if(!lastReset[k]) lastReset[k] = getLastRollover(k).getTime(); });
+      guardarEstado();
+      render();
+      renderCheck();
+      renderHist();
+      alert("Respaldo importado correctamente.");
+    } catch(err) {
+      alert("El archivo no es un respaldo válido.");
+    }
+    event.target.value = "";
+  };
+  reader.readAsText(file);
+}
+
 // ── HISTORIAL ─────────────────────────────────────────────────────────────────
 function renderHist() {
   const cont = document.getElementById("hist-list");
@@ -903,11 +965,53 @@ setInterval(()=>{
   document.getElementById("status-hora").textContent = nowStr();
 }, 30000);
 
+// ── AUTO-RESPALDO DIARIO ───────────────────────────────────────────────────────
+// No existe forma de ejecutar código con la app cerrada en iOS, así que el
+// respaldo se dispara solo automáticamente la primera vez que abres el Control
+// después de la hora configurada cada día — sin que tengas que acordarte de nada.
+// El botón manual de la pestaña Pre-trade queda solo como rescate de emergencia.
+const RESPALDO_HORA = "15:55";
+const RESPALDO_KEY = "control_operativa_v2_ultimo_respaldo";
+
+function fechaHoy() { return new Date().toISOString().slice(0,10); }
+
+function chequearAutoRespaldo() {
+  const ahora = hhmmStr();
+  const hoy = fechaHoy();
+  let ultimo = null;
+  try { ultimo = localStorage.getItem(RESPALDO_KEY); } catch(e) {}
+  const hayDatos = ops.length>0 || historico.length>0 || Object.values(pnlDia).some(v=>v!==0);
+  if(ahora >= RESPALDO_HORA && ultimo !== hoy && hayDatos) {
+    exportarRespaldo();
+    try { localStorage.setItem(RESPALDO_KEY, hoy); } catch(e) {}
+    renderRespaldoStatus();
+  }
+}
+
+function renderRespaldoStatus() {
+  const el = document.getElementById("respaldo-status");
+  if(!el) return;
+  let ultimo = null;
+  try { ultimo = localStorage.getItem(RESPALDO_KEY); } catch(e) {}
+  if(ultimo === fechaHoy()) {
+    el.textContent = "✓ Respaldo automático de hoy ya generado (" + RESPALDO_HORA + ")";
+    el.style.color = "#1D9E75";
+  } else {
+    el.textContent = "Pendiente — se generará solo al abrir la app después de las " + RESPALDO_HORA;
+    el.style.color = "#94A3B8";
+  }
+}
+
+// Chequear al abrir y cada 30s mientras la app esté abierta
+chequearAutoRespaldo();
+setInterval(chequearAutoRespaldo, 30000);
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 render();
 renderCheck();
 renderReglas();
 renderHist();
+renderRespaldoStatus();
 </script>
 </body>
 </html>
