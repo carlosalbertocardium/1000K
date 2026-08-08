@@ -180,6 +180,10 @@
           <option value="">Seleccionar…</option>
         </select>
       </div>
+      <div id="form-par-otro-wrap" style="display:none">
+        <label class="form-label">ESCRIBE EL SÍMBOLO</label>
+        <input type="text" class="inp" id="form-par-otro" placeholder="Ej: NAS100c, GOLD, etc." style="text-transform:uppercase">
+      </div>
       <div class="form-grid2">
         <div>
           <label class="form-label">DIRECCIÓN</label>
@@ -360,9 +364,17 @@ const FIRMS = {
 
 const FIRM_KEYS = ["FS","FC","WS","FN","T5"];
 
-const PARES_WSF = ["Germany40","France40","UK100","USNDAQ100","USSPX500","US30","EURUSD","EURCAD","EURGBP","EURAUD","EURJPY","EURNZD","USDJPY","USDCAD","AUDJPY","AUDCAD","AUDNZD","AUDUSD","GBPUSD","GBPJPY","GBPAUD","GBPCAD","GBPNZD","NZDJPY","NZDUSD","NZDCAD","CADJPY","XAGUSD","XAUUSD","WTI","BITCOIN","DASH","ETHEREUM"];
-const PARES_GENERAL = ["EURUSD","GBPUSD","USDJPY","USDCAD","AUDUSD","NZDUSD","EURGBP","EURJPY","GBPJPY","AUDJPY","CADJPY","NZDJPY","XAUUSD","XAGUSD","WTI","DAX","CAC","FTSE","US30","US100","US500","BTCUSD","DASHUSD"];
-const PARES_POR_FIRMA = {FS:PARES_GENERAL,FC:PARES_GENERAL,WS:PARES_WSF,FN:PARES_GENERAL,T5:PARES_GENERAL};
+// Listas verificadas desde CUADRO_INSTRUMENTOS.xlsx — símbolos exactos por plataforma/firma.
+// FTMO cTrader es la misma plataforma para FT Swing (FS) y FT Scalp (FC) — comparten lista.
+const PARES_FTMO = ["EURAUD","XAUUSD","XAGUSD","BTCUSD","DASHUSD","ETHUSD","CADJPY","USDJPY","USDCAD","AUDUSD","GBPUSD","EURCAD","AUDJPY","GBPJPY","EURJPY","EURGBP","GBPCAD","GBPNZD","GBPAUD","AUDCAD","US2000.cash","US30.cash","GER40.cash","FRA40.cash","US500.cash","US100.cash","UK100.cash","USOIL.cash","DXY.cash","NZDUSD","EURNZD","NZDCAD","NZDJPY","AUDNZD","JP225.cash","Otro"];
+// WSF cTrader (cuenta Ultra 2-Step) — nombres de índices propios de esta plataforma (DAX/CAC/FTSE/NSDQ/SP/DOW)
+const PARES_WSF = ["DAX","CAC","FTSE","NSDQ","SP","DOW","EURUSD","EURCAD","EURGBP","EURAUD","USDJPY","USDCAD","AUDJPY","GBPUSD","GBPJPY","EURJPY","CADJPY","AUDCAD","AUDNZD","AUDUSD","NZDJPY","NZDUSD","XAGUSD","XAUUSD","CL","BTCUSD","ETHEREUM","HK50","GBPCAD","GBPAUD","NZDCAD","NIKEY","Otro"];
+// The5%ers
+const PARES_T5 = ["DAX40","CAC40","UK100","NAS100","SP500","US30","EURUSD","EURCAD","EURGBP","EURAUD","USDJPY","USDCAD","AUDJPY","GBPUSD","GBPJPY","EURJPY","CADJPY","AUDCAD","AUDNZD","AUDUSD","NZDJPY","NZDUSD","XAGUSD","XAUUSD","BTCUSD","ETHUSD","GBPAUD","GBPCAD","GBPNZD","EURNZD","NZDCAD","JPN225","Otro"];
+// FundedNext
+const PARES_FN = ["GER40","FRA40","UK100","NDX100","SPX500","US30","EURUSD","EURCAD","EURGBP","EURAUD","USDJPY","USDCAD","AUDJPY","GBPUSD","GBPJPY","EURJPY","CADJPY","AUDCAD","AUDNZD","AUDUSD","NZDJPY","NZDUSD","XAGUSD","XAUUSD","BTCUSD","ETHUSD","GBPAUD","GBPCAD","GBPNZD","EURNZD","HK50","JPN225","US2000","USOUSD","Otro"];
+const PARES_GENERAL = PARES_FTMO; // fallback de seguridad si alguna firma no tiene lista propia
+const PARES_POR_FIRMA = {FS:PARES_FTMO,FC:PARES_FTMO,WS:PARES_WSF,FN:PARES_FN,T5:PARES_T5};
 
 const ROLLOVER_HHMM = {FS:"19:00",FC:"19:00",WS:"16:00",FN:"15:45",T5:"18:00"};
 
@@ -718,6 +730,8 @@ function abrirForm(k) {
   document.getElementById("form-estado").value = "Abierto";
   document.getElementById("form-venc").value = "";
   document.getElementById("form-venc-wrap").style.display = "none";
+  document.getElementById("form-par-otro").value = "";
+  document.getElementById("form-par-otro-wrap").style.display = "none";
 
   const btn = document.getElementById("btn-registrar");
   btn.style.background = firm.color;
@@ -738,17 +752,22 @@ function actualizarAlertasForm() {
   const par    = document.getElementById("form-par").value;
   const dir    = document.getElementById("form-dir").value;
   const estado = document.getElementById("form-estado").value;
-  const alertas = getAlertasForm(formFirmKey, par, dir, estado);
+  const esOtro = par === "Otro";
+  document.getElementById("form-par-otro-wrap").style.display = esOtro ? "block" : "none";
+  const parOtro = document.getElementById("form-par-otro").value.trim();
+  const parEfectivo = esOtro ? parOtro : par;
+  const alertas = getAlertasForm(formFirmKey, parEfectivo, dir, estado);
   const cont = document.getElementById("form-alertas");
   cont.innerHTML = alertas.map(a=>`<div class="form-alerta" style="background:${a.color}12;border:0.5px solid ${a.color}33;color:${a.color}">${a.txt}</div>`).join("");
   document.getElementById("form-venc-wrap").style.display = estado==="Orden"?"block":"none";
   document.getElementById("form-dir").style.color = dir==="BUY"?"#1D9E75":"#EF4444";
   const btn = document.getElementById("btn-registrar");
-  if(par) { btn.style.background=FIRMS[formFirmKey].color; btn.style.color="#0A0F1E"; btn.style.cursor="pointer"; }
-  else    { btn.style.background="rgba(255,255,255,0.08)"; btn.style.color="#475569"; btn.style.cursor="not-allowed"; }
+  if(parEfectivo) { btn.style.background=FIRMS[formFirmKey].color; btn.style.color="#0A0F1E"; btn.style.cursor="pointer"; }
+  else            { btn.style.background="rgba(255,255,255,0.08)"; btn.style.color="#475569"; btn.style.cursor="not-allowed"; }
 }
 
 document.getElementById("form-par").addEventListener("input", actualizarAlertasForm);
+document.getElementById("form-par-otro").addEventListener("input", actualizarAlertasForm);
 document.getElementById("form-dir").addEventListener("change", actualizarAlertasForm);
 document.getElementById("form-estado").addEventListener("change", actualizarAlertasForm);
 
@@ -765,7 +784,9 @@ function calcularVencimientoTs(horaTexto) {
 }
 
 function registrarOp() {
-  const par    = document.getElementById("form-par").value;
+  const parSel = document.getElementById("form-par").value;
+  const parOtro = document.getElementById("form-par-otro").value.trim().toUpperCase();
+  const par = parSel==="Otro" ? parOtro : parSel;
   if(!par||!formFirmKey) return;
   const dir    = document.getElementById("form-dir").value;
   const estado = document.getElementById("form-estado").value;
