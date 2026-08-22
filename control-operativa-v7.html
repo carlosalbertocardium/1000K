@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Control Operativa">
+<title>Control Operativa v2</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#070D1A;color:#E2E8F0;font-family:'DM Sans',sans-serif;min-height:100vh;}
+  input,select,button{font-family:'DM Sans',sans-serif;}
+  select option{background:#0F1A2E;color:#E2E8F0;}
+  button:active{opacity:0.8;transform:scale(0.97);}
+  ::-webkit-scrollbar{width:3px;}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:99px;}
+
+  /* STATUS BAR */
+  #status-bar{background:rgba(0,212,170,0.06);border-bottom:0.5px solid rgba(0,212,170,0.15);padding:10px 14px;position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;}
+  #status-left .label{font-size:11px;font-weight:700;color:#00D4AA;letter-spacing:1px;}
+  #status-left .sub{font-size:10px;color:#475569;}
+  #status-right{text-align:right;}
+  #status-hora{font-size:15px;font-weight:700;color:#F1F5F9;font-family:monospace;}
+  #status-pnl{font-size:11px;font-weight:500;font-family:monospace;}
+
+  /* CONTENIDO */
+  #contenido{padding:12px 12px 80px;}
+
+  /* GRID FIRMAS */
+  #grid-firmas{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+
+  /* TARJETA FIRMA */
+  .firm-card{border-radius:14px;overflow:hidden;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.1);}
+  .firm-header{padding:8px 12px;display:flex;justify-content:space-between;align-items:center;border-bottom:0.5px solid rgba(255,255,255,0.08);}
+  .firm-name{font-size:12px;font-weight:700;font-family:monospace;}
+  .firm-meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+  .badge{font-size:9px;padding:1px 5px;border-radius:99px;}
+  .btn-add{border:none;border-radius:6px;width:22px;height:22px;font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-weight:700;line-height:1;color:#0A0F1E;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+
+  /* BARRA DÍA */
+  .daybar-wrap{padding:9px 12px 5px;}
+  .daybar-row{display:flex;justify-content:space-between;margin-bottom:4px;}
+  .daybar-label{font-size:9px;color:#475569;}
+  .daybar-pct{font-size:9px;font-weight:700;}
+  .daybar-track{background:rgba(255,255,255,0.07);border-radius:99px;height:5px;overflow:hidden;}
+  .daybar-fill{height:100%;border-radius:99px;transition:width 0.4s;}
+
+  /* ROLLOVER */
+  .rollover-row{padding:2px 12px 7px;display:flex;justify-content:space-between;}
+  .rollover-txt{font-size:9px;color:#334155;}
+
+  /* FLOTANTE */
+  .flotante-wrap{padding:0 12px 8px;display:flex;align-items:center;gap:8px;}
+  .flotante-label{font-size:10px;color:#64748B;flex-shrink:0;}
+
+  /* ALERTAS */
+  .alert-box{margin:0 10px 6px;padding:5px 9px;border-radius:7px;font-size:10px;line-height:1.5;}
+
+  /* OPERACIONES */
+  .op-row{border-top:0.5px solid rgba(255,255,255,0.06);}
+  .op-main{padding:7px 10px;display:flex;align-items:center;gap:7px;}
+  .op-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+  .op-par{font-size:12px;font-weight:700;color:#F1F5F9;min-width:68px;font-family:monospace;}
+  .op-dir{font-size:11px;font-weight:700;}
+  .op-badge{font-size:9px;padding:1px 6px;border-radius:99px;}
+  .op-hora{font-size:9px;color:#475569;}
+  .op-actions{display:flex;gap:4px;margin-left:auto;}
+  .btn-sm{border-radius:5px;padding:2px 7px;font-size:9px;cursor:pointer;border:0.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.07);color:#94A3B8;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .op-close-panel{padding:7px 10px 9px;background:rgba(0,0,0,0.25);border-top:0.5px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:8px;}
+  .no-ops{padding:6px 12px 9px;font-size:11px;color:#475569;}
+
+  /* INPUT / SELECT base */
+  .inp{background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 10px;color:#E2E8F0;outline:none;font-size:12px;width:100%;font-family:monospace;}
+  .sel{background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:8px 10px;color:#E2E8F0;outline:none;font-size:12px;width:100%;font-family:monospace;cursor:pointer;}
+  .inp-flot{width:54px;font-size:10px;padding:2px 5px;border-radius:5px;border:0.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);outline:none;text-align:right;font-family:monospace;}
+
+  /* FORM NUEVA OP */
+  #form-nueva{border-radius:14px;overflow:hidden;background:rgba(10,15,30,0.98);margin-bottom:12px;display:none;}
+  .form-header{padding:8px 14px;}
+  .form-title{font-size:12px;font-weight:700;}
+  .form-body{padding:14px;display:flex;flex-direction:column;gap:10px;}
+  .form-label{font-size:10px;color:#64748B;margin-bottom:5px;letter-spacing:0.4px;display:block;}
+  .form-grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;}
+  .form-hint{font-size:9px;color:#475569;margin-top:4px;}
+  .form-alertas{display:flex;flex-direction:column;gap:6px;}
+  .form-alerta{padding:7px 10px;border-radius:8px;font-size:11px;line-height:1.5;}
+  .form-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:2px;}
+  .btn-cancel{padding:9px;font-size:12px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.12);border-radius:8px;color:#94A3B8;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .btn-registrar{padding:9px;font-size:12px;font-weight:700;border:none;border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+
+  /* PANELES */
+  .panel{display:none;}
+  .panel.active{display:block;}
+  #panel-reglas{padding:1rem 0;}
+  #panel-check{padding:1rem 0;}
+  #panel-hist{padding:1rem 0;}
+
+  /* REGLAS */
+  .reg-firm{margin-bottom:8px;border-radius:12px;overflow:hidden;}
+  .reg-firm-btn{width:100%;border:none;padding:10px 14px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .reg-firm-name{font-size:13px;font-weight:700;font-family:monospace;}
+  .reg-body{padding:4px 14px 12px;display:flex;flex-direction:column;gap:6px;}
+  .reg-rule{padding:7px 10px;border-radius:8px;font-size:11px;line-height:1.5;}
+  .reg-info{padding:7px 10px;border-radius:8px;background:rgba(255,255,255,0.04);font-size:11px;color:#64748B;}
+
+  /* CHECKLIST */
+  .check-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .check-progress-track{background:rgba(255,255,255,0.07);border-radius:99px;height:4px;margin-bottom:14px;overflow:hidden;}
+  .check-progress-fill{height:100%;border-radius:99px;transition:width 0.3s;}
+  .check-items{display:flex;flex-direction:column;gap:6px;}
+  .check-item{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:10px;text-align:left;cursor:pointer;border:0.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .check-box{width:18px;height:18px;border-radius:5px;flex-shrink:0;margin-top:1px;border:1.5px solid rgba(255,255,255,0.2);background:transparent;display:flex;align-items:center;justify-content:center;}
+  .check-txt{font-size:12px;line-height:1.5;color:#CBD5E1;}
+  .btn-reset-check{width:100%;margin-top:10px;padding:9px;font-size:12px;color:#475569;background:transparent;border:0.5px solid rgba(255,255,255,0.08);border-radius:8px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+
+  /* HISTORIAL */
+  .hist-item{background:rgba(255,255,255,0.03);border-radius:10px;padding:9px 12px;display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;margin-bottom:6px;}
+  .hist-dot{width:6px;height:6px;border-radius:50%;}
+  .hist-par{font-size:12px;font-weight:700;color:#F1F5F9;font-family:monospace;}
+  .hist-dir{font-size:11px;font-weight:700;}
+  .hist-badge{font-size:9px;padding:1px 5px;border-radius:99px;}
+  .hist-hora{font-size:10px;color:#475569;margin-top:2px;}
+  .hist-result{font-size:13px;font-weight:700;font-family:monospace;text-align:right;}
+  .resumen-dia{margin-top:8px;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 14px;}
+  .resumen-title{font-size:10px;color:#475569;margin-bottom:8px;letter-spacing:0.4px;}
+  .resumen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+  .resumen-firm{text-align:center;}
+  .resumen-firm-name{font-size:9px;margin-bottom:3px;font-weight:700;}
+  .resumen-firm-val{font-size:12px;font-weight:700;font-family:monospace;}
+
+  /* BOTTOM NAV */
+  #bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(7,13,26,0.97);border-top:0.5px solid rgba(255,255,255,0.08);display:flex;backdrop-filter:blur(12px);}
+  .nav-btn{flex:1;background:none;border:none;cursor:pointer;padding:10px 0 14px;display:flex;flex-direction:column;align-items:center;gap:3px;color:#475569;border-top:2px solid transparent;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+  .nav-btn.active{color:#00D4AA;border-top-color:#00D4AA;}
+  .nav-icon{font-size:20px;}
+  .nav-label{font-size:10px;font-weight:400;}
+  .nav-btn.active .nav-label{font-weight:700;}
+
+  /* ANIMACIONES */
+  @keyframes alertFlash{
+    0%,100%{border-color:rgba(239,68,68,0.25);box-shadow:none;}
+    50%{border-color:rgba(239,68,68,0.9);box-shadow:0 0 0 2px rgba(239,68,68,0.3);}
+  }
+  @keyframes alertFlashWarn{
+    0%,100%{border-color:rgba(245,158,11,0.25);box-shadow:none;}
+    50%{border-color:rgba(245,158,11,0.9);box-shadow:0 0 0 2px rgba(245,158,11,0.25);}
+  }
+  .flash-danger{animation:alertFlash 1s ease-in-out infinite;}
+  .flash-warn{animation:alertFlashWarn 1s ease-in-out infinite;}
+</style>
+</head>
+<body>
+
+<!-- Overlay mientras carga config.json -->
+<div id="loading-overlay" style="position:fixed;inset:0;background:#070D1A;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px">
+  <div style="width:28px;height:28px;border:2.5px solid rgba(0,212,170,0.2);border-top-color:#00D4AA;border-radius:50%;animation:spin 0.8s linear infinite"></div>
+  <div style="font-size:12px;color:#64748B">Cargando configuración…</div>
+</div>
+<div id="config-error" style="display:none;position:fixed;inset:0;background:#070D1A;z-index:100;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center">
+  <div style="font-size:28px">⚠</div>
+  <div style="font-size:14px;color:#EF4444;font-weight:700">No se pudo cargar config.json</div>
+  <div style="font-size:12px;color:#94A3B8;line-height:1.6;max-width:320px">Verifica tu conexión a internet, o que el archivo <span style="font-family:monospace">config.json</span> esté subido en el mismo repositorio de GitHub que este HTML. Tus datos guardados (operaciones, P&L, historial) siguen intactos en el dispositivo.</div>
+  <button onclick="location.reload()" style="padding:10px 20px;background:rgba(0,212,170,0.15);border:0.5px solid rgba(0,212,170,0.4);border-radius:8px;color:#00D4AA;font-size:12px;font-weight:700;cursor:pointer">Reintentar</button>
+</div>
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+
+<!-- STATUS BAR -->
+<div id="status-bar">
+  <div id="status-left">
+    <div class="label">CONTROL OPERATIVA</div>
+    <div class="sub" id="status-sub">0 abiertos · 0 órdenes</div>
+  </div>
+  <div id="status-right">
+    <div id="status-hora" style="font-family:monospace">--:--</div>
+    <div id="status-pnl" style="color:#1D9E75;font-family:monospace">+$0 total</div>
+  </div>
+</div>
+
+<!-- CONTENIDO -->
+<div id="contenido">
+
+  <!-- FORM NUEVA OP -->
+  <div id="form-nueva">
+    <div class="form-header" id="form-header">
+      <span class="form-title" id="form-title">Nueva operación</span>
+    </div>
+    <div class="form-body">
+      <div>
+        <label class="form-label">INSTRUMENTO</label>
+        <select class="sel" id="form-par">
+          <option value="">Seleccionar…</option>
+        </select>
+      </div>
+      <div id="form-par-otro-wrap" style="display:none">
+        <label class="form-label">ESCRIBE EL SÍMBOLO</label>
+        <input type="text" class="inp" id="form-par-otro" placeholder="Ej: NAS100c, GOLD, etc." style="text-transform:uppercase">
+      </div>
+      <div class="form-grid2">
+        <div>
+          <label class="form-label">DIRECCIÓN</label>
+          <select class="sel" id="form-dir" style="color:#1D9E75">
+            <option value="BUY">BUY ▲</option>
+            <option value="SELL">SELL ▼</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">ESTADO</label>
+          <select class="sel" id="form-estado">
+            <option value="Abierto">Abierto</option>
+            <option value="Orden">Orden pendiente</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="form-label">ESQUEMA DE ENTRADA</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <button type="button" id="chk-sistema1" onclick="seleccionarEsquema('sistema1')"
+            style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 4px;border-radius:8px;cursor:pointer;background:rgba(34,211,238,0.12);border:1.5px solid #22D3EE;color:#22D3EE;font-size:11px;font-weight:600">
+            <span class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid #22D3EE;background:#22D3EE;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;color:#0A0F1E;font-weight:900">✓</span>
+            Sistema 1
+          </button>
+          <button type="button" id="chk-bollinger" onclick="seleccionarEsquema('bollinger')"
+            style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 4px;border-radius:8px;cursor:pointer;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.15);color:#94A3B8;font-size:11px;font-weight:600">
+            <span class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.3);flex-shrink:0"></span>
+            Bollinger
+          </button>
+          <button type="button" id="chk-ubf" onclick="seleccionarEsquema('no_tocado')"
+            style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 4px;border-radius:8px;cursor:pointer;background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.15);color:#94A3B8;font-size:11px;font-weight:600">
+            <span class="chk-box" style="width:16px;height:16px;border-radius:4px;border:1.5px solid rgba(255,255,255,0.3);flex-shrink:0"></span>
+            UBF
+          </button>
+        </div>
+      </div>
+      <div id="form-venc-wrap" style="display:none">
+        <label class="form-label">VENCIMIENTO (opcional — HH:MM)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="time" class="inp" id="form-venc" style="color:#F59E0B;flex:1">
+          <button type="button" onclick="rellenarCierreNY()" style="flex-shrink:0;padding:8px 10px;font-size:10px;background:rgba(245,158,11,0.12);border:0.5px solid rgba(245,158,11,0.3);border-radius:8px;color:#F59E0B;cursor:pointer;white-space:nowrap">Cierre NY</button>
+        </div>
+        <div class="form-hint">La orden desaparecerá automáticamente a esa hora si no se activó manualmente. "Cierre NY" pone 15:00 (horario de verano EDT) — ajusta a 16:00 si es horario estándar EST.</div>
+      </div>
+      <div class="form-alertas" id="form-alertas"></div>
+      <div class="form-btns">
+        <button class="btn-cancel" onclick="cancelarForm()">Cancelar</button>
+        <button class="btn-registrar" id="btn-registrar" onclick="registrarOp()">Registrar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PANEL OPS -->
+  <div id="panel-ops" class="panel active">
+    <div id="grid-firmas"></div>
+  </div>
+
+  <!-- PANEL REGLAS -->
+  <div id="panel-reglas" class="panel">
+    <p style="font-size:12px;color:#64748B;margin-bottom:14px">Reglas críticas verificadas desde la documentación oficial de cada firma.</p>
+    <div id="reglas-list"></div>
+  </div>
+
+  <!-- PANEL CHECKLIST -->
+  <div id="panel-check" class="panel">
+    <div class="check-header">
+      <span style="font-size:13px;color:#94A3B8">Pre-trade checklist</span>
+      <span id="check-counter" style="font-size:12px;font-weight:500;color:#F59E0B">0/13</span>
+    </div>
+    <div class="check-progress-track">
+      <div class="check-progress-fill" id="check-progress" style="width:0%;background:#F59E0B"></div>
+    </div>
+    <div class="check-items" id="check-items"></div>
+    <button class="btn-reset-check" onclick="resetCheck()">Reiniciar checklist para nueva sesión</button>
+
+    <div style="margin-top:18px;padding:14px;border-radius:10px;background:rgba(0,212,170,0.05);border:0.5px solid rgba(0,212,170,0.2)">
+      <div style="font-size:11px;font-weight:700;color:#00D4AA;letter-spacing:0.4px;margin-bottom:4px">RESPALDO AUTOMÁTICO</div>
+      <div style="font-size:11px;color:#94A3B8;line-height:1.5;margin-bottom:8px">Se genera solo una vez al día, la primera vez que abres la app después de las 15:55 — sin que tengas que hacer nada. El archivo se guarda en la carpeta <strong>Descargas</strong> del dispositivo (app Archivos → En mi iPad/iPhone → Descargas), con nombre <span style="font-family:monospace">respaldo-control-operativa-FECHA.json</span>.</div>
+      <div id="respaldo-status" style="font-size:11px;font-weight:600;margin-bottom:10px">Verificando…</div>
+      <div style="font-size:10px;color:#64748B;margin-bottom:8px">Botones de rescate — solo si necesitas respaldar en otro momento o restaurar. Para importar, el archivo debe estar en Descargas o donde lo hayas movido:</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button class="btn-reset-check" style="margin-top:0;color:#00D4AA;border-color:rgba(0,212,170,0.3)" onclick="exportarRespaldo()">⬇ Exportar ahora</button>
+        <button class="btn-reset-check" style="margin-top:0;color:#00D4AA;border-color:rgba(0,212,170,0.3)" onclick="document.getElementById('input-importar').click()">⬆ Importar respaldo</button>
+      </div>
+      <input type="file" id="input-importar" accept=".json,application/json" style="display:none" onchange="importarRespaldo(event)">
+    </div>
+
+    <button class="btn-reset-check" style="margin-top:10px;color:#EF4444;border-color:rgba(239,68,68,0.25)" onclick="vaciarTodo()">Vaciar todos los datos guardados (operaciones, P&L, historial)</button>
+  </div>
+
+  <!-- PANEL HISTORIAL -->
+  <div id="panel-hist" class="panel">
+    <p style="font-size:12px;color:#64748B;margin-bottom:14px">Trades cerrados hoy. Las órdenes no ejecutadas no aparecen aquí.</p>
+    <div id="hist-list"></div>
+  </div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div id="bottom-nav">
+  <button class="nav-btn active" onclick="switchTab('ops',this)">
+    <span class="nav-icon">⊞</span>
+    <span class="nav-label">Operativas</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab('hist',this)">
+    <span class="nav-icon">⏱</span>
+    <span class="nav-label">Historial</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab('reglas',this)">
+    <span class="nav-icon">🛡</span>
+    <span class="nav-label">Reglas</span>
+  </button>
+  <button class="nav-btn" onclick="switchTab('check',this)">
+    <span class="nav-icon">☑</span>
+    <span class="nav-label">Pre-trade</span>
+  </button>
+</div>
+
+<script>
+// ── DATOS ────────────────────────────────────────────────────────────────────
+// ── DATOS DE FIRMAS ──────────────────────────────────────────────────────────
+// Se cargan desde config.json al abrir la app (ver sección CARGA DE CONFIGURACIÓN
+// más abajo) — así la mesa y el control pueden compartir la misma fuente de datos
+// sin duplicar información entre archivos.
+let FIRMS = {};
+let FIRM_KEYS = [];
+let PARES_POR_FIRMA = {};
+let ROLLOVER_HHMM = {};
+
+// ── PERSISTENCIA (localStorage) ───────────────────────────────────────────────
+// Guarda todo el estado en el propio dispositivo — sobrevive a que Safari
+// descargue la pestaña de memoria, cierre el navegador o reinicies el iPad.
+const STORAGE_KEY = "control_operativa_v2";
+
+function guardarEstado() {
+  try {
+    const data = { ops, pnlDia, histAyer, historico, lastReset, checkState };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    ocultarAvisoGuardado();
+  } catch(e) {
+    mostrarAvisoGuardado();
+  }
+}
+
+function mostrarAvisoGuardado() {
+  let el = document.getElementById("aviso-guardado-fallo");
+  if(el) return;
+  el = document.createElement("div");
+  el.id = "aviso-guardado-fallo";
+  el.style.cssText = "position:fixed;top:52px;left:12px;right:12px;background:rgba(239,68,68,0.15);border:0.5px solid rgba(239,68,68,0.4);color:#EF4444;font-size:11px;padding:8px 12px;border-radius:8px;z-index:20;text-align:center";
+  el.textContent = "⚠ El guardado automático en este dispositivo falló — exporta un respaldo manual ahora para no perder lo registrado.";
+  document.body.appendChild(el);
+}
+
+function ocultarAvisoGuardado() {
+  const el = document.getElementById("aviso-guardado-fallo");
+  if(el) el.remove();
+}
+
+function cargarEstado() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw) return null;
+    return JSON.parse(raw);
+  } catch(e) { return null; }
+}
+
+// ── ESTADO ───────────────────────────────────────────────────────────────────
+const guardado = cargarEstado();
+
+let ops        = guardado?.ops        || [];
+let pnlDia     = guardado?.pnlDia     || {FS:0,FC:0,WS:0,FN:0,T5:0,RP:0};
+let histAyer   = guardado?.histAyer   || {};
+let historico  = guardado?.historico  || [];
+let checkState = guardado?.checkState || {};
+let formFirmKey = null;
+let lastReset = guardado?.lastReset || {};
+FIRM_KEYS.forEach(k => { if(!lastReset[k]) lastReset[k] = getLastRollover(k).getTime(); });
+let reglasFirmOpen = null;
+let cerrarPanelId = null; // id de op en modo cierre
+
+// ── HELPERS TIEMPO ────────────────────────────────────────────────────────────
+function nowStr() {
+  return new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit",hour12:false});
+}
+function hhmmStr() {
+  return new Date().toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit",hour12:false});
+}
+function isZonaMuerta() { return new Date().getHours()===22; }
+
+function getLastRollover(k) {
+  const [h,m] = ROLLOVER_HHMM[k].split(":").map(Number);
+  const now = new Date();
+  const r = new Date(now);
+  r.setHours(h,m,0,0);
+  if(r>now) r.setDate(r.getDate()-1);
+  return r;
+}
+function minutosSinceRollover(k) {
+  return Math.floor((new Date()-getLastRollover(k))/60000);
+}
+function horasHastaRollover(k) {
+  const [h,m] = ROLLOVER_HHMM[k].split(":").map(Number);
+  const now = new Date();
+  const next = new Date(now);
+  next.setHours(h,m,0,0);
+  if(next<=now) next.setDate(next.getDate()+1);
+  const diff = next-now;
+  return `${Math.floor(diff/3600000)}h ${Math.floor((diff%3600000)/60000)}m`;
+}
+
+// ── ALERTAS ───────────────────────────────────────────────────────────────────
+function getAlertasTarjeta(k) {
+  const firm = FIRMS[k];
+  const openOps = ops.filter(o=>o.firmKey===k&&o.estado==="Abierto");
+  const flotanteSum = firm.flotante ? openOps.reduce((a,o)=>a+(parseFloat(o.flotante)||0),0) : 0;
+  const exp = pnlDia[k] + flotanteSum;
+  const pct = Math.min(100, Math.abs(exp)/firm.stopPersonal*100);
+  const alertas = [];
+  if(firm.checks.sl && openOps.length>0)
+    alertas.push({color:"#EF4444",txt:"Verifica que todas las posiciones abiertas tienen SL (obligatorio 2 min)"});
+  if(firm.checks.zonaMuerta && isZonaMuerta())
+    alertas.push({color:"#EF4444",txt:"ZONA MUERTA activa — no abrir posiciones en FundedNext ahora (22:00-23:00)"});
+  if(exp<0 && pct>60)
+    alertas.push({color:firm.termina?"#EF4444":"#F59E0B",txt:firm.termina?"⚠ Acercándose al DD diario — si llega al 100% la cuenta TERMINA":"⚠ Acercándose al stop personal del día"});
+  const mismaIdea = openOps.filter(o=>openOps[0]&&o.dir===openOps[0].dir&&o.par===openOps[0].par);
+  if(firm.checks.idea && mismaIdea.length>1)
+    alertas.push({color:"#F97316",txt:"Misma idea activa — verifica que el riesgo acumulado no supera $2,500"});
+  return alertas;
+}
+
+function getAlertasForm(k, par, dir, estado) {
+  const firm = FIRMS[k];
+  const firmOps = ops.filter(o=>o.firmKey===k);
+  const alertas = [];
+  if(firm.checks.idea && par && dir) {
+    const mismos = firmOps.filter(o=>o.par===par&&o.dir===dir&&o.estado==="Abierto");
+    if(mismos.length>0) {
+      const detalleIdea = k==="RP"
+        ? "Máx $100 acumulado (50% del DD diario $200) — sizing muy pequeño, verificar lote mínimo en MT5."
+        : "Máx $2,500 acumulado · 35 lotes Forex / 7 metales / 70 índices.";
+      alertas.push({color:"#F97316",txt:`Ya tienes ${mismos.length} trade(s) abiertos en ${par} ${dir}. Misma idea de trading. ${detalleIdea}`});
+    }
+  }
+  if(firm.checks.sl && estado==="Abierto")
+    alertas.push({color:"#EF4444",txt:"Tienes 2 minutos para colocar el SL. Si no lo haces, cierra la posición manualmente."});
+  if(firm.checks.duracion && estado==="Abierto")
+    alertas.push({color:"#F59E0B",txt:"Duración mínima 60 segundos. Si el TP se toca antes, mueve el SL a BE y espera los 60s."});
+  if(firm.checks.news && estado==="Abierto")
+    alertas.push({color:"#F59E0B",txt:"Verifica en Forex Factory que no hay noticias de alto impacto en los próximos 2 minutos."});
+  if(firm.checks.bestDay && estado==="Abierto")
+    alertas.push({color:"#F59E0B",txt:"Best Day Rule activa: evita concentrar demasiado profit en un solo día (máx 50% del total del ciclo)."});
+  if(firm.checks.zonaMuerta && isZonaMuerta())
+    alertas.push({color:"#EF4444",txt:"ZONA MUERTA activa (22:00-23:00). No abrir posiciones en FundedNext ahora."});
+  if(firm.checks.quickStrike && estado==="Abierto")
+    alertas.push({color:"#F59E0B",txt:"Quick Strike: no cierres en menos de 30 segundos si el profit supera el 20% del ciclo."});
+  if(k==="FN" && estado==="Abierto")
+    alertas.push({color:"#F59E0B",txt:"Riesgo simultáneo máx $1,500 (3% del saldo). Si el total abierto supera ese monto, SL obligatorio en menos de 3 minutos."});
+  if(k==="FN" && estado==="Abierto")
+    alertas.push({color:"#22D3EE",txt:"Quick Strike: si cierras en <30s, verifica que ese profit no supere el 30% del total del ciclo."});
+  if(firm.checks.newsSoftBreach && estado==="Abierto")
+    alertas.push({color:"#F59E0B",txt:"The5%ers: si abres dentro de ±2 min de una noticia roja (Forex Factory) es soft breach — el profit de ese trade se deduce, pero la cuenta NO termina."});
+  if(k==="T5" && estado==="Abierto")
+    alertas.push({color:"#818CF8",txt:"DD diario firma: $5,000 (5%) · DD overall: $10,000 (10%) — absoluto desde $100K, sin trailing. Stop personal: $2,500."});
+  return alertas;
+}
+
+// ── RENDER PRINCIPAL ──────────────────────────────────────────────────────────
+function render() {
+  renderStatusBar();
+  renderGrid();
+}
+
+function renderStatusBar() {
+  const abiertos = ops.filter(o=>o.estado==="Abierto").length;
+  const ordenes  = ops.filter(o=>o.estado==="Orden").length;
+  document.getElementById("status-sub").textContent = `${abiertos} abiertos · ${ordenes} órdenes`;
+  document.getElementById("status-hora").textContent = nowStr();
+  const total = Object.values(pnlDia).reduce((a,b)=>a+b,0);
+  const pnlEl = document.getElementById("status-pnl");
+  pnlEl.textContent = (total>=0?"+":"")+"$"+total.toLocaleString("es-CO")+" total";
+  pnlEl.style.color = total>=0?"#1D9E75":"#EF4444";
+}
+
+function renderGrid() {
+  const grid = document.getElementById("grid-firmas");
+  grid.innerHTML = "";
+  FIRM_KEYS.forEach(k => grid.appendChild(buildCard(k)));
+}
+
+function buildCard(k) {
+  const firm = FIRMS[k];
+  const firmOps = ops.filter(o=>o.firmKey===k);
+  const openOps = firmOps.filter(o=>o.estado==="Abierto");
+  const ordOps  = firmOps.filter(o=>o.estado==="Orden");
+  const flotanteSum = firm.flotante ? openOps.reduce((a,o)=>a+(parseFloat(o.flotante)||0),0) : 0;
+  const exp = pnlDia[k] + flotanteSum;
+  const pct = Math.min(100, Math.abs(exp)/firm.stopPersonal*100);
+  const enPeligro = exp<0 && pct>80;
+  const flashClass = (exp<0&&pct>80)?"flash-danger":(exp<0&&pct>50)?"flash-warn":"";
+
+  const card = document.createElement("div");
+  card.className = "firm-card "+flashClass;
+  card.style.border = `0.5px solid ${enPeligro?"#EF444466":firm.color+"44"}`;
+  if(enPeligro) card.style.background = "rgba(239,68,68,0.05)";
+
+  // Header
+  const pos = exp>=0;
+  const barColor = pos?"#1D9E75":pct>80?"#DC2626":pct>50?"#F59E0B":"#EF4444";
+
+  let metaHTML = `<span class="firm-name" style="color:${firm.color}">${firm.name}</span>`;
+  if(firm.termina) metaHTML += `<span style="font-size:10px;color:#EF4444">☠</span>`;
+  const ayerVal = histAyer[k];
+  if(ayerVal!==undefined&&ayerVal!==0) metaHTML += `<span style="font-size:9px;color:#334155">ayer:${ayerVal>=0?"+":""}$${Math.abs(ayerVal).toLocaleString("es-CO")}</span>`;
+  if(openOps.length>0) metaHTML += `<span class="badge" style="background:${firm.color}20;color:${firm.color}">${openOps.length}ab</span>`;
+  if(ordOps.length>0)  metaHTML += `<span class="badge" style="background:rgba(245,158,11,0.15);color:#F59E0B">${ordOps.length}ord</span>`;
+  metaHTML += `<span style="font-size:9px;color:#475569">⏱${firm.horaCorte}</span>`;
+
+  card.innerHTML = `
+    <div class="firm-header" style="background:${firm.color}12;border-bottom:0.5px solid ${firm.color}22">
+      <div class="firm-meta">${metaHTML}</div>
+      <button class="btn-add" style="background:${firm.color}" onclick="abrirForm('${k}')">+</button>
+    </div>
+    <div class="daybar-wrap">
+      <div class="daybar-row">
+        <span class="daybar-label">${pos?"Ganancia":"Exposición"} del día</span>
+        <span class="daybar-pct" style="color:${barColor}">${pct.toFixed(0)}% del stop${!pos&&pct>80?" ⚠":""}</span>
+      </div>
+      <div class="daybar-track">
+        <div class="daybar-fill" style="width:${pct}%;background:${barColor}"></div>
+      </div>
+    </div>
+    <div class="rollover-row">
+      <span class="rollover-txt">⏱ día activo ${minutosSinceRollover(k)}min · corte ${firm.horaCorte}</span>
+      <span class="rollover-txt">reset en ${horasHastaRollover(k)}</span>
+    </div>
+    ${firm.flotante && openOps.length>0 ? `
+    <div class="flotante-wrap">
+      <span class="flotante-label">Flotante $</span>
+      <input type="number" class="inp" placeholder="0" value="${flotanteSum||""}"
+        style="color:${flotanteSum>=0?"#1D9E75":"#EF4444"};text-align:right;padding:4px 8px"
+        oninput="setFlotanteTotal('${k}',this.value)">
+    </div>` : ""}
+    ${getAlertasTarjeta(k).map(a=>`<div class="alert-box" style="background:${a.color}14;border:0.5px solid ${a.color}33;color:${a.color}">${a.txt}</div>`).join("")}
+    <div id="ops-${k}">
+      ${firmOps.length>0 ? firmOps.map(op=>buildOpRowHTML(op,firm)).join("") : '<div class="no-ops">Sin operaciones activas</div>'}
+    </div>
+  `;
+  return card;
+}
+
+// Mapeo central de esquema → etiqueta corta y color. Un solo lugar para
+// mantener consistencia en badges de tarjeta, historial y comparativa.
+const ESQUEMA_INFO = {
+  sistema1:  { label:"Sistema 1", color:"#22D3EE", bg:"rgba(34,211,238,0.15)" },
+  bollinger: { label:"Bollinger", color:"#FBBF24", bg:"rgba(251,191,36,0.15)" },
+  no_tocado: { label:"UBF",       color:"#A78BFA", bg:"rgba(167,139,250,0.15)" },
+};
+function badgeEsquema(esquema) {
+  if(!esquema) return "";
+  const e = ESQUEMA_INFO[esquema];
+  if(!e) return "";
+  return `<span class="op-badge" style="background:${e.bg};color:${e.color}">${e.label}</span>`;
+}
+
+function buildOpRowHTML(op, firm) {
+  const isAbierto   = op.estado==="Abierto";
+  const isPendiente = op.estado==="Orden";
+  const dotColor    = isAbierto?"#1D9E75":isPendiente?"#F59E0B":"#64748B";
+  const badgeBg     = isAbierto?"rgba(29,158,117,0.15)":isPendiente?"rgba(245,158,11,0.15)":"rgba(100,116,139,0.15)";
+  const badgeColor  = isAbierto?"#1D9E75":isPendiente?"#F59E0B":"#64748B";
+  const dirColor    = op.dir==="BUY"?"#1D9E75":"#EF4444";
+  const flotVal     = parseFloat(op.flotante)||0;
+  const showCierre  = cerrarPanelId===op.id;
+
+  let flotHTML = "";
+  if(firm.flotante && isAbierto) {
+    flotHTML = `<input type="number" class="inp-flot"
+      style="border-color:${flotVal<0?"#EF444455":"rgba(255,255,255,0.15)"};color:${flotVal>=0?"#1D9E75":"#EF4444"}"
+      value="${op.flotante||""}" placeholder="flot."
+      oninput="setFlotanteOp('${op.id}','${op.firmKey}',this.value)">`;
+  }
+
+  let closePanelHTML = "";
+  if(showCierre) {
+    if(isAbierto) {
+      closePanelHTML = `
+        <div class="op-close-panel" id="close-panel-${op.id}">
+          <span style="font-size:10px;color:#64748B;flex-shrink:0">Resultado $</span>
+          <input type="number" class="inp" id="resultado-${op.id}" placeholder="320 o -150"
+            style="color:#1D9E75;flex:1" oninput="colorResultado('${op.id}')">
+          <button style="background:${firm.color};border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;color:#0A0F1E;cursor:pointer;flex-shrink:0"
+            onclick="confirmarCierre('${op.id}','${op.firmKey}',${isAbierto})">Confirmar</button>
+        </div>`;
+    } else {
+      closePanelHTML = `
+        <div class="op-close-panel">
+          <span style="font-size:11px;color:#F59E0B;flex:1">Orden no ejecutada — se eliminará sin afectar el P&L</span>
+          <button style="background:${firm.color};border:none;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:700;color:#0A0F1E;cursor:pointer"
+            onclick="confirmarCierre('${op.id}','${op.firmKey}',false)">Confirmar</button>
+        </div>`;
+    }
+  }
+
+  return `
+    <div class="op-row">
+      <div class="op-main">
+        <div class="op-dot" style="background:${dotColor}"></div>
+        <span class="op-par">${op.par}</span>
+        <span class="op-dir" style="color:${dirColor}">${op.dir}</span>
+        <span class="op-badge" style="background:${badgeBg};color:${badgeColor}">${op.estado}</span>
+        ${badgeEsquema(op.esquema)}
+        ${op.vencimiento&&isPendiente?`<span style="font-size:9px;color:#64748B">⏱${op.vencimiento}</span>`:""}
+        ${flotHTML}
+        <span class="op-hora">${op.hora}</span>
+        <div class="op-actions">
+          ${isPendiente?`<button class="btn-sm" style="background:rgba(29,158,117,0.15);border-color:rgba(29,158,117,0.3);color:#1D9E75" onclick="activarOp('${op.id}')">Activar</button>`:""}
+          <button class="btn-sm" style="${showCierre?"background:rgba(239,68,68,0.15);color:#EF4444":""}" onclick="toggleCierre('${op.id}')">${showCierre?"Cancelar":"Cerrar"}</button>
+        </div>
+      </div>
+      ${closePanelHTML}
+    </div>`;
+}
+
+// ── ACCIONES OPS ─────────────────────────────────────────────────────────────
+function toggleCierre(id) {
+  cerrarPanelId = cerrarPanelId===id ? null : id;
+  render();
+}
+
+function colorResultado(id) {
+  const inp = document.getElementById("resultado-"+id);
+  if(inp) inp.style.color = parseFloat(inp.value)>=0?"#1D9E75":"#EF4444";
+}
+
+function confirmarCierre(id, firmKey, isAbierto) {
+  const op = ops.find(o=>o.id===id);
+  if(isAbierto) {
+    const inp = document.getElementById("resultado-"+id);
+    const val = parseFloat(inp?inp.value:0)||0;
+    pnlDia[firmKey] = (pnlDia[firmKey]||0)+val;
+    if(op) historico.unshift({...op, resultado:val, horaClose:hhmmStr(), estadoFinal:"Cerrado", siguioFavor:null});
+  } else if(op) {
+    // Orden pendiente cancelada manualmente — se registra igual, sin resultado, para poder
+    // marcar después si el precio hubiera funcionado si se llega a activar.
+    historico.unshift({...op, resultado:null, horaClose:hhmmStr(), estadoFinal:"Cancelada", siguioFavor:null});
+  }
+  ops = ops.filter(o=>o.id!==id);
+  cerrarPanelId = null;
+  guardarEstado();
+  render();
+  renderHist();
+}
+
+function activarOp(id) {
+  const op = ops.find(o=>o.id===id);
+  if(op) { op.estado="Abierto"; op.vencimiento=null; op.vencimientoTs=null; }
+  guardarEstado();
+  render();
+}
+
+function setFlotanteOp(id, firmKey, val) {
+  const op = ops.find(o=>o.id===id);
+  if(op) op.flotante = parseFloat(val)||0;
+  guardarEstado();
+  renderStatusBar();
+}
+
+function setFlotanteTotal(k, val) {
+  const total = parseFloat(val)||0;
+  const openOps = ops.filter(o=>o.firmKey===k&&o.estado==="Abierto");
+  const perOp = openOps.length>0 ? total/openOps.length : 0;
+  openOps.forEach(o=>o.flotante=perOp);
+  guardarEstado();
+  renderStatusBar();
+}
+
+// ── FORM NUEVA OP ─────────────────────────────────────────────────────────────
+function abrirForm(k) {
+  formFirmKey = k;
+  const firm = FIRMS[k];
+  const form = document.getElementById("form-nueva");
+  const header = document.getElementById("form-header");
+  const title = document.getElementById("form-title");
+  header.style.background = firm.color+"18";
+  header.style.borderBottom = `0.5px solid ${firm.color}22`;
+  title.style.color = firm.color;
+  title.textContent = "Nueva operación — "+firm.name;
+
+  // Llenar pares
+  const sel = document.getElementById("form-par");
+  sel.innerHTML = '<option value="">Seleccionar…</option>';
+  (PARES_POR_FIRMA[k]||[]).forEach(p=>{
+    const opt = document.createElement("option");
+    opt.value = p; opt.textContent = p;
+    sel.appendChild(opt);
+  });
+  sel.value = "";
+
+  document.getElementById("form-dir").value = "BUY";
+  document.getElementById("form-dir").style.color = "#1D9E75";
+  document.getElementById("form-estado").value = "Abierto";
+  seleccionarEsquema("sistema1");
+  document.getElementById("form-venc").value = "";
+  document.getElementById("form-venc-wrap").style.display = "none";
+  document.getElementById("form-par-otro").value = "";
+  document.getElementById("form-par-otro-wrap").style.display = "none";
+
+  const btn = document.getElementById("btn-registrar");
+  btn.style.background = firm.color;
+  btn.style.color = "#0A0F1E";
+
+  actualizarAlertasForm();
+  form.style.display = "block";
+  form.scrollIntoView({behavior:"smooth"});
+}
+
+function cancelarForm() {
+  document.getElementById("form-nueva").style.display = "none";
+  formFirmKey = null;
+}
+
+let formEsquemaActual = "sistema1";
+
+function seleccionarEsquema(valor) {
+  formEsquemaActual = valor;
+  const sistema1 = document.getElementById("chk-sistema1");
+  const bollinger = document.getElementById("chk-bollinger");
+  const ubf = document.getElementById("chk-ubf");
+  const on  = {bg:"rgba(34,211,238,0.12)",border:"#22D3EE",color:"#22D3EE",boxBg:"#22D3EE",boxBorder:"#22D3EE",check:"✓"};
+  const off = {bg:"rgba(255,255,255,0.04)",border:"rgba(255,255,255,0.15)",color:"#94A3B8",boxBg:"transparent",boxBorder:"rgba(255,255,255,0.3)",check:""};
+  [[sistema1,"sistema1"],[bollinger,"bollinger"],[ubf,"no_tocado"]].forEach(([btn,val])=>{
+    const s = val===valor ? on : off;
+    btn.style.background = s.bg; btn.style.borderColor = s.border; btn.style.color = s.color;
+    const box = btn.querySelector(".chk-box");
+    box.style.background = s.boxBg; box.style.borderColor = s.boxBorder; box.textContent = s.check;
+  });
+  actualizarAlertasForm();
+}
+
+function rellenarCierreNY() {
+  document.getElementById("form-venc").value = "15:00";
+  actualizarAlertasForm();
+}
+
+function actualizarAlertasForm() {
+  if(!formFirmKey) return;
+  const par    = document.getElementById("form-par").value;
+  const dir    = document.getElementById("form-dir").value;
+  const estado = document.getElementById("form-estado").value;
+  const esOtro = par === "Otro";
+  document.getElementById("form-par-otro-wrap").style.display = esOtro ? "block" : "none";
+  const parOtro = document.getElementById("form-par-otro").value.trim();
+  const parEfectivo = esOtro ? parOtro : par;
+  const alertas = getAlertasForm(formFirmKey, parEfectivo, dir, estado);
+  const cont = document.getElementById("form-alertas");
+  cont.innerHTML = alertas.map(a=>`<div class="form-alerta" style="background:${a.color}12;border:0.5px solid ${a.color}33;color:${a.color}">${a.txt}</div>`).join("");
+  document.getElementById("form-venc-wrap").style.display = estado==="Orden"?"block":"none";
+  document.getElementById("form-dir").style.color = dir==="BUY"?"#1D9E75":"#EF4444";
+  const btn = document.getElementById("btn-registrar");
+  if(parEfectivo) { btn.style.background=FIRMS[formFirmKey].color; btn.style.color="#0A0F1E"; btn.style.cursor="pointer"; }
+  else            { btn.style.background="rgba(255,255,255,0.08)"; btn.style.color="#475569"; btn.style.cursor="not-allowed"; }
+}
+
+document.getElementById("form-par").addEventListener("input", actualizarAlertasForm);
+document.getElementById("form-par-otro").addEventListener("input", actualizarAlertasForm);
+document.getElementById("form-dir").addEventListener("change", actualizarAlertasForm);
+document.getElementById("form-estado").addEventListener("change", actualizarAlertasForm);
+
+function calcularVencimientoTs(horaTexto) {
+  // Convierte "HH:MM" en un timestamp real. Si la hora ya pasó hoy,
+  // asume que es para mañana (esto es lo que fallaba antes: se comparaba
+  // solo el texto de la hora, sin saber a qué día pertenecía).
+  if(!horaTexto) return null;
+  const [h,m] = horaTexto.split(":").map(Number);
+  const target = new Date();
+  target.setHours(h,m,0,0);
+  if(target <= new Date()) target.setDate(target.getDate()+1);
+  return target.getTime();
+}
+
+function registrarOp() {
+  const parSel = document.getElementById("form-par").value;
+  const parOtro = document.getElementById("form-par-otro").value.trim().toUpperCase();
+  const par = parSel==="Otro" ? parOtro : parSel;
+  if(!par||!formFirmKey) return;
+  const dir     = document.getElementById("form-dir").value;
+  const estado  = document.getElementById("form-estado").value;
+  const esquema = formEsquemaActual;
+  const venc    = document.getElementById("form-venc").value||null;
+  const vencTs  = calcularVencimientoTs(venc);
+  ops.push({id:Date.now().toString(), par, dir, estado, esquema, vencimiento:venc, vencimientoTs:vencTs, hora:hhmmStr(), firmKey:formFirmKey, flotante:0});
+  guardarEstado();
+  cancelarForm();
+  render();
+}
+
+// ── REGLAS ────────────────────────────────────────────────────────────────────
+function renderReglas() {
+  const cont = document.getElementById("reglas-list");
+  cont.innerHTML = "";
+  FIRM_KEYS.forEach(k=>{
+    const f = FIRMS[k];
+    const div = document.createElement("div");
+    div.className = "reg-firm";
+    div.style.border = `0.5px solid ${f.color}33`;
+    const isOpen = reglasFirmOpen===k;
+    div.innerHTML = `
+      <button class="reg-firm-btn" style="background:${f.color}10" onclick="toggleRegla('${k}')">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="reg-firm-name" style="color:${f.color}">${f.name}</span>
+          ${f.termina?`<span style="font-size:10px;color:#EF4444">☠ DD termina cuenta</span>`:""}
+        </div>
+        <span style="font-size:12px;color:#64748B">${isOpen?"▲":"▼"}</span>
+      </button>
+      ${isOpen?`<div class="reg-body">
+        ${f.reglasCriticas.map(r=>`<div class="reg-rule" style="background:${r.tipo==="danger"?"rgba(239,68,68,0.08)":"rgba(245,158,11,0.08)"};border:0.5px solid ${r.tipo==="danger"?"#EF444433":"#F59E0B33"};color:${r.tipo==="danger"?"#EF4444":"#F59E0B"}">${r.tipo==="danger"?"🔴 ":"🟡 "}${r.txt}</div>`).join("")}
+        <div class="reg-info">Stop personal: $${f.stopPersonal.toLocaleString()} · DD diario firma: $${f.ddDia.toLocaleString()} · Hora corte: ${f.horaCorte} Bogotá</div>
+      </div>`:""}
+    `;
+    cont.appendChild(div);
+  });
+}
+
+function toggleRegla(k) {
+  reglasFirmOpen = reglasFirmOpen===k ? null : k;
+  renderReglas();
+}
+
+// ── CHECKLIST ─────────────────────────────────────────────────────────────────
+const CHECK_ITEMS = [
+  {id:"cal",   txt:"Revisé Forex Factory — noticias del día marcadas"},
+  {id:"bias",  txt:"Definí bias por sesión (alcista / bajista / lateral)"},
+  {id:"niv",   txt:"Marqué niveles S/R, OB, FVG en instrumentos activos"},
+  {id:"sz",    txt:"Sizing (0.5%): FT-SW $1,000 · FT-SC $1,000 · WS $500 · FN $250 · T5 $500 · RP $25 por trade"},
+  {id:"ftcap", txt:"FTMO cap combinado: $400K alcanzado — ambas cuentas bajo el mismo límite de firma"},
+  {id:"slws",  txt:"WSF: nivel de SL definido ANTES de entrar en cTrader"},
+  {id:"t5n",   txt:"The5%ers: revisé Forex Factory — no abriré nuevas órdenes en ±2 min de noticia roja (soft breach)"},
+  {id:"t5r",   txt:"The5%ers: rollover 18:00 Colombia — no dejar posiciones abiertas cerca de esa hora"},
+  {id:"fnz",   txt:"FundedNext: no operar 22:00-23:00 (zona muerta US→Asia)"},
+  {id:"fnswap",txt:"FundedNext: días de swap triple (mié XAU/WTI/Forex · vie índices/crypto) → reducir sizing"},
+  {id:"ftb",   txt:"FTMO: ningún día supera el 50% del profit del ciclo"},
+  {id:"wsdc",  txt:"WSF: el día reinicia a las 16:00 Bogotá — calcular margen real desde esa hora"},
+  {id:"rpdd",  txt:"WSF Rapid: DD máximo $300 es extremadamente ajustado — verificar exposición antes de cada trade"},
+  {id:"rpsym", txt:"WSF Rapid: símbolos con sufijo 'c' (ej. EURUSDc) — confirmar en MT5 antes de operar"},
+  {id:"jour",  txt:"Journal de ayer completado · días rentables T5 actualizados"},
+];
+
+function renderCheck() {
+  const cont = document.getElementById("check-items");
+  cont.innerHTML = CHECK_ITEMS.map(item=>{
+    const done = !!checkState[item.id];
+    return `
+      <button class="check-item" onclick="toggleCheck('${item.id}')"
+        style="background:${done?"rgba(29,158,117,0.08)":"rgba(255,255,255,0.03)"};border-color:${done?"rgba(29,158,117,0.25)":"rgba(255,255,255,0.08)"}">
+        <div class="check-box" style="border-color:${done?"#1D9E75":"rgba(255,255,255,0.2)"};background:${done?"#1D9E75":"transparent"}">
+          ${done?`<span style="color:#0A0F1E;font-size:11px;font-weight:900">✓</span>`:""}
+        </div>
+        <span class="check-txt" style="color:${done?"#475569":"#CBD5E1"};text-decoration:${done?"line-through":"none"}">${item.txt}</span>
+      </button>`;
+  }).join("");
+  const done = Object.values(checkState).filter(Boolean).length;
+  const total = CHECK_ITEMS.length;
+  const allDone = done===total;
+  document.getElementById("check-counter").textContent = `${done}/${total}${allDone?" ✓ Listo":""}`;
+  document.getElementById("check-counter").style.color = allDone?"#1D9E75":"#F59E0B";
+  document.getElementById("check-progress").style.width = `${done/total*100}%`;
+  document.getElementById("check-progress").style.background = allDone?"#1D9E75":"#F59E0B";
+}
+
+function toggleCheck(id) {
+  checkState[id] = !checkState[id];
+  guardarEstado();
+  renderCheck();
+}
+
+function resetCheck() {
+  checkState = {};
+  guardarEstado();
+  renderCheck();
+}
+
+function vaciarTodo() {
+  if(!confirm("¿Vaciar TODAS las operaciones, P&L del día, historial y checklist guardados? Esta acción no se puede deshacer.")) return;
+  ops = [];
+  pnlDia = {FS:0,FC:0,WS:0,FN:0,T5:0,RP:0};
+  histAyer = {};
+  historico = [];
+  checkState = {};
+  FIRM_KEYS.forEach(k => lastReset[k] = getLastRollover(k).getTime());
+  guardarEstado();
+  render();
+  renderCheck();
+  renderHist();
+}
+
+// ── RESPALDO MANUAL (exportar / importar) ────────────────────────────────────
+// Salvaguarda independiente de localStorage: iOS puede purgar el almacenamiento
+// de apps agregadas a pantalla de inicio sin aviso. Exportar guarda un archivo
+// .json descargable; importar lo restaura por completo.
+function exportarRespaldo() {
+  const data = { ops, pnlDia, histAyer, historico, lastReset, checkState, exportadoEn: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  const fecha = new Date().toISOString().slice(0,10);
+  a.href = url;
+  a.download = `respaldo-control-operativa-${fecha}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function importarRespaldo(event) {
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      if(!confirm("¿Reemplazar los datos actuales con este respaldo? Se perderá lo que no esté guardado en el respaldo.")) return;
+      ops        = data.ops        || [];
+      pnlDia     = data.pnlDia     || {FS:0,FC:0,WS:0,FN:0,T5:0,RP:0};
+      histAyer   = data.histAyer   || {};
+      historico  = data.historico  || [];
+      checkState = data.checkState || {};
+      lastReset  = data.lastReset  || {};
+      FIRM_KEYS.forEach(k => { if(!lastReset[k]) lastReset[k] = getLastRollover(k).getTime(); });
+      guardarEstado();
+      render();
+      renderCheck();
+      renderHist();
+      alert("Respaldo importado correctamente.");
+    } catch(err) {
+      alert("El archivo no es un respaldo válido.");
+    }
+    event.target.value = "";
+  };
+  reader.readAsText(file);
+}
+
+// ── HISTORIAL ─────────────────────────────────────────────────────────────────
+let histVista = "trades"; // "trades" | "comparar"
+let histFiltroEsquema = "todos"; // "todos" | "sistema1" | "bollinger" | "no_tocado" — reservado, no usado aún en filtro activo
+
+function marcarSiguioFavor(idx, valor) {
+  if(!historico[idx]) return;
+  historico[idx].siguioFavor = historico[idx].siguioFavor===valor ? null : valor;
+  guardarEstado();
+  renderHist();
+}
+
+function toggleHistVista(v) {
+  histVista = v;
+  renderHist();
+}
+
+const ESTADO_FINAL_COLOR = { "Cerrado":"#1D9E75", "Vencida":"#F59E0B", "Cancelada":"#64748B" };
+
+function renderHist() {
+  const cont = document.getElementById("hist-list");
+
+  // Selector de vista
+  const selectorHTML = `
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn-sm" style="flex:1;padding:8px;font-size:11px;${histVista==="trades"?"background:rgba(0,212,170,0.15);color:#00D4AA;border-color:rgba(0,212,170,0.3)":""}" onclick="toggleHistVista('trades')">Trades</button>
+      <button class="btn-sm" style="flex:1;padding:8px;font-size:11px;${histVista==="comparar"?"background:rgba(0,212,170,0.15);color:#00D4AA;border-color:rgba(0,212,170,0.3)":""}" onclick="toggleHistVista('comparar')">Comparativa esquemas</button>
+    </div>`;
+
+  if(histVista==="comparar") {
+    cont.innerHTML = selectorHTML + buildComparativaHTML();
+    return;
+  }
+
+  if(historico.length===0) {
+    cont.innerHTML = selectorHTML + `<div style="text-align:center;color:#475569;font-size:13px;padding:40px">Sin trades registrados hoy.</div>`;
+    return;
+  }
+  const resumen = {};
+  FIRM_KEYS.forEach(k=>resumen[k]=0);
+  historico.forEach(op=>{ if(resumen[op.firmKey]!==undefined) resumen[op.firmKey]+=(op.resultado||0); });
+
+  cont.innerHTML = selectorHTML + historico.map((op,idx)=>{
+    const f = FIRMS[op.firmKey]||{color:"#94A3B8",short:op.firmKey||"?"};
+    const estadoFinal = op.estadoFinal || "Cerrado"; // entradas viejas sin este campo = ya cerradas
+    const tieneResultado = op.resultado!==null && op.resultado!==undefined;
+    const pos = tieneResultado && op.resultado>=0;
+    const resultadoHTML = tieneResultado
+      ? `<div class="hist-result" style="color:${pos?"#1D9E75":"#EF4444"}">${pos?"+":""}$${op.resultado.toLocaleString("es-CO")}</div>`
+      : `<div class="hist-result" style="color:#64748B;font-size:11px">—</div>`;
+    const esquemaHTML = badgeEsquema(op.esquema).replace('class="op-badge"','class="hist-badge"');
+    // Toggle "¿Siguió a favor?" — solo útil para trades no cerrados con resultado, o cerrados en BE
+    const mostrarSiguioFavor = "siguioFavor" in op;
+    const siguioFavorHTML = mostrarSiguioFavor ? `
+      <div style="display:flex;align-items:center;gap:6px;margin-top:6px;padding-top:6px;border-top:0.5px solid rgba(255,255,255,0.06)">
+        <span style="font-size:10px;color:#64748B">¿Siguió a favor después?</span>
+        <button class="btn-sm" style="padding:2px 8px;${op.siguioFavor===true?"background:rgba(29,158,117,0.2);color:#1D9E75;border-color:rgba(29,158,117,0.4)":""}" onclick="marcarSiguioFavor(${idx},true)">Sí</button>
+        <button class="btn-sm" style="padding:2px 8px;${op.siguioFavor===false?"background:rgba(239,68,68,0.2);color:#EF4444;border-color:rgba(239,68,68,0.4)":""}" onclick="marcarSiguioFavor(${idx},false)">No</button>
+      </div>` : "";
+    return `
+      <div class="hist-item" style="border:0.5px solid ${f.color}33;grid-template-columns:auto 1fr auto;display:grid;gap:10px;padding:9px 12px;align-items:start">
+        <div class="hist-dot" style="background:${f.color};margin-top:4px"></div>
+        <div>
+          <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+            <span class="hist-par">${op.par}</span>
+            <span class="hist-dir" style="color:${op.dir==="BUY"?"#1D9E75":"#EF4444"}">${op.dir}</span>
+            <span class="hist-badge" style="background:${f.color}18;color:${f.color}">${f.short}</span>
+            <span class="hist-badge" style="background:${ESTADO_FINAL_COLOR[estadoFinal]}18;color:${ESTADO_FINAL_COLOR[estadoFinal]}">${estadoFinal}</span>
+            ${esquemaHTML}
+          </div>
+          <div class="hist-hora">${op.hora} → ${op.horaClose}</div>
+          ${siguioFavorHTML}
+        </div>
+        ${resultadoHTML}
+      </div>`;
+  }).join("")+`
+    <div class="resumen-dia">
+      <div class="resumen-title">RESUMEN DEL DÍA</div>
+      <div class="resumen-grid">
+        ${FIRM_KEYS.map(k=>{
+          const f=FIRMS[k]; const tot=resumen[k];
+          return `<div class="resumen-firm">
+            <div class="resumen-firm-name" style="color:${f.color}">${f.short}</div>
+            <div class="resumen-firm-val" style="color:${tot>=0?"#1D9E75":"#EF4444"}">${tot>=0?"+":""}$${tot.toLocaleString("es-CO")}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+}
+
+function buildComparativaHTML() {
+  const conEsquema = historico.filter(op=>op.esquema);
+  if(conEsquema.length===0) {
+    return `<div style="text-align:center;color:#475569;font-size:13px;padding:40px">Aún no hay trades con esquema registrado.<br>Los nuevos que registres se compararán aquí con el tiempo.</div>`;
+  }
+
+  function statsDe(esquema) {
+    const trades = conEsquema.filter(op=>op.esquema===esquema);
+    const cerrados = trades.filter(op=>op.estadoFinal==="Cerrado" || (!op.estadoFinal && op.resultado!==null));
+    const ganadores = cerrados.filter(op=>op.resultado>0);
+    const perdedores = cerrados.filter(op=>op.resultado<0);
+    const be = cerrados.filter(op=>op.resultado===0);
+    const vencidas = trades.filter(op=>op.estadoFinal==="Vencida");
+    const canceladas = trades.filter(op=>op.estadoFinal==="Cancelada");
+    const vencidasFavor = vencidas.filter(op=>op.siguioFavor===true);
+    const pnlTotal = cerrados.reduce((a,op)=>a+(op.resultado||0),0);
+    return {
+      total: trades.length, cerrados: cerrados.length,
+      ganadores: ganadores.length, perdedores: perdedores.length, be: be.length,
+      vencidas: vencidas.length, canceladas: canceladas.length,
+      vencidasFavor: vencidasFavor.length,
+      pnlTotal, pnlProm: cerrados.length>0 ? pnlTotal/cerrados.length : 0,
+      winRate: cerrados.length>0 ? (ganadores.length/cerrados.length*100) : 0,
+    };
+  }
+
+  // Esquemas dinámicos: solo se muestran columnas de los que ya tienen algún trade,
+  // en el orden fijo Sistema 1 → Bollinger → UBF cuando aplique.
+  const ordenEsquemas = ["sistema1","bollinger","no_tocado"];
+  const esquemasConDatos = ordenEsquemas.filter(e => conEsquema.some(op=>op.esquema===e));
+  const stats = {};
+  esquemasConDatos.forEach(e => stats[e] = statsDe(e));
+  const colWidth = esquemasConDatos.length===3 ? "72px" : "90px";
+  const gridCols = `1fr ${esquemasConDatos.map(()=>colWidth).join(" ")}`;
+
+  function filaComparativa(label, campo, formatFn) {
+    const fmt = formatFn || (v=>v);
+    const celdas = esquemasConDatos.map(e => {
+      const info = ESQUEMA_INFO[e];
+      return `<span style="font-size:12px;font-weight:700;color:${info.color};text-align:center">${fmt(stats[e][campo])}</span>`;
+    }).join("");
+    return `<div style="display:grid;grid-template-columns:${gridCols};gap:6px;padding:8px 0;border-bottom:0.5px solid rgba(255,255,255,0.06);align-items:center">
+      <span style="font-size:11px;color:#94A3B8">${label}</span>
+      ${celdas}
+    </div>`;
+  }
+
+  const encabezados = esquemasConDatos.map(e => {
+    const info = ESQUEMA_INFO[e];
+    return `<span style="font-size:11px;font-weight:700;color:${info.color};text-align:center">${info.label}</span>`;
+  }).join("");
+
+  return `
+    <div style="background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;overflow-x:auto">
+      <div style="display:grid;grid-template-columns:${gridCols};gap:6px;padding-bottom:10px;margin-bottom:6px;border-bottom:1px solid rgba(255,255,255,0.1);min-width:280px">
+        <span></span>
+        ${encabezados}
+      </div>
+      <div style="min-width:280px">
+        ${filaComparativa("Total operaciones", "total")}
+        ${filaComparativa("Cerradas (con resultado)", "cerrados")}
+        ${filaComparativa("Ganadoras", "ganadores")}
+        ${filaComparativa("Perdedoras", "perdedores")}
+        ${filaComparativa("En breakeven ($0)", "be")}
+        ${filaComparativa("Win rate", "winRate", v=>v.toFixed(0)+"%")}
+        ${filaComparativa("P&L total", "pnlTotal", v=>(v>=0?"+":"")+"$"+v.toLocaleString("es-CO"))}
+        ${filaComparativa("P&L promedio/trade", "pnlProm", v=>(v>=0?"+":"")+"$"+v.toFixed(0))}
+        ${filaComparativa("Órdenes vencidas", "vencidas")}
+        ${filaComparativa("Vencidas que sí iban a favor", "vencidasFavor")}
+        ${filaComparativa("Canceladas manualmente", "canceladas")}
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:#64748B;line-height:1.5;padding:0 4px">
+      "Vencidas que sí iban a favor" son las que marcaste con "Sí" en ¿Siguió a favor? — esa es tu métrica de oportunidad perdida por esquema. Entre más datos acumules, más confiable la comparación.
+    </div>`;
+}
+
+// ── NAVEGACIÓN ────────────────────────────────────────────────────────────────
+function switchTab(id, btn) {
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("panel-"+id).classList.add("active");
+  btn.classList.add("active");
+  if(id==="reglas")  renderReglas();
+  if(id==="check")   renderCheck();
+  if(id==="hist")    renderHist();
+  if(id==="ops")     render();
+}
+
+// ── AUTO-ROLLOVER ─────────────────────────────────────────────────────────────
+setInterval(()=>{
+  const ahoraTs = Date.now();
+  // Vencer órdenes — usa el timestamp real (fecha+hora), no solo el texto de la hora.
+  // Antes desaparecían sin dejar rastro; ahora quedan en el historial como "Vencida"
+  // para poder marcar después si el precio sí habría llegado a favor.
+  const vencidas = ops.filter(op=>op.estado==="Orden"&&op.vencimientoTs&&op.vencimientoTs<=ahoraTs);
+  if(vencidas.length>0) {
+    vencidas.forEach(op=>{
+      historico.unshift({...op, resultado:null, horaClose:hhmmStr(), estadoFinal:"Vencida", siguioFavor:null});
+    });
+    ops = ops.filter(op=>!(op.estado==="Orden"&&op.vencimientoTs&&op.vencimientoTs<=ahoraTs));
+  }
+  // Rollover
+  FIRM_KEYS.forEach(k=>{
+    const rolTime = getLastRollover(k).getTime();
+    if(rolTime>lastReset[k]) {
+      histAyer[k] = pnlDia[k];
+      pnlDia[k] = 0;
+      lastReset[k] = rolTime;
+    }
+  });
+  guardarEstado();
+  render();
+  if(vencidas.length>0) renderHist();
+}, 30000);
+
+// Reloj cada 30s
+setInterval(()=>{
+  document.getElementById("status-hora").textContent = nowStr();
+}, 30000);
+
+// ── AUTO-RESPALDO DIARIO ───────────────────────────────────────────────────────
+// No existe forma de ejecutar código con la app cerrada en iOS, así que el
+// respaldo se dispara solo automáticamente la primera vez que abres el Control
+// después de la hora configurada cada día — sin que tengas que acordarte de nada.
+// El botón manual de la pestaña Pre-trade queda solo como rescate de emergencia.
+const RESPALDO_HORA = "15:55";
+const RESPALDO_KEY = "control_operativa_v2_ultimo_respaldo";
+
+function fechaHoy() { return new Date().toISOString().slice(0,10); }
+
+function chequearAutoRespaldo() {
+  const ahora = hhmmStr();
+  const hoy = fechaHoy();
+  let ultimo = null;
+  try { ultimo = localStorage.getItem(RESPALDO_KEY); } catch(e) {}
+  const hayDatos = ops.length>0 || historico.length>0 || Object.values(pnlDia).some(v=>v!==0);
+  if(ahora >= RESPALDO_HORA && ultimo !== hoy && hayDatos) {
+    exportarRespaldo();
+    try { localStorage.setItem(RESPALDO_KEY, hoy); } catch(e) {}
+    renderRespaldoStatus();
+  }
+}
+
+function renderRespaldoStatus() {
+  const el = document.getElementById("respaldo-status");
+  if(!el) return;
+  let ultimo = null;
+  try { ultimo = localStorage.getItem(RESPALDO_KEY); } catch(e) {}
+  if(ultimo === fechaHoy()) {
+    el.textContent = "✓ Respaldo automático de hoy ya generado (" + RESPALDO_HORA + ")";
+    el.style.color = "#1D9E75";
+  } else {
+    el.textContent = "Pendiente — se generará solo al abrir la app después de las " + RESPALDO_HORA;
+    el.style.color = "#94A3B8";
+  }
+}
+
+// Chequear al abrir y cada 30s mientras la app esté abierta
+chequearAutoRespaldo();
+setInterval(chequearAutoRespaldo, 30000);
+
+// ── CARGA DE CONFIGURACIÓN ────────────────────────────────────────────────────
+// Trae los datos de las firmas, instrumentos y rollover desde config.json —
+// mismo archivo que puede usar la mesa de referencia, para no duplicar datos.
+// Si falla (sin internet, archivo movido/borrado), muestra un error claro en vez
+// de una app rota o vacía. Los datos ya guardados del usuario no se pierden.
+fetch("./config.json")
+  .then(r => { if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  .then(cfg => {
+    FIRMS = cfg.FIRMS;
+    FIRM_KEYS = cfg.FIRM_KEYS;
+    PARES_POR_FIRMA = cfg.PARES_POR_FIRMA;
+    ROLLOVER_HHMM = cfg.ROLLOVER_HHMM;
+
+    // Completar lastReset y pnlDia para cualquier firma que no viniera ya en el
+    // estado guardado (ej. la primera vez que se agrega una firma nueva)
+    FIRM_KEYS.forEach(k => {
+      if(!lastReset[k]) lastReset[k] = getLastRollover(k).getTime();
+      if(pnlDia[k]===undefined) pnlDia[k] = 0;
+    });
+
+    document.getElementById("loading-overlay").style.display = "none";
+
+    // ── INIT ────────────────────────────────────────────────────────────────
+    render();
+    renderCheck();
+    renderReglas();
+    renderHist();
+    renderRespaldoStatus();
+  })
+  .catch(err => {
+    document.getElementById("loading-overlay").style.display = "none";
+    document.getElementById("config-error").style.display = "flex";
+    console.error("Error cargando config.json:", err);
+  });
+</script>
+</body>
+</html>
