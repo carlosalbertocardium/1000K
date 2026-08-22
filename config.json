@@ -1,0 +1,113 @@
+{
+  "FIRM_KEYS": ["FS", "FC", "WS", "FN", "T5", "RP"],
+
+  "FIRMS": {
+    "FS": {
+      "name": "FT Swing", "short": "FS", "color": "#00D4AA",
+      "capital": 200000, "targetF1": 20000, "targetF2": 10000,
+      "stopPersonal": 5000, "ddDia": 10000, "riesgoTrade": 1000,
+      "flotante": true, "termina": false, "horaCorte": "19:00", "minDias": 4,
+      "reglasCriticas": [
+        {"tipo": "danger", "txt": "Equity real-time ⚡ — flotantes cuentan contra el DD al instante"},
+        {"tipo": "danger", "txt": "Best Day Rule: ningún día puede concentrar ≥50% del profit total acumulado del ciclo"},
+        {"tipo": "warning", "txt": "Noticias: en challenge libres · en funded ±2 min restricción"},
+        {"tipo": "warning", "txt": "Inactividad: CUALQUIER trade abierto (no requiere cierre) resetea el contador de 30 días"},
+        {"tipo": "warning", "txt": "Consistencia de lotaje: no cambiar drásticamente el sizing entre días"}
+      ],
+      "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": false, "bestDay": true}
+    },
+    "FC": {
+      "name": "FT Scalp", "short": "FC", "color": "#00B894",
+      "capital": 200000, "targetF1": 20000, "targetF2": 10000,
+      "stopPersonal": 5000, "ddDia": 10000, "riesgoTrade": 1000,
+      "flotante": true, "termina": false, "horaCorte": "19:00", "minDias": 4,
+      "reglasCriticas": [
+        {"tipo": "danger", "txt": "Equity real-time ⚡ — flotantes cuentan contra el DD al instante"},
+        {"tipo": "danger", "txt": "Best Day Rule: ningún día puede concentrar ≥50% del profit total acumulado del ciclo"},
+        {"tipo": "danger", "txt": "Consistencia de lotaje: scalping usa lotes altos — mantener patrón histórico coherente"},
+        {"tipo": "danger", "txt": "NO replicar el mismo trade de FT Swing simultáneamente — riesgo de 'estrategia idéntica'"},
+        {"tipo": "warning", "txt": "Comisiones de scalping cuentan contra el DD — parada operativa en -$4,500 neto (buffer $500)"},
+        {"tipo": "warning", "txt": "Leverage Standard 1:100 (vs 1:30 de FT Swing)"},
+        {"tipo": "warning", "txt": "Noticias: en challenge libres · en funded ±2 min restricción + cerrar antes del fin de semana"},
+        {"tipo": "warning", "txt": "Inactividad: CUALQUIER trade abierto (no requiere cierre) resetea el contador de 30 días"},
+        {"tipo": "warning", "txt": "Cap FTMO combinado: $400K total entre ambas cuentas FTMO — ya alcanzado"}
+      ],
+      "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": false, "bestDay": true}
+    },
+    "WS": {
+      "name": "WSF", "short": "WS", "color": "#F97316",
+      "capital": 100000, "targetF1": 10000, "targetF2": 5000,
+      "stopPersonal": 2500, "ddDia": 5000, "riesgoTrade": 500,
+      "flotante": true, "termina": false, "horaCorte": "16:00", "minDias": 4,
+      "reglasCriticas": [
+        {"tipo": "danger", "txt": "SL obligatorio en 2 min desde apertura — 3 softbreaches = cuenta eliminada"},
+        {"tipo": "danger", "txt": "Idea de trading: mismo activo + dirección + <30 min entre trades = una idea. Máx $2,500 acumulado"},
+        {"tipo": "danger", "txt": "Trades <60 segundos PROHIBIDOS — aunque el TP se toque antes, esperar"},
+        {"tipo": "danger", "txt": "Lotes máx por idea: Forex 35 · Metales/WTI 7 · Índices 70"},
+        {"tipo": "warning", "txt": "DD reinicia 16:00 Bogotá — trades tarde/noche acumulan contra el mismo límite diario"},
+        {"tipo": "warning", "txt": "Copy trading entre cuentas funded prohibido"},
+        {"tipo": "warning", "txt": "Cuenta fondeada activa solo miércoles y domingos — planificar timing de cierre del challenge"}
+      ],
+      "checks": {"sl": true, "idea": true, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": true, "bestDay": false}
+    },
+    "FN": {
+      "name": "FundedNext", "short": "FN", "color": "#22D3EE",
+      "capital": 50000, "targetF1": 4000, "targetF2": 2500,
+      "stopPersonal": 1250, "ddDia": 2500, "riesgoTrade": 250,
+      "flotante": false, "termina": false, "horaCorte": "15:45", "minDias": 0,
+      "reglasCriticas": [
+        {"tipo": "danger", "txt": "Quick Strike: trades cerrados en <30s no pueden ser ≥30% del profit del ciclo"},
+        {"tipo": "danger", "txt": "No operar 22:00–23:00 Colombia (zona muerta US→Asia)"},
+        {"tipo": "danger", "txt": "Riesgo simultáneo máx $1,500 (3%) — SL obligatorio en <3 min si se supera"},
+        {"tipo": "warning", "txt": "Máx 2,000 mensajes/día al servidor — modificaciones de SL/TP cuentan"},
+        {"tipo": "warning", "txt": "Swap triple miércoles (XAU/WTI/Forex) y viernes (índices/crypto) descuenta del daily limit"},
+        {"tipo": "warning", "txt": "KYC: iniciar el mismo día que se aprueba F2 — plazo máximo 30 días"}
+      ],
+      "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": true, "quickStrike": true, "duracion": false, "bestDay": false}
+    },
+    "T5": {
+      "name": "The5%ers", "short": "T5", "color": "#818CF8",
+      "capital": 100000, "targetF1": 10000, "targetF2": 5000,
+      "stopPersonal": 2500, "ddDia": 5000, "riesgoTrade": 500,
+      "flotante": false, "termina": false, "horaCorte": "18:00", "minDias": 3,
+      "reglasCriticas": [
+        {"tipo": "danger", "txt": "DD diario 5% ($5,000) y DD overall 10% ($10,000) — absoluto desde $100K, sin trailing"},
+        {"tipo": "warning", "txt": "Soft breach noticias: trade abierto en ±2 min de noticia roja (Forex Factory) — deduce el profit pero NO termina la cuenta"},
+        {"tipo": "warning", "txt": "Mantener un trade abierto que atraviesa una noticia SÍ está permitido — solo abrir nuevo en la ventana es soft breach"},
+        {"tipo": "warning", "txt": "Mínimo 3 días rentables por fase — cada día necesita ≥$500 neto cerrado (0.5% del capital)"},
+        {"tipo": "warning", "txt": "WTI leverage 1:5 también en F1/F2 — ajustar sizing en petróleo"},
+        {"tipo": "warning", "txt": "Rollover: 18:00 Colombia (verano GMT+3) — EOD, usa el mayor entre balance/equity del día anterior"}
+      ],
+      "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": false, "bestDay": false, "newsSoftBreach": true}
+    },
+    "RP": {
+      "name": "WSF Rapid", "short": "RP", "color": "#F43F5E",
+      "capital": 5000, "targetF1": 500, "targetF2": null,
+      "stopPersonal": 100, "ddDia": 200, "riesgoTrade": 25,
+      "flotante": true, "termina": true, "horaCorte": "16:00", "minDias": 4,
+      "reglasCriticas": [
+        {"tipo": "danger", "txt": "DD máximo 6% estático ($300) — CIERRA la cuenta. Margen extremadamente ajustado: 12 trades perdedores de $25 la consumen por completo"},
+        {"tipo": "danger", "txt": "SL obligatorio en 2 min desde apertura"},
+        {"tipo": "danger", "txt": "Trades <60 segundos PROHIBIDOS"},
+        {"tipo": "danger", "txt": "Idea de trading: máx $100 acumulado (50% del DD diario $200) — sizing muy pequeño, verificar lote mínimo en MT5"},
+        {"tipo": "warning", "txt": "DD diario 4% ($200) — hora de reset sin confirmar oficialmente; se usa 16:00 Bogotá como referencia provisional (igual que WSF Ultra)"},
+        {"tipo": "warning", "txt": "Leverage reducido: Forex 1:30 · Índices/Oro 1:10 · Cripto 1:1 — mucho menor que WSF Ultra"},
+        {"tipo": "warning", "txt": "Cuenta de obsequio (sin fee pagado) — tratar con la misma disciplina que las cuentas pagadas"},
+        {"tipo": "warning", "txt": "Copy manual permitido con WSF Ultra en evaluación (balances distintos) — prohibido en funded"},
+        {"tipo": "warning", "txt": "Plataforma MT5 — símbolos con sufijo 'c' propio de este bróker (ej. EURUSDc), distintos a cTrader"}
+      ],
+      "checks": {"sl": true, "idea": true, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": true, "bestDay": false}
+    }
+  },
+
+  "PARES_POR_FIRMA": {
+    "FS": ["EURAUD","XAUUSD","XAGUSD","BTCUSD","DASHUSD","ETHUSD","CADJPY","USDJPY","USDCAD","AUDUSD","GBPUSD","EURCAD","AUDJPY","GBPJPY","EURJPY","EURGBP","GBPCAD","GBPNZD","GBPAUD","AUDCAD","US2000.cash","US30.cash","GER40.cash","FRA40.cash","US500.cash","US100.cash","UK100.cash","USOIL.cash","DXY.cash","NZDUSD","EURNZD","NZDCAD","NZDJPY","AUDNZD","JP225.cash","Otro"],
+    "FC": ["EURAUD","XAUUSD","XAGUSD","BTCUSD","DASHUSD","ETHUSD","CADJPY","USDJPY","USDCAD","AUDUSD","GBPUSD","EURCAD","AUDJPY","GBPJPY","EURJPY","EURGBP","GBPCAD","GBPNZD","GBPAUD","AUDCAD","US2000.cash","US30.cash","GER40.cash","FRA40.cash","US500.cash","US100.cash","UK100.cash","USOIL.cash","DXY.cash","NZDUSD","EURNZD","NZDCAD","NZDJPY","AUDNZD","JP225.cash","Otro"],
+    "WS": ["DAX","CAC","FTSE","NSDQ","SP","DOW","EURUSD","EURCAD","EURGBP","EURAUD","USDJPY","USDCAD","AUDJPY","GBPUSD","GBPJPY","EURJPY","CADJPY","AUDCAD","AUDNZD","AUDUSD","NZDJPY","NZDUSD","XAGUSD","XAUUSD","CL","BTCUSD","ETHEREUM","HK50","GBPCAD","GBPAUD","NZDCAD","NIKEY","Otro"],
+    "FN": ["GER40","FRA40","UK100","NDX100","SPX500","US30","EURUSD","EURCAD","EURGBP","EURAUD","USDJPY","USDCAD","AUDJPY","GBPUSD","GBPJPY","EURJPY","CADJPY","AUDCAD","AUDNZD","AUDUSD","NZDJPY","NZDUSD","XAGUSD","XAUUSD","BTCUSD","ETHUSD","GBPAUD","GBPCAD","GBPNZD","EURNZD","HK50","JPN225","US2000","USOUSD","Otro"],
+    "T5": ["DAX40","CAC40","UK100","NAS100","SP500","US30","EURUSD","EURCAD","EURGBP","EURAUD","USDJPY","USDCAD","AUDJPY","GBPUSD","GBPJPY","EURJPY","CADJPY","AUDCAD","AUDNZD","AUDUSD","NZDJPY","NZDUSD","XAGUSD","XAUUSD","BTCUSD","ETHUSD","GBPAUD","GBPCAD","GBPNZD","EURNZD","NZDCAD","JPN225","Otro"],
+    "RP": ["AUDUSDc","USDCADc","EURUSDc","GBPUSDc","USDJPYc","AUDCADc","AUDJPYc","AUDNZDc","CADJPYc","XAUUSD","XAGUSD","DE40.c","USOIL.c","US500.c","USTEC.c","DJ30.c","F40.c","UK100.c","HK50.c","JP225.c","BTCUSD","ETHUSD","EURCADc","EURGBPc","EURJPYc","EURAUDc","NZDCADc","NZDJPYc","NZDUSDc","GBPAUDc","GBPCADc","GBPJPYc","Otro"]
+  },
+
+  "ROLLOVER_HHMM": {"FS": "19:00", "FC": "19:00", "WS": "16:00", "FN": "15:45", "T5": "18:00", "RP": "16:00"}
+}
