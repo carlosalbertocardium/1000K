@@ -9,12 +9,12 @@
       "flotante": true, "termina": false, "horaCorte": "19:00", "minDias": 4,
       "reglasCriticas": [
         {"tipo": "danger", "txt": "Equity real-time ⚡ — flotantes cuentan contra el DD al instante"},
-        {"tipo": "danger", "txt": "Best Day Rule: ningún día puede concentrar ≥50% del profit total acumulado del ciclo"},
+        {"tipo": "danger", "txt": "Max Loss estático en $180,000 para siempre (NO trailing) — el trailing solo aplica al 1-Step"},
         {"tipo": "warning", "txt": "Noticias: en challenge libres · en funded ±2 min restricción"},
         {"tipo": "warning", "txt": "Inactividad: CUALQUIER trade abierto (no requiere cierre) resetea el contador de 30 días"},
         {"tipo": "warning", "txt": "Consistencia de lotaje: no cambiar drásticamente el sizing entre días"}
       ],
-      "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": false, "bestDay": true}
+      "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": false, "bestDay": false}
     },
     "FC": {
       "name": "FT Scalp", "short": "FC", "color": "#00B894",
@@ -23,16 +23,16 @@
       "flotante": true, "termina": false, "horaCorte": "19:00", "minDias": 4,
       "reglasCriticas": [
         {"tipo": "danger", "txt": "Equity real-time ⚡ — flotantes cuentan contra el DD al instante"},
-        {"tipo": "danger", "txt": "Best Day Rule: ningún día puede concentrar ≥50% del profit total acumulado del ciclo"},
+        {"tipo": "danger", "txt": "Max Loss estático en $180,000 para siempre (NO trailing) — el trailing solo aplica al 1-Step"},
         {"tipo": "danger", "txt": "Consistencia de lotaje: scalping usa lotes altos — mantener patrón histórico coherente"},
         {"tipo": "danger", "txt": "NO replicar el mismo trade de FT Swing simultáneamente — riesgo de 'estrategia idéntica'"},
         {"tipo": "warning", "txt": "Comisiones de scalping cuentan contra el DD — parada operativa en -$4,500 neto (buffer $500)"},
         {"tipo": "warning", "txt": "Leverage Standard 1:100 (vs 1:30 de FT Swing)"},
         {"tipo": "warning", "txt": "Noticias: en challenge libres · en funded ±2 min restricción + cerrar antes del fin de semana"},
         {"tipo": "warning", "txt": "Inactividad: CUALQUIER trade abierto (no requiere cierre) resetea el contador de 30 días"},
-        {"tipo": "warning", "txt": "Cap FTMO combinado: $400K total entre ambas cuentas FTMO — ya alcanzado"}
+        {"tipo": "warning", "txt": "Cap FTMO combinado: $400K de capital INICIAL (antes de scaling) entre ambas cuentas — ya alcanzado. El capital escalado no cuenta para este límite"}
       ],
-      "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": false, "bestDay": true}
+      "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": false, "bestDay": false}
     },
     "WS": {
       "name": "WSF", "short": "WS", "color": "#F97316",
@@ -58,10 +58,11 @@
       "reglasCriticas": [
         {"tipo": "danger", "txt": "Quick Strike: trades cerrados en <30s no pueden ser ≥30% del profit del ciclo"},
         {"tipo": "danger", "txt": "No operar 22:00–23:00 Colombia (zona muerta US→Asia)"},
-        {"tipo": "danger", "txt": "Riesgo simultáneo máx $1,500 (3%) — SL obligatorio en <3 min si se supera"},
+        {"tipo": "danger", "txt": "Riesgo simultáneo máx $1,500 (3%) — aplica SOLO en cuenta fondeada, NO durante el Challenge. 1ª violación = 100% de deducción del profit del trade (no 50%)"},
+        {"tipo": "danger", "txt": "EA prohibido en cuentas $50K+ en CUALQUIER plataforma (MT4/MT5 también) — incluye herramientas que solo modifican SL/TP/lot size. Relevante si conectas bots o asistentes aquí"},
         {"tipo": "warning", "txt": "Máx 2,000 mensajes/día al servidor — modificaciones de SL/TP cuentan"},
         {"tipo": "warning", "txt": "Swap triple miércoles (XAU/WTI/Forex) y viernes (índices/crypto) descuenta del daily limit"},
-        {"tipo": "warning", "txt": "KYC: iniciar el mismo día que se aprueba F2 — plazo máximo 30 días"}
+        {"tipo": "warning", "txt": "KYC: iniciar el mismo día que se aprueba F2 — plazo máximo 30 días. Entrega de cuenta fondeada: 48-72h tras aprobación (no 24-48h)"}
       ],
       "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": true, "quickStrike": true, "duracion": false, "bestDay": false}
     },

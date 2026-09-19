@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Mesa">
+<title>Mesa de Trabajo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#070D1A;color:#E2E8F0;font-family:'DM Sans',sans-serif;min-height:100vh;}
+  input,select,button,textarea{font-family:'DM Sans',sans-serif;}
+  ::-webkit-scrollbar{width:3px;height:3px;}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:99px;}
+
+  /* HEADER */
+  #header{background:rgba(245,158,11,0.06);border-bottom:0.5px solid rgba(245,158,11,0.18);padding:10px 14px;position:sticky;top:0;z-index:10;display:flex;justify-content:space-between;align-items:center;}
+  .h-title{font-size:11px;font-weight:700;color:#F59E0B;letter-spacing:1px;}
+  .h-sub{font-size:10px;color:#475569;margin-top:2px;}
+  #h-hora{font-size:18px;font-weight:700;color:#F1F5F9;font-family:monospace;text-align:right;}
+  #h-jornada{font-size:10px;font-weight:600;text-align:right;margin-top:1px;}
+
+  /* NAV */
+  #nav{display:flex;overflow-x:auto;border-bottom:0.5px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.02);}
+  .nav-btn{flex-shrink:0;background:none;border:none;border-bottom:2px solid transparent;padding:12px 14px;font-size:12px;font-weight:600;color:#475569;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;min-height:44px;white-space:nowrap;}
+  .nav-btn.active{color:#F59E0B;border-bottom-color:#F59E0B;}
+  .nav-btn.locked{opacity:0.35;}
+
+  #content{padding:14px 14px 70px;}
+  .panel{display:none;}
+  .panel.active{display:block;}
+
+  .section-title{font-size:11px;font-weight:700;color:#94A3B8;letter-spacing:0.5px;margin:18px 0 10px;text-transform:uppercase;}
+  .section-title:first-child{margin-top:0;}
+  .hint{font-size:11px;color:#64748B;line-height:1.5;margin-bottom:12px;}
+
+  /* GATE / CHECKLIST */
+  .gate-banner{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);border-radius:12px;padding:14px;margin-bottom:16px;}
+  .gate-title{font-size:13px;font-weight:700;color:#F59E0B;margin-bottom:6px;}
+  .gate-txt{font-size:11px;color:#94A3B8;line-height:1.5;}
+  .check-item{display:flex;align-items:flex-start;gap:11px;padding:13px 13px;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;margin-bottom:7px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;text-align:left;width:100%;}
+  .check-item.done{background:rgba(29,158,117,0.08);border-color:rgba(29,158,117,0.28);}
+  .check-box{width:20px;height:20px;border-radius:6px;flex-shrink:0;margin-top:1px;border:1.5px solid rgba(255,255,255,0.22);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#0A0F1E;}
+  .check-item.done .check-box{background:#1D9E75;border-color:#1D9E75;}
+  .check-txt{font-size:12.5px;line-height:1.5;color:#CBD5E1;}
+  .check-item.done .check-txt{color:#475569;text-decoration:line-through;}
+  .check-progress{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+  .progress-track{background:rgba(255,255,255,0.07);border-radius:99px;height:5px;overflow:hidden;margin-bottom:14px;}
+  .progress-fill{height:100%;border-radius:99px;transition:width 0.3s;}
+
+  .btn{width:100%;padding:13px;font-size:13px;font-weight:700;border:none;border-radius:10px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;margin-top:6px;}
+  .btn-ghost{background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.12);color:#94A3B8;font-weight:500;}
+
+  /* SEMÁFORO */
+  .sem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+  .sem-cell{padding:11px 3px;border-radius:7px;font-size:10px;font-weight:700;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;border:0.5px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);color:#94A3B8;min-height:44px;display:flex;align-items:center;justify-content:center;line-height:1.25;}
+  .sem-cell.up{background:#16A34A;color:#fff;border-color:#16A34A;}
+  .sem-cell.down{background:#DC2626;color:#fff;border-color:#DC2626;}
+  .sem-legend{display:flex;gap:14px;margin-bottom:12px;flex-wrap:wrap;}
+  .leg{display:flex;align-items:center;gap:5px;font-size:10px;color:#64748B;}
+  .leg-dot{width:11px;height:11px;border-radius:3px;}
+
+  /* NOTICIAS */
+  .news-form{background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:13px;margin-bottom:14px;}
+  .lbl{font-size:10px;color:#64748B;letter-spacing:0.4px;margin-bottom:5px;display:block;}
+  .inp{background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.15);border-radius:8px;padding:9px 10px;color:#E2E8F0;outline:none;font-size:13px;width:100%;font-family:monospace;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px;}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;}
+  textarea.inp{font-family:'DM Sans',sans-serif;font-size:12px;min-height:80px;resize:vertical;}
+
+  .ev-card{border-radius:11px;padding:12px 13px;margin-bottom:8px;border:0.5px solid;}
+  .ev-now{background:rgba(220,38,38,0.1);border-color:rgba(220,38,38,0.45);}
+  .ev-soon{background:rgba(245,158,11,0.09);border-color:rgba(245,158,11,0.35);}
+  .ev-later{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.09);}
+  .ev-past{background:rgba(255,255,255,0.02);border-color:rgba(255,255,255,0.05);opacity:0.5;}
+  .ev-head{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:7px;}
+  .ev-when{font-size:12px;font-weight:700;}
+  .ev-name{font-size:12.5px;font-weight:700;color:#F1F5F9;}
+  .ev-cur{font-size:10px;padding:2px 7px;border-radius:99px;background:rgba(255,255,255,0.1);color:#CBD5E1;font-weight:600;}
+  .ev-instr{font-size:11px;color:#CBD5E1;line-height:1.55;font-family:monospace;margin-bottom:8px;}
+  .ev-firms{display:flex;flex-direction:column;gap:3px;}
+  .ev-firm{font-size:10.5px;display:flex;gap:6px;align-items:baseline;}
+  .ev-del{font-size:10px;color:#475569;background:none;border:none;cursor:pointer;padding:4px;}
+
+  /* PORTAFOLIO */
+  .pf-card{background:rgba(255,255,255,0.03);border-radius:11px;padding:12px 13px;margin-bottom:8px;border-left:3px solid;}
+  .pf-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;}
+  .pf-name{font-size:13px;font-weight:700;font-family:monospace;}
+  .pf-cap{font-size:11px;color:#64748B;}
+  .pf-row{display:flex;justify-content:space-between;font-size:10.5px;margin-bottom:4px;}
+  .pf-lbl{color:#64748B;}
+  .pf-val{font-weight:600;font-family:monospace;}
+  .bar-track{background:rgba(255,255,255,0.07);border-radius:99px;height:4px;overflow:hidden;margin:6px 0 9px;}
+  .bar-fill{height:100%;border-radius:99px;}
+
+  /* PARADA */
+  .stop-card{background:rgba(220,38,38,0.07);border:1px solid rgba(220,38,38,0.28);border-radius:11px;padding:13px;margin-bottom:9px;}
+  .stop-num{font-size:10px;font-weight:700;color:#EF4444;letter-spacing:0.6px;margin-bottom:5px;}
+  .stop-txt{font-size:12.5px;color:#E2E8F0;line-height:1.55;}
+
+  /* SESIÓN */
+  .ses-card{border-radius:11px;padding:13px;margin-bottom:9px;border:0.5px solid;}
+  .ses-active{background:rgba(29,158,117,0.09);border-color:rgba(29,158,117,0.4);}
+  .ses-idle{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);}
+  .ses-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;}
+  .ses-name{font-size:12.5px;font-weight:700;}
+  .ses-time{font-size:11px;font-family:monospace;color:#64748B;}
+  .ses-body{font-size:11.5px;color:#94A3B8;line-height:1.55;}
+  .badge{font-size:9px;padding:2px 7px;border-radius:99px;font-weight:700;}
+
+  .empty{text-align:center;color:#475569;font-size:12.5px;padding:34px 12px;line-height:1.6;}
+
+  /* OVERLAYS */
+  #loading,#cfg-error{position:fixed;inset:0;background:#070D1A;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:24px;text-align:center;}
+  #cfg-error{display:none;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .spinner{width:26px;height:26px;border:2.5px solid rgba(245,158,11,0.2);border-top-color:#F59E0B;border-radius:50%;animation:spin 0.8s linear infinite;}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <div style="font-size:12px;color:#64748B">Cargando configuración…</div>
+</div>
+<div id="cfg-error">
+  <div style="font-size:28px">⚠</div>
+  <div style="font-size:14px;color:#EF4444;font-weight:700">No se pudo cargar config.json</div>
+  <div style="font-size:12px;color:#94A3B8;line-height:1.6;max-width:320px">Verifica tu conexión, o que <span style="font-family:monospace">config.json</span> esté en el mismo repositorio que este archivo. Tus datos guardados siguen intactos.</div>
+  <button class="btn" style="background:rgba(245,158,11,0.15);color:#F59E0B;max-width:200px" onclick="location.reload()">Reintentar</button>
+</div>
+
+<div id="header">
+  <div>
+    <div class="h-title">MESA DE TRABAJO</div>
+    <div class="h-sub" id="h-fecha">—</div>
+  </div>
+  <div>
+    <div id="h-hora">--:--</div>
+    <div id="h-jornada" style="color:#475569">—</div>
+  </div>
+</div>
+
+<div id="nav"></div>
+
+<div id="content">
+
+  <!-- PRE-TRADE (GATE) -->
+  <div id="p-pretrade" class="panel active">
+    <div class="gate-banner" id="gate-banner">
+      <div class="gate-title" id="gate-title">🔒 Pre-trade pendiente</div>
+      <div class="gate-txt" id="gate-txt">Completa los 5 puntos para desbloquear el resto de la mesa.</div>
+    </div>
+
+    <div class="check-progress">
+      <span style="font-size:12px;color:#94A3B8">Checklist de apertura</span>
+      <span id="chk-count" style="font-size:12px;font-weight:700;color:#F59E0B">0/5</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="chk-bar" style="width:0%;background:#F59E0B"></div></div>
+    <div id="chk-list"></div>
+
+    <button class="btn btn-ghost" onclick="resetChecklist()">Reiniciar para nueva sesión</button>
+
+    <div class="section-title">Calendarios a revisar</div>
+    <div class="hint">Cada firma designa su propia fuente como autoritativa — revisar solo una no cubre a las demás.</div>
+    <div id="cal-links"></div>
+  </div>
+
+  <!-- SESIÓN -->
+  <div id="p-sesion" class="panel">
+    <div class="section-title">Jornada actual</div>
+    <div id="ses-now"></div>
+    <div class="section-title">Todas las sesiones</div>
+    <div id="ses-all"></div>
+  </div>
+
+  <!-- NOTICIAS -->
+  <div id="p-noticias" class="panel">
+    <div class="section-title">Agregar evento</div>
+    <div class="hint">Ingresa las noticias de alto impacto del día. La mesa calcula qué instrumentos quedan bloqueados y en qué firmas.</div>
+    <div class="news-form">
+      <div class="grid3">
+        <div>
+          <label class="lbl">HORA</label>
+          <input type="time" class="inp" id="nw-hora">
+        </div>
+        <div>
+          <label class="lbl">DIVISA</label>
+          <select class="inp" id="nw-cur"></select>
+        </div>
+        <div>
+          <label class="lbl">IMPACTO</label>
+          <select class="inp" id="nw-imp">
+            <option value="alto">Alto 🔴</option>
+            <option value="medio">Medio 🟠</option>
+          </select>
+        </div>
+      </div>
+      <div style="margin-top:9px">
+        <label class="lbl">EVENTO</label>
+        <input type="text" class="inp" id="nw-nombre" placeholder="CPI m/m, NFP, Tasa BoE…" style="font-family:'DM Sans',sans-serif">
+      </div>
+      <button class="btn" id="nw-add" style="background:#F59E0B;color:#0A0F1E" onclick="agregarEvento()">Agregar</button>
+    </div>
+
+    <div class="section-title">Pegar desde calendario</div>
+    <div class="hint">Copia las filas del calendario y pégalas aquí. Formato por línea: <span style="font-family:monospace">HORA · DIVISA · EVENTO</span> (ej. <span style="font-family:monospace">08:30 USD CPI m/m</span>).</div>
+    <textarea class="inp" id="nw-bulk" placeholder="08:30 USD CPI m/m&#10;10:00 EUR Tasa BCE&#10;14:00 GBP Empleo"></textarea>
+    <button class="btn btn-ghost" onclick="procesarBulk()">Procesar pegado</button>
+
+    <div class="section-title">Eventos de hoy</div>
+    <div id="nw-list"></div>
+    <button class="btn btn-ghost" onclick="limpiarEventos()">Borrar todos los eventos</button>
+  </div>
+
+  <!-- SEMÁFORO -->
+  <div id="p-semaforo" class="panel">
+    <div class="section-title">Semáforo de mercados</div>
+    <div class="hint">Toca cada mercado para marcar su dirección. Se usa para cruzar con las noticias y sugerir dónde mirar.</div>
+    <div class="sem-legend">
+      <div class="leg"><div class="leg-dot" style="background:#16A34A"></div>Con tendencia</div>
+      <div class="leg"><div class="leg-dot" style="background:#DC2626"></div>Sin tendencia</div>
+      <div class="leg"><div class="leg-dot" style="background:rgba(255,255,255,0.1);border:0.5px solid rgba(255,255,255,0.2)"></div>Neutro</div>
+    </div>
+    <div class="sem-grid" id="sem-grid"></div>
+    <button class="btn btn-ghost" onclick="limpiarSemaforo()">Limpiar semáforo</button>
+
+    <div class="section-title">Con tendencia y sin bloqueo</div>
+    <div class="hint">Mercados marcados en verde que no están restringidos por noticias en este momento.</div>
+    <div id="sem-libres"></div>
+  </div>
+
+  <!-- PORTAFOLIO -->
+  <div id="p-portafolio" class="panel">
+    <div class="section-title">Estado de las cuentas</div>
+    <div class="hint">Importa el respaldo exportado desde Control Operativa para ver el P&L y actividad. Las fechas reales de cada trade vienen de la Bitácora.</div>
+    <input type="file" id="pf-file" accept=".json,application/json" style="display:none" onchange="importarRespaldo(event)">
+    <button class="btn btn-ghost" onclick="document.getElementById('pf-file').click()">⬆ Importar respaldo del Control</button>
+    <div id="pf-stamp" style="font-size:10.5px;color:#475569;margin:9px 0 4px;text-align:center"></div>
+    <div id="pf-list" style="margin-top:12px"></div>
+  </div>
+
+  <!-- PARADA -->
+  <div id="p-parada" class="panel">
+    <div class="section-title">Protocolo de parada</div>
+    <div class="hint">Condiciones que obligan a detener la operativa. No son sugerencias.</div>
+    <div class="stop-card">
+      <div class="stop-num">CONDICIÓN 1</div>
+      <div class="stop-txt">3 pérdidas consecutivas en tres mercados → <strong>pausar el día en todas las cuentas</strong>.</div>
+    </div>
+    <div class="stop-card">
+      <div class="stop-num">CONDICIÓN 2</div>
+      <div class="stop-txt">Si se alcanza el límite diario de pérdida → <strong>congelar esa cuenta por hoy</strong>.</div>
+    </div>
+    <div class="stop-card">
+      <div class="stop-num">CONDICIÓN 3</div>
+      <div class="stop-txt">Noticia de alto impacto inesperada → <strong>cerrar posiciones</strong>.</div>
+    </div>
+
+    <div class="section-title">Balas disponibles por cuenta</div>
+    <div class="hint">Cada entrada arriesga 0.5% del capital. Estas son las posiciones perdedoras simultáneas que caben antes de tocar el stop personal. Las órdenes pendientes cuentan igual que las abiertas.</div>
+    <div id="balas-list"></div>
+  </div>
+
+</div>
+
+<script>
+// ── DATOS PROPIOS DE LA MESA ─────────────────────────────────────────────────
+let FIRMS = {}, FIRM_KEYS = [];
+
+// Mapeo divisa → instrumentos afectados (fuente: tabla oficial FundedNext).
+// Pendiente verificar si las demás firmas usan la misma correspondencia.
+const MAPA_NOTICIAS = {
+  USD: ["XAUUSD","NDX100","SPX500","US2000","US30","USDX","USOUSD","XAGUSD","BTCUSD","ETHUSD","USDCAD","AUDUSD","EURUSD","GBPUSD","NZDUSD","USDJPY","USDCHF"],
+  EUR: ["FRA40","EUSTX50","GER30","EURUSD","EURCAD","EURCHF","EURJPY","EURGBP","EURAUD","EURNZD"],
+  GBP: ["UK100","UKOUSD","GBPUSD","GBPAUD","GBPCAD","GBPCHF","GBPJPY","GBPNZD","EURGBP"],
+  JPY: ["JPN225","AUDJPY","CADJPY","CHFJPY","EURJPY","GBPJPY","NZDJPY","USDJPY"],
+  AUD: ["AUS200","XAUUSD","AUDCAD","AUDCHF","AUDJPY","AUDNZD","AUDUSD","EURAUD","GBPAUD"],
+  CAD: ["XAUUSD","AUDCAD","CADCHF","CADJPY","EURCAD","GBPCAD","NZDCAD","USDCAD"],
+  CHF: ["AUDCHF","CADCHF","CHFJPY","EURCHF","GBPCHF","NZDCHF","USDCHF"],
+  NZD: ["AUDNZD","EURNZD","GBPNZD","NZDCAD","NZDCHF","NZDJPY","NZDUSD"],
+};
+
+// Ventana de restricción por firma en cuenta fondeada (minutos antes/después)
+const VENTANA_FIRMA = {
+  FS: {min:0,  txt:"Sin restricción de noticias",            tipo:"libre"},
+  FC: {min:2,  txt:"±2 min — no abrir ni cerrar",            tipo:"duro"},
+  WS: {min:4,  txt:"±4 min — no abrir ni cerrar",            tipo:"duro"},
+  FN: {min:4,  txt:"Regla 40/60 — ver condiciones de la firma", tipo:"duro"},
+  T5: {min:2,  txt:"±2 min — soft breach (deduce profit)",   tipo:"suave"},
+  RP: {min:4,  txt:"±4 min — no abrir ni cerrar",            tipo:"duro"},
+};
+
+// Semáforo — 28 mercados, con su símbolo canónico para cruzar con noticias
+const MERCADOS = [
+  {lbl:"INDEX US",   sym:"USDX"},   {lbl:"DAX 40",     sym:"GER30"},
+  {lbl:"CAC 40",     sym:"FRA40"},  {lbl:"UK 100",     sym:"UK100"},
+  {lbl:"US NDQ 100", sym:"NDX100"}, {lbl:"US S&P 500", sym:"SPX500"},
+  {lbl:"US DJ 30",   sym:"US30"},   {lbl:"EUR USD",    sym:"EURUSD"},
+  {lbl:"EUR CAD",    sym:"EURCAD"}, {lbl:"EUR GBP",    sym:"EURGBP"},
+  {lbl:"EUR AUD",    sym:"EURAUD"}, {lbl:"USD JPY",    sym:"USDJPY"},
+  {lbl:"USD CAD",    sym:"USDCAD"}, {lbl:"AUD JPY",    sym:"AUDJPY"},
+  {lbl:"GBP USD",    sym:"GBPUSD"}, {lbl:"GBP JPY",    sym:"GBPJPY"},
+  {lbl:"EUR JPY",    sym:"EURJPY"}, {lbl:"CAD JPY",    sym:"CADJPY"},
+  {lbl:"AUD CAD",    sym:"AUDCAD"}, {lbl:"AUD NZD",    sym:"AUDNZD"},
+  {lbl:"AUD USD",    sym:"AUDUSD"}, {lbl:"NZD JPY",    sym:"NZDJPY"},
+  {lbl:"NZD USD",    sym:"NZDUSD"}, {lbl:"XAG USD",    sym:"XAGUSD"},
+  {lbl:"AUX USD",    sym:"XAUUSD"}, {lbl:"WTI",        sym:"USOUSD"},
+  {lbl:"BTC USD",    sym:"BTCUSD"}, {lbl:"DASH USD",   sym:"DASHUSD"},
+];
+
+// Sesiones de trading — hora Colombia (GMT-5)
+const SESIONES = [
+  {id:"preasia", nom:"Pre-Asia",  ini:"21:00", fin:"22:00",
+   foco:"JPY, AUD, NZD, BTC, DASH. Índices US solo condicional: scalping rápido, sizing reducido, stops amplios, verificar spread.",
+   obj:"Análisis y bias del día siguiente."},
+  {id:"londres", nom:"Apertura Londres",  ini:"05:30", fin:"07:00",
+   foco:"EUR, GBP, CAD, DAX, CAC, FTSE, oro, plata, WTI.",
+   obj:"Sesión principal — scalping activo e intradía. Verificar noticias EU antes de entrar."},
+  {id:"overlap", nom:"Overlap Londres/NY", ini:"10:30", fin:"11:00",
+   foco:"Gestión de posiciones abiertas, ajuste de SL a breakeven o trailing.",
+   obj:"No abrir nuevas posiciones salvo setup muy claro en índices US."},
+];
+
+const CALENDARIOS = [
+  {nom:"FTMO — calendario propio", url:"https://ftmo.com/es/calendar/", firmas:"FT Swing · FT Scalp", nota:"Es el que manda para ambas cuentas FTMO."},
+  {nom:"Forex Factory",            url:"https://www.forexfactory.com/calendar", firmas:"The5%ers", nota:"The5%ers remite explícitamente aquí."},
+  {nom:"FundedNext",               url:"https://fundednext.com/es/economic-calendar", firmas:"FundedNext", nota:"Público, sin login. Ya viene en hora Bogotá y con filtro de restricciones."},
+  {nom:"WSF — portal del cliente", url:"https://portal.wsfunded.com/trading-tools", firmas:"WSF Ultra · WSF Rapid", nota:"Requiere iniciar sesión. Horarios en zona Bogotá."},
+];
+
+const CHECKLIST = [
+  {id:"cal",  txt:"Revisé los calendarios de noticias"},
+  {id:"dir",  txt:"Definí las direcciones del momento (semáforo)"},
+  {id:"ftmo", txt:"FT Scalp y FT Swing no replicados en el mismo instrumento y dirección"},
+  {id:"wsf",  txt:"WSF con SL montado desde antes y trades mayores de 60 segundos"},
+  {id:"fn",   txt:"FundedNext trades mayores de 30 segundos"},
+];
+
+const TABS = [
+  {id:"pretrade",   lbl:"Pre-trade",   gate:false},
+  {id:"sesion",     lbl:"Sesión",      gate:true},
+  {id:"noticias",   lbl:"Noticias",    gate:true},
+  {id:"semaforo",   lbl:"Semáforo",    gate:true},
+  {id:"portafolio", lbl:"Portafolio",  gate:true},
+  {id:"parada",     lbl:"Parada",      gate:true},
+];
+
+// ── PERSISTENCIA ─────────────────────────────────────────────────────────────
+const KEY = "mesa_v2";
+
+function hoyStr(){ return new Date().toISOString().slice(0,10); }
+
+function guardar(){
+  try{ localStorage.setItem(KEY, JSON.stringify({fecha:hoyStr(), checkState, semaforo, eventos, snapshot})); }catch(e){}
+}
+function cargar(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(!raw) return null;
+    const d = JSON.parse(raw);
+    // El checklist y las noticias son de la jornada: si es otro día, arrancan limpios.
+    if(d.fecha !== hoyStr()){ d.checkState = {}; d.eventos = []; }
+    return d;
+  }catch(e){ return null; }
+}
+
+const guardado = cargar() || {};
+let checkState = guardado.checkState || {};
+let semaforo   = guardado.semaforo   || {};
+let eventos    = guardado.eventos    || [];
+let snapshot   = guardado.snapshot   || null;
+let tabActual  = "pretrade";
+
+// ── HORA / JORNADA ───────────────────────────────────────────────────────────
+function ahoraMin(){ const d=new Date(); return d.getHours()*60 + d.getMinutes(); }
+function hhmmAMin(s){ const [h,m]=s.split(":").map(Number); return h*60+m; }
+function minAHHMM(m){ const h=Math.floor(m/60)%24, mm=m%60; return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0"); }
+
+function sesionActual(){
+  const n = ahoraMin();
+  return SESIONES.find(s => n >= hhmmAMin(s.ini) && n <= hhmmAMin(s.fin)) || null;
+}
+
+function proximaSesion(){
+  const n = ahoraMin();
+  const futuras = SESIONES.filter(s => hhmmAMin(s.ini) > n).sort((a,b)=>hhmmAMin(a.ini)-hhmmAMin(b.ini));
+  return futuras[0] || SESIONES.slice().sort((a,b)=>hhmmAMin(a.ini)-hhmmAMin(b.ini))[0];
+}
+
+function renderHeader(){
+  const d = new Date();
+  document.getElementById("h-hora").textContent =
+    d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit",hour12:false});
+  document.getElementById("h-fecha").textContent =
+    d.toLocaleDateString("es-CO",{weekday:"long",day:"numeric",month:"short"});
+  const s = sesionActual();
+  const el = document.getElementById("h-jornada");
+  if(s){ el.textContent = s.nom; el.style.color = "#1D9E75"; }
+  else {
+    const p = proximaSesion();
+    el.textContent = "Fuera de sesión · sigue " + p.nom + " " + p.ini;
+    el.style.color = "#475569";
+  }
+}
+
+// ── GATE / CHECKLIST ─────────────────────────────────────────────────────────
+function checklistCompleto(){ return CHECKLIST.every(i => checkState[i.id]); }
+
+function renderChecklist(){
+  const cont = document.getElementById("chk-list");
+  cont.innerHTML = CHECKLIST.map(i=>{
+    const done = !!checkState[i.id];
+    return `<button class="check-item ${done?"done":""}" onclick="toggleCheck('${i.id}')">
+      <div class="check-box">${done?"✓":""}</div>
+      <span class="check-txt">${i.txt}</span>
+    </button>`;
+  }).join("");
+
+  const n = CHECKLIST.filter(i=>checkState[i.id]).length;
+  const full = n === CHECKLIST.length;
+  document.getElementById("chk-count").textContent = n+"/"+CHECKLIST.length;
+  document.getElementById("chk-count").style.color = full ? "#1D9E75" : "#F59E0B";
+  document.getElementById("chk-bar").style.width = (n/CHECKLIST.length*100)+"%";
+  document.getElementById("chk-bar").style.background = full ? "#1D9E75" : "#F59E0B";
+
+  const banner = document.getElementById("gate-banner");
+  if(full){
+    banner.style.background = "rgba(29,158,117,0.08)";
+    banner.style.borderColor = "rgba(29,158,117,0.35)";
+    document.getElementById("gate-title").textContent = "✓ Mesa desbloqueada";
+    document.getElementById("gate-title").style.color = "#1D9E75";
+    document.getElementById("gate-txt").textContent = "Todas las pestañas están disponibles. Buena sesión.";
+  } else {
+    banner.style.background = "rgba(245,158,11,0.08)";
+    banner.style.borderColor = "rgba(245,158,11,0.3)";
+    document.getElementById("gate-title").textContent = "🔒 Pre-trade pendiente";
+    document.getElementById("gate-title").style.color = "#F59E0B";
+    document.getElementById("gate-txt").textContent = "Completa los 5 puntos para desbloquear el resto de la mesa.";
+  }
+  renderNav();
+}
+
+function toggleCheck(id){
+  checkState[id] = !checkState[id];
+  guardar();
+  renderChecklist();
+}
+
+function resetChecklist(){
+  checkState = {};
+  guardar();
+  if(tabActual !== "pretrade") switchTab("pretrade");
+  renderChecklist();
+}
+
+function renderNav(){
+  const open = checklistCompleto();
+  document.getElementById("nav").innerHTML = TABS.map(t=>{
+    const locked = t.gate && !open;
+    return `<button class="nav-btn ${tabActual===t.id?"active":""} ${locked?"locked":""}" onclick="switchTab('${t.id}')">${locked?"🔒 ":""}${t.lbl}</button>`;
+  }).join("");
+}
+
+function switchTab(id){
+  const t = TABS.find(x=>x.id===id);
+  if(t.gate && !checklistCompleto()){
+    const banner = document.getElementById("gate-banner");
+    banner.style.transition = "none";
+    banner.style.transform = "scale(1.03)";
+    setTimeout(()=>{ banner.style.transition="transform .25s"; banner.style.transform="scale(1)"; },120);
+    return;
+  }
+  tabActual = id;
+  document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
+  document.getElementById("p-"+id).classList.add("active");
+  renderNav();
+  window.scrollTo(0,0);
+  if(id==="sesion")     renderSesiones();
+  if(id==="noticias")   renderEventos();
+  if(id==="semaforo")   { renderSemaforo(); renderLibres(); }
+  if(id==="portafolio") renderPortafolio();
+  if(id==="parada")     renderBalas();
+}
+
+// ── CALENDARIOS ──────────────────────────────────────────────────────────────
+function renderCalendarios(){
+  document.getElementById("cal-links").innerHTML = CALENDARIOS.map(c=>`
+    <a href="${c.url}" target="_blank" rel="noopener" style="display:block;text-decoration:none;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:10px;padding:12px 13px;margin-bottom:7px">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <span style="font-size:12.5px;font-weight:700;color:#93C5FD">${c.nom}</span>
+        <span style="font-size:10px;color:#475569">abrir ↗</span>
+      </div>
+      <div style="font-size:10px;color:#64748B;margin-top:3px">${c.firmas}</div>
+      <div style="font-size:10.5px;color:#94A3B8;margin-top:5px;line-height:1.45">${c.nota}</div>
+    </a>`).join("");
+}
+
+// ── SESIONES ─────────────────────────────────────────────────────────────────
+function renderSesiones(){
+  const s = sesionActual();
+  const cont = document.getElementById("ses-now");
+  if(s){
+    const fin = hhmmAMin(s.fin) - ahoraMin();
+    cont.innerHTML = `
+      <div class="ses-card ses-active">
+        <div class="ses-head">
+          <span class="ses-name" style="color:#1D9E75">${s.nom}</span>
+          <span class="badge" style="background:rgba(29,158,117,0.2);color:#1D9E75">quedan ${fin} min</span>
+        </div>
+        <div class="ses-body"><strong>Foco:</strong> ${s.foco}<br><strong>Objetivo:</strong> ${s.obj}</div>
+      </div>`;
+  } else {
+    const p = proximaSesion();
+    let falta = hhmmAMin(p.ini) - ahoraMin();
+    if(falta < 0) falta += 24*60;
+    const h = Math.floor(falta/60), m = falta%60;
+    cont.innerHTML = `
+      <div class="ses-card ses-idle">
+        <div class="ses-head">
+          <span class="ses-name" style="color:#64748B">Fuera de sesión</span>
+          <span class="badge" style="background:rgba(255,255,255,0.08);color:#94A3B8">en ${h}h ${m}m</span>
+        </div>
+        <div class="ses-body">Sigue <strong>${p.nom}</strong> a las ${p.ini}.<br>${p.foco}</div>
+      </div>`;
+  }
+
+  document.getElementById("ses-all").innerHTML = SESIONES.map(x=>{
+    const act = s && s.id===x.id;
+    return `<div class="ses-card ${act?"ses-active":"ses-idle"}">
+      <div class="ses-head">
+        <span class="ses-name" style="color:${act?"#1D9E75":"#CBD5E1"}">${x.nom}</span>
+        <span class="ses-time">${x.ini} – ${x.fin}</span>
+      </div>
+      <div class="ses-body">${x.foco}</div>
+    </div>`;
+  }).join("");
+}
+
+// ── NOTICIAS ─────────────────────────────────────────────────────────────────
+function instrumentosDe(cur){ return MAPA_NOTICIAS[cur] || []; }
+
+function estadoEvento(ev){
+  // Devuelve el estado según la ventana MÁS AMPLIA de todas las firmas (4 min)
+  const n = ahoraMin(), t = hhmmAMin(ev.hora);
+  const maxV = Math.max(...Object.values(VENTANA_FIRMA).map(v=>v.min));
+  if(n >= t - maxV && n <= t + maxV) return "now";
+  if(t - n > 0 && t - n <= 15)       return "soon";
+  if(t < n)                          return "past";
+  return "later";
+}
+
+function agregarEvento(){
+  const hora = document.getElementById("nw-hora").value;
+  const cur  = document.getElementById("nw-cur").value;
+  const imp  = document.getElementById("nw-imp").value;
+  const nom  = document.getElementById("nw-nombre").value.trim() || "Evento " + cur;
+  if(!hora){ alert("Falta la hora del evento."); return; }
+  eventos.push({id:Date.now().toString(), hora, cur, imp, nom});
+  eventos.sort((a,b)=>hhmmAMin(a.hora)-hhmmAMin(b.hora));
+  document.getElementById("nw-hora").value = "";
+  document.getElementById("nw-nombre").value = "";
+  guardar();
+  renderEventos();
+}
+
+function procesarBulk(){
+  const txt = document.getElementById("nw-bulk").value.trim();
+  if(!txt){ return; }
+  const curs = Object.keys(MAPA_NOTICIAS);
+  let añadidos = 0;
+  txt.split("\n").forEach(linea=>{
+    const l = linea.trim();
+    if(!l) return;
+    const mHora = l.match(/(\d{1,2}):(\d{2})/);
+    if(!mHora) return;
+    const cur = curs.find(c => new RegExp("\\b"+c+"\\b","i").test(l));
+    if(!cur) return;
+    const hora = String(mHora[1]).padStart(2,"0")+":"+mHora[2];
+    let nom = l.replace(mHora[0],"").replace(new RegExp("\\b"+cur+"\\b","i"),"")
+               .replace(/\b(AM|PM|High|Alto|Medium|Medio)\b/gi,"")
+               .replace(/[·|\t]+/g," ").trim();
+    eventos.push({id:Date.now().toString()+añadidos, hora, cur, imp:"alto", nom: nom || ("Evento "+cur)});
+    añadidos++;
+  });
+  eventos.sort((a,b)=>hhmmAMin(a.hora)-hhmmAMin(b.hora));
+  document.getElementById("nw-bulk").value = "";
+  guardar();
+  renderEventos();
+  if(añadidos===0) alert("No se reconoció ninguna línea. Revisa que cada una tenga hora y divisa.");
+}
+
+function borrarEvento(id){
+  eventos = eventos.filter(e=>e.id!==id);
+  guardar(); renderEventos();
+}
+function limpiarEventos(){
+  if(!confirm("¿Borrar todos los eventos de hoy?")) return;
+  eventos = []; guardar(); renderEventos();
+}
+
+function renderEventos(){
+  const cont = document.getElementById("nw-list");
+  if(eventos.length===0){
+    cont.innerHTML = `<div class="empty">Sin eventos cargados.<br>Agrégalos arriba o pégalos desde el calendario.</div>`;
+    return;
+  }
+  const n = ahoraMin();
+  cont.innerHTML = eventos.map(ev=>{
+    const est = estadoEvento(ev);
+    const dif = hhmmAMin(ev.hora) - n;
+    let cuando, color;
+    if(est==="now")       { cuando = "AHORA";                  color="#EF4444"; }
+    else if(est==="soon") { cuando = "en "+dif+" min";         color="#F59E0B"; }
+    else if(est==="past") { cuando = "hace "+Math.abs(dif)+" min"; color="#475569"; }
+    else                  { cuando = "en "+Math.floor(dif/60)+"h "+(dif%60)+"m"; color="#94A3B8"; }
+
+    const instr = instrumentosDe(ev.cur);
+    const firmas = FIRM_KEYS.map(k=>{
+      const v = VENTANA_FIRMA[k]; const f = FIRMS[k];
+      if(!v || !f) return "";
+      const libre = v.tipo==="libre";
+      const c = libre ? "#1D9E75" : (v.tipo==="suave" ? "#F59E0B" : "#EF4444");
+      return `<div class="ev-firm"><span style="color:${f.color};font-weight:700;min-width:74px">${f.name}</span><span style="color:${c}">${v.txt}</span></div>`;
+    }).join("");
+
+    return `<div class="ev-card ev-${est}">
+      <div class="ev-head">
+        <div>
+          <span class="ev-name">${ev.nom}</span>
+          <span class="ev-cur" style="margin-left:6px">${ev.cur}</span>
+        </div>
+        <div style="text-align:right;flex-shrink:0">
+          <div class="ev-when" style="color:${color}">${cuando}</div>
+          <div style="font-size:10px;color:#475569;font-family:monospace">${ev.hora}</div>
+        </div>
+      </div>
+      <div class="ev-instr">${instr.length? instr.join(" · ") : "Sin instrumentos mapeados"}</div>
+      <div class="ev-firms">${firmas}</div>
+      <button class="ev-del" onclick="borrarEvento('${ev.id}')">eliminar</button>
+    </div>`;
+  }).join("");
+}
+
+// Instrumentos bloqueados en este instante (por cualquier firma con restricción dura)
+function bloqueadosAhora(){
+  const n = ahoraMin();
+  const set = new Set();
+  eventos.forEach(ev=>{
+    const t = hhmmAMin(ev.hora);
+    const maxV = Math.max(...Object.values(VENTANA_FIRMA).filter(v=>v.tipo!=="libre").map(v=>v.min));
+    if(n >= t - maxV && n <= t + maxV) instrumentosDe(ev.cur).forEach(i=>set.add(i));
+  });
+  return set;
+}
+
+// ── SEMÁFORO ─────────────────────────────────────────────────────────────────
+function renderSemaforo(){
+  document.getElementById("sem-grid").innerHTML = MERCADOS.map((m,i)=>{
+    const st = semaforo[m.sym] || "";
+    return `<button class="sem-cell ${st}" onclick="cicloSem('${m.sym}')">${m.lbl}</button>`;
+  }).join("");
+}
+
+function cicloSem(sym){
+  const cur = semaforo[sym] || "";
+  semaforo[sym] = cur==="" ? "up" : (cur==="up" ? "down" : "");
+  if(!semaforo[sym]) delete semaforo[sym];
+  guardar();
+  renderSemaforo(); renderLibres();
+}
+
+function limpiarSemaforo(){
+  if(!confirm("¿Limpiar todas las marcas del semáforo?")) return;
+  semaforo = {}; guardar(); renderSemaforo(); renderLibres();
+}
+
+function renderLibres(){
+  const bloq = bloqueadosAhora();
+  const verdes = MERCADOS.filter(m => semaforo[m.sym]==="up");
+  const cont = document.getElementById("sem-libres");
+  if(verdes.length===0){
+    cont.innerHTML = `<div class="empty">Ningún mercado marcado con tendencia todavía.</div>`;
+    return;
+  }
+  cont.innerHTML = verdes.map(m=>{
+    const bl = bloq.has(m.sym);
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(255,255,255,0.03);border-radius:9px;margin-bottom:6px;border-left:3px solid ${bl?"#EF4444":"#16A34A"}">
+      <span style="font-size:12.5px;font-weight:700;color:#F1F5F9;font-family:monospace">${m.lbl}</span>
+      <span style="font-size:10.5px;font-weight:600;color:${bl?"#EF4444":"#1D9E75"}">${bl?"bloqueado por noticia":"libre"}</span>
+    </div>`;
+  }).join("");
+}
+
+// ── PORTAFOLIO ───────────────────────────────────────────────────────────────
+function importarRespaldo(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const r = new FileReader();
+  r.onload = ev=>{
+    try{
+      const d = JSON.parse(ev.target.result);
+      snapshot = {
+        pnlDia: d.pnlDia || {},
+        historico: d.historico || [],
+        ops: d.ops || [],
+        importadoEn: new Date().toISOString(),
+        exportadoEn: d.exportadoEn || null,
+      };
+      guardar(); renderPortafolio();
+    }catch(err){ alert("El archivo no es un respaldo válido del Control."); }
+    e.target.value = "";
+  };
+  r.readAsText(file);
+}
+
+function renderPortafolio(){
+  const stamp = document.getElementById("pf-stamp");
+  const cont  = document.getElementById("pf-list");
+
+  if(!snapshot){
+    stamp.textContent = "";
+    cont.innerHTML = `<div class="empty">Sin datos importados.<br>Exporta el respaldo desde Control Operativa e impórtalo aquí.</div>`;
+    return;
+  }
+
+  const exp = snapshot.exportadoEn ? new Date(snapshot.exportadoEn) : null;
+  stamp.textContent = exp
+    ? "Respaldo del " + exp.toLocaleString("es-CO",{dateStyle:"medium",timeStyle:"short"})
+    : "Respaldo sin fecha de exportación";
+
+  cont.innerHTML = FIRM_KEYS.map(k=>{
+    const f = FIRMS[k]; if(!f) return "";
+    const hist = (snapshot.historico||[]).filter(o=>o.firmKey===k);
+    const cerrados = hist.filter(o=>o.resultado!==null && o.resultado!==undefined);
+    const acum = cerrados.reduce((a,o)=>a+(o.resultado||0),0);
+    const dia  = snapshot.pnlDia ? (snapshot.pnlDia[k]||0) : 0;
+    const abiertas = (snapshot.ops||[]).filter(o=>o.firmKey===k).length;
+    const pct = f.targetF1 ? Math.max(0, Math.min(100, acum/f.targetF1*100)) : 0;
+
+    return `<div class="pf-card" style="border-left-color:${f.color}">
+      <div class="pf-head">
+        <span class="pf-name" style="color:${f.color}">${f.name}</span>
+        <span class="pf-cap">$${(f.capital/1000)}K</span>
+      </div>
+      <div class="pf-row"><span class="pf-lbl">Progreso a target F1</span>
+        <span class="pf-val" style="color:${acum>=0?"#1D9E75":"#EF4444"}">$${acum.toLocaleString("es-CO")} / $${(f.targetF1||0).toLocaleString("es-CO")}</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${f.color}"></div></div>
+      <div class="pf-row"><span class="pf-lbl">P&L del día</span>
+        <span class="pf-val" style="color:${dia>=0?"#1D9E75":"#EF4444"}">${dia>=0?"+":""}$${dia.toLocaleString("es-CO")}</span></div>
+      <div class="pf-row"><span class="pf-lbl">Trades registrados</span><span class="pf-val" style="color:#CBD5E1">${hist.length}</span></div>
+      <div class="pf-row"><span class="pf-lbl">Posiciones / órdenes activas</span>
+        <span class="pf-val" style="color:${abiertas>0?"#F59E0B":"#475569"}">${abiertas}</span></div>
+    </div>`;
+  }).join("") + `<div class="hint" style="margin-top:12px">Los días de inactividad por cuenta no se muestran aquí porque requieren la fecha real de cada trade, que vive en la Bitácora — no en el Control.</div>`;
+}
+
+// ── BALAS ────────────────────────────────────────────────────────────────────
+function renderBalas(){
+  document.getElementById("balas-list").innerHTML = FIRM_KEYS.map(k=>{
+    const f = FIRMS[k]; if(!f) return "";
+    const balasPers = f.riesgoTrade ? Math.floor(f.stopPersonal / f.riesgoTrade) : 0;
+    const balasFirma= f.riesgoTrade ? Math.floor(f.ddDia        / f.riesgoTrade) : 0;
+    return `<div class="pf-card" style="border-left-color:${f.color}">
+      <div class="pf-head">
+        <span class="pf-name" style="color:${f.color}">${f.name}</span>
+        <span class="pf-cap">$${f.riesgoTrade}/trade</span>
+      </div>
+      <div class="pf-row"><span class="pf-lbl">Hasta el stop personal ($${f.stopPersonal.toLocaleString("es-CO")})</span>
+        <span class="pf-val" style="color:#F59E0B">${balasPers} posiciones</span></div>
+      <div class="pf-row"><span class="pf-lbl">Hasta el límite de la firma ($${f.ddDia.toLocaleString("es-CO")})</span>
+        <span class="pf-val" style="color:#EF4444">${balasFirma} posiciones</span></div>
+    </div>`;
+  }).join("");
+}
+
+// ── TICK ─────────────────────────────────────────────────────────────────────
+function tick(){
+  renderHeader();
+  if(tabActual==="noticias") renderEventos();
+  if(tabActual==="semaforo") renderLibres();
+  if(tabActual==="sesion")   renderSesiones();
+}
+
+// ── CARGA ────────────────────────────────────────────────────────────────────
+fetch("./config.json")
+  .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
+  .then(cfg=>{
+    FIRMS = cfg.FIRMS; FIRM_KEYS = cfg.FIRM_KEYS;
+
+    document.getElementById("nw-cur").innerHTML =
+      Object.keys(MAPA_NOTICIAS).map(c=>`<option value="${c}">${c}</option>`).join("");
+
+    document.getElementById("loading").style.display = "none";
+    renderHeader(); renderChecklist(); renderCalendarios(); renderNav();
+    setInterval(tick, 20000);
+  })
+  .catch(err=>{
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("cfg-error").style.display = "flex";
+    console.error("config.json:", err);
+  });
+</script>
+</body>
+</html>
