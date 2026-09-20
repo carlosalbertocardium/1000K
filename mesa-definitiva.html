@@ -194,6 +194,7 @@
       <button class="tab" onclick="switchTab('sesiones',this)">Sesiones</button>
       <button class="tab" onclick="switchTab('checklist',this)">Pre-Trade</button>
       <button class="tab" onclick="switchTab('pendientes',this)">Pendientes</button>
+      <button class="tab" onclick="switchTab('semaforo',this)">Semáforo</button>
     </div>
   </div>
 </div>
@@ -243,10 +244,10 @@
       <div class="best-item">Scalping EUR/GBP apertura Londres</div>
       <div class="best-item">Gold/Plata intraday con SL rápido</div>
       <div class="best-item">DAX/CAC apertura EU</div>
-      <div class="strategy-text">Equity real-time = máxima vigilancia. Best Day Rule obliga a distribuir el profit — no concentrar en un solo día. Noticias libres en challenge; en fondeada aplican restricciones ±2 min. Inactividad: cualquier trade abierto rompe el contador de 30 días. Límites escalan con el balance en cada scale-up.</div>
+      <div class="strategy-text">Equity real-time = máxima vigilancia. Max Loss estático en $180,000 para siempre (NO trailing — el trailing solo aplica al 1-Step). Best Day Rule NO aplica a esta cuenta 2-Step. Noticias libres en challenge; en fondeada aplican restricciones ±2 min. Inactividad: cualquier trade abierto rompe el contador de 30 días. Límites escalan con el balance en cada scale-up.</div>
       <div class="tags">
         <span class="tag" style="background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25)">Equity real-time ⚡</span>
-        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.25)">Best Day Rule ⚠️</span>
+        <span class="tag" style="background:rgba(0,212,170,0.1);color:var(--ftmo);border:1px solid rgba(0,212,170,0.2)">Max Loss estático $180K</span>
         <span class="tag" style="background:rgba(0,212,170,0.1);color:var(--ftmo);border:1px solid rgba(0,212,170,0.2)">4 días mínimo</span>
         <span class="tag" style="background:rgba(0,212,170,0.1);color:var(--ftmo);border:1px solid rgba(0,212,170,0.2)">Techo $2M</span>
       </div>
@@ -286,10 +287,9 @@
       <div class="best-item">Scalping apertura Londres EUR/GBP/AUX — entries rápidos</div>
       <div class="best-item">SL ajustado 3–5 pips con leverage 1:100</div>
       <div class="best-item">Momentum primeros 30 min — duración de minutos</div>
-      <div class="strategy-text">Cuenta Standard $200K para scalping activo. Leverage 1:100 permite SL muy ajustados con sizing suficiente. Parada operativa: cuando P&L neto (incluidas comisiones) llegue a −$4,500 — buffer de $500 antes del stop personal. En funded: no dejar posiciones abiertas el viernes ni en rollover ≥2h. Challenge: noticias libres igual que FT Swing.</div>
+      <div class="strategy-text">Cuenta Standard $200K para scalping activo. Leverage 1:100 permite SL muy ajustados con sizing suficiente. Max Loss estático en $180,000 para siempre (NO trailing). Best Day Rule NO aplica a esta cuenta 2-Step. Parada operativa: cuando P&L neto (incluidas comisiones) llegue a −$4,500 — buffer de $500 antes del stop personal. En funded: no dejar posiciones abiertas el viernes ni en rollover ≥2h. Challenge: noticias libres igual que FT Swing.</div>
       <div class="tags">
         <span class="tag" style="background:rgba(239,68,68,0.12);color:var(--red);border:1px solid rgba(239,68,68,0.25)">Equity real-time ⚡</span>
-        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.25)">Best Day Rule ⚠️</span>
         <span class="tag" style="background:rgba(0,184,148,0.12);color:#00B894;border:1px solid rgba(0,184,148,0.25)">Leverage 1:100</span>
         <span class="tag" style="background:rgba(0,184,148,0.12);color:#00B894;border:1px solid rgba(0,184,148,0.25)">No replicar Swing ⚠️</span>
         <span class="tag" style="background:rgba(0,184,148,0.1);color:#00B894;border:1px solid rgba(0,184,148,0.2)">Cap $400K ⚠️</span>
@@ -443,42 +443,43 @@
       </thead>
       <tbody>
         <tr class="section-head"><td colspan="6">MEDICIÓN Y LÍMITES</td></tr>
-        <tr><td>Medición pérdida diaria</td><td style="color:var(--red)">Equity real-time ⚡</td><td style="color:var(--red)">Equity real-time ⚡</td><td style="color:var(--green)">EOD (snapshot 00:00)</td><td style="color:var(--gold)">EOD* / RT con flotante</td><td style="color:var(--fn)">Real-time (balance+flotante)</td></tr>
-        <tr><td>Tipo de drawdown overall</td><td>Trailing EOD</td><td>Trailing EOD</td><td style="color:var(--green)">Absoluto desde $100K</td><td style="color:var(--green)">Estático desde $100K</td><td style="color:var(--green)">Estático desde $50K</td></tr>
+        <tr><td>Medición pérdida diaria</td><td style="color:var(--red)">Equity real-time ⚡</td><td style="color:var(--red)">Equity real-time ⚡</td><td style="color:var(--green)">EOD (snapshot 00:00)</td><td style="color:var(--gold)">RT con flotante · reset 16:00 Bogotá fijo</td><td style="color:var(--fn)">Real-time (balance+flotante)</td></tr>
+        <tr><td>Tipo de drawdown overall</td><td style="color:var(--green)">Estático $180K</td><td style="color:var(--green)">Estático $180K</td><td style="color:var(--green)">Absoluto desde $100K</td><td style="color:var(--green)">Estático desde $100K</td><td style="color:var(--green)">Estático desde $50K</td></tr>
         <tr><td>Target Fase 1</td><td style="color:var(--ftmo)">$20,000 (10%)</td><td style="color:#00B894">$20,000 (10%)</td><td style="color:var(--the5)">$10,000 (10%)</td><td style="color:var(--wsf)">$10,000 (10%)</td><td style="color:var(--fn)">$4,000 (8%)</td></tr>
         <tr><td>Target Fase 2</td><td style="color:var(--ftmo)">$10,000 (5%)</td><td style="color:#00B894">$10,000 (5%)</td><td style="color:var(--the5)">$5,000 (5%)</td><td style="color:var(--wsf)">$5,000 (5%)</td><td style="color:var(--fn)">$2,500 (5%)</td></tr>
         <tr><td>Límite diario (firma)</td><td>$10,000 (5%)</td><td>$10,000 (5%)</td><td>$5,000 (5%)</td><td>$5,000 (5%)</td><td>$2,500 (5%)</td></tr>
         <tr><td>Overall loss máximo</td><td>$20,000 (10%)</td><td>$20,000 (10%)</td><td>$10,000 (10%)</td><td>$10,000 (10%)</td><td>$5,000 (10%)</td></tr>
         <tr><td>Stop personal (50%)</td><td style="color:var(--gold)">$5,000</td><td style="color:var(--gold)">$5,000</td><td style="color:var(--gold)">$2,500</td><td style="color:var(--gold)">$2,500</td><td style="color:var(--gold)">$1,250</td></tr>
         <tr><td>Riesgo por trade (0.5%)</td><td style="color:var(--ftmo)">$1,000</td><td style="color:#00B894">$1,000</td><td style="color:var(--the5)">$500</td><td style="color:var(--wsf)">$500</td><td style="color:var(--fn)">$250</td></tr>
+        <tr><td>Comisión por lote</td><td>Estándar FTMO</td><td style="color:var(--gold)">Estándar — cuenta contra el DD ⚠️</td><td>$4 / lote (round trip)</td><td>$3 / lote (todas las plataformas)</td><td>Según instrumento</td></tr>
         <tr class="section-head"><td colspan="6">REGLAS OPERATIVAS</td></tr>
         <tr><td>Días mínimos</td><td>4 días operados</td><td>4 días operados</td><td>3 días rentables ≥$500</td><td>4 días operados</td><td>5 días operados</td></tr>
-        <tr><td>Regla de consistencia</td><td style="color:var(--gold)">Best Day ≤50% ⚠️</td><td style="color:var(--gold)">Best Day ≤50% ⚠️</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td></tr>
-        <tr><td>SL obligatorio</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td><td style="color:var(--red)">SÍ — 2 min 🛑</td><td style="color:var(--gold)">Recomendado (sin SL = 100% en riesgo)</td></tr>
-        <tr><td>Solo trading manual</td><td style="color:var(--green)">NO (EAs permitidos)</td><td style="color:var(--green)">NO (EAs permitidos)</td><td style="color:var(--gold)">EA propio con código fuente</td><td style="color:var(--gold)">EA propio permitido</td><td style="color:var(--red)">SÍ — solo manual 🤚</td></tr>
-        <tr><td>Riesgo simultáneo máx.</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--red)">3% = $1,500 🚫</td></tr>
+        <tr><td>Regla de consistencia</td><td style="color:var(--green)">NO (solo 1-Step)</td><td style="color:var(--green)">NO (solo 1-Step)</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td></tr>
+        <tr><td>SL obligatorio</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO</td><td style="color:var(--green)">NO — sugerido en fondeada</td><td style="color:var(--red)">SÍ — 2 min 🛑</td><td style="color:var(--gold)">Recomendado (sin SL = 100% en riesgo)</td></tr>
+        <tr><td>Solo trading manual</td><td style="color:var(--green)">NO (EAs permitidos)</td><td style="color:var(--green)">NO (EAs permitidos)</td><td style="color:var(--gold)">EA propio con código fuente</td><td style="color:var(--red)">Conflicto abierto — no usar EA en funded ⚠️</td><td style="color:var(--red)">SÍ — solo manual 🤚</td></tr>
+        <tr><td>Riesgo simultáneo máx.</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--red)">3% = $1,500 — solo en fondeada 🚫</td></tr>
         <tr><td>Scalping corto</td><td style="color:var(--green)">Permitido</td><td style="color:var(--green)">Permitido</td><td style="color:var(--green)">Permitido</td><td style="color:var(--green)">Permitido</td><td style="color:var(--red)">Quick Strike: &gt;30 seg 🚫</td></tr>
         <tr><td>Tiempo límite del challenge</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td><td style="color:var(--green)">Sin límite</td></tr>
         <tr><td>Inactividad máxima</td><td>30 días</td><td>30 días</td><td>30 días</td><td>30 días</td><td>30 días</td></tr>
         <tr class="section-head"><td colspan="6">NOTICIAS</td></tr>
         <tr><td>Noticias en challenge</td><td style="color:var(--green)">Libre ✅</td><td style="color:var(--green)">Libre ✅</td><td style="color:var(--gold)">Soft breach ±2 min ⚠️</td><td style="color:var(--green)">Libre ✅</td><td style="color:var(--green)">Libre ✅</td></tr>
         <tr><td>Noticias en fondeada</td><td style="color:var(--green)">Sin restricción ✅</td><td style="color:var(--red)">±2 min 🚫</td><td style="color:var(--red)">±2 min 🚫</td><td style="color:var(--red)">±4 min 🚫</td><td style="color:var(--gold)">Regla 40/60 ⚠️</td></tr>
-        <tr><td>Referencia calendario</td><td>ftmo.com/es/calendar/</td><td>ftmo.com/es/calendar/</td><td>Forex Factory</td><td>Dashboard WSF</td><td>Calendario interno FN</td></tr>
+        <tr><td>Referencia calendario</td><td>ftmo.com/es/calendar/</td><td>ftmo.com/es/calendar/</td><td>Forex Factory</td><td>portal.wsfunded.com/trading-tools</td><td>fundednext.com/es/economic-calendar</td></tr>
         <tr class="section-head"><td colspan="6">FONDEO Y PAGOS</td></tr>
         <tr><td>Profit split inicial</td><td style="color:var(--ftmo)">80% → 90%</td><td style="color:#00B894">80% → 90%</td><td style="color:var(--the5)">80% → 100%</td><td style="color:var(--wsf)">80% → 95%</td><td style="color:var(--fn)">80% → 90%</td></tr>
-        <tr><td>Primer pago</td><td>Desde día 14</td><td>Desde día 14</td><td>Desde día 14 (bi-semanal)</td><td>A los 15 días</td><td>Ciclos 21/14 días</td></tr>
-        <tr><td>Mínimo de retiro</td><td>No especificado</td><td>No especificado</td><td>$1,500 (Rise) / cripto libre</td><td>$100 USD</td><td>$20 USD</td></tr>
+        <tr><td>Primer pago</td><td>Desde día 14</td><td>Desde día 14</td><td>Desde día 14 (bi-semanal) · procesa 72h</td><td>A los 15 días</td><td>Ciclos 21/14 días</td></tr>
+        <tr><td>Mínimo de retiro</td><td>No especificado</td><td>No especificado</td><td>$1,500 (Rise 2%) / cripto 2% / Hub Credits sin comisión</td><td>$100 USD</td><td>$20 USD</td></tr>
         <tr><td>Activación cuenta funded</td><td>1-2 días hábiles</td><td>1-2 días hábiles</td><td>Proceso estándar</td><td style="color:var(--gold)">Solo miérc / dom ⚠️</td><td>48-72 horas</td></tr>
         <tr><td>KYC plazo máximo</td><td>Sin plazo definido</td><td>Sin plazo definido</td><td>5 días hábiles post-solicitud</td><td>No especificado</td><td style="color:var(--red)">30 días desde aprobación F2</td></tr>
-        <tr><td>Techo máximo de capital</td><td style="color:var(--ftmo)">$2,000,000</td><td style="color:#00B894">$2,000,000</td><td style="color:var(--the5)">$4,000,000</td><td style="color:var(--wsf)">$2,000,000</td><td style="color:var(--fn)">$4,000,000</td></tr>
+        <tr><td>Techo máximo de capital</td><td style="color:var(--ftmo)">$2,000,000</td><td style="color:#00B894">$2,000,000</td><td style="color:var(--the5)">$500,000 (High Stakes)</td><td style="color:var(--wsf)">$2,000,000</td><td style="color:var(--fn)">$4,000,000</td></tr>
         <tr><td>Fusión de cuentas</td><td>Sí — máx $400K combinado</td><td>Sí — máx $400K combinado</td><td>Copy entre cuentas propias</td><td>Sí — máx $400K</td><td>Sí (condiciones pendientes)</td></tr>
       </tbody>
     </table>
   </div>
   <div class="key-grid">
     <div class="key-card" style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.18)">
-      <div class="key-icon">⚡</div><div class="key-title" style="color:var(--ftmo)">FT Swing — Equity real-time + Best Day</div>
-      <div class="key-desc">Flotantes cuentan al instante. Ningún día puede representar ≥50% del profit total — distribuir en mínimo 4 días positivos. Leverage 1:30. Fondeada: sin restricción de noticias ni fin de semana.</div>
+      <div class="key-icon">⚡</div><div class="key-title" style="color:var(--ftmo)">FT Swing — Equity real-time</div>
+      <div class="key-desc">Flotantes cuentan al instante. Max Loss estático en $180K para siempre (no trailing). Best Day Rule NO aplica a esta cuenta 2-Step. Leverage 1:30. Fondeada: sin restricción de noticias ni fin de semana.</div>
     </div>
     <div class="key-card" style="background:rgba(0,184,148,0.06);border:1px solid rgba(0,184,148,0.18)">
       <div class="key-icon">⚡</div><div class="key-title" style="color:#00B894">FT Scalp — Standard + comisiones</div>
@@ -704,7 +705,7 @@
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FT Scalp: el trade de hoy es claramente diferente al de FT Swing — no replicar mismo instrumento + dirección</span></div>
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Journal del día anterior completado — todas las cuentas</span></div>
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FTMO: revisé equity actual — sin flotantes grandes sin SL ajustado</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FTMO: el P&L de hoy no puede concentrar ≥50% del profit total acumulado (Best Day Rule)</span></div>
+    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FTMO: Max Loss estático $180K — recordar que NO es trailing y Best Day Rule NO aplica (solo 1-Step)</span></div>
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">WSF: tengo el nivel de SL definido ANTES de cada entrada — máx 2 min para colocarlo</span></div>
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">WSF: ningún trade durará menos de 60 segundos — esperar aunque el TP se toque antes</span></div>
     <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">WSF: el DD del día reinicia a las 16:00 Bogotá — calcular margen disponible desde esa hora</span></div>
@@ -762,7 +763,92 @@
   </div>
 </div>
 
+<!-- ══ SEMÁFORO + BANDERAS ══ -->
+<div id="panel-semaforo" class="panel">
+  <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Semáforo direccional por mercado + banderas de noticias de alto impacto con cruce automático.</p>
+
+  <style>
+    .sf-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+    .sf-hora{font-family:var(--mono);font-size:20px;font-weight:700;color:#f1f5f9;}
+    .sf-leg{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px;}
+    .sf-leg-i{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);}
+    .sf-leg-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
+    .sf-btn-clear{font-size:11px;color:var(--muted);background:rgba(255,255,255,0.05);border:1px solid var(--border);cursor:pointer;padding:5px 10px;border-radius:6px;}
+    .sf-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:22px;}
+    .sf-cell{border-radius:8px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;
+             background:rgba(255,255,255,0.05);border:1px solid var(--border);color:#cbd5e1;
+             min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+             gap:3px;line-height:1.25;position:relative;user-select:none;transition:background .12s,border-color .12s;
+             padding:4px 2px;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+    .sf-cell.up{background:#16A34A;color:#fff;border-color:#16A34A;}
+    .sf-cell.dn{background:var(--red);color:#fff;border-color:var(--red);}
+    .sf-cell.blocked{border:2px solid var(--gold) !important;color:rgba(255,255,255,0.5);}
+    .sf-cell .sf-lock{position:absolute;font-size:22px;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0;transition:opacity .1s;}
+    .sf-cell.blocked .sf-lock{opacity:1;}
+    @keyframes sf-pulse{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,0);}50%{box-shadow:0 0 0 4px rgba(245,158,11,0.28);}}
+    .sf-cell.soon{animation:sf-pulse 1.2s ease-in-out infinite;border:2px solid var(--gold) !important;color:rgba(255,255,255,0.6);}
+    .sf-cell.soon .sf-lock{opacity:0.65;font-size:17px;}
+    .sf-cols{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+    @media (max-width:720px){.sf-cols{grid-template-columns:1fr;}}
+    .sf-panel-title{font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:0.5px;text-transform:uppercase;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center;}
+    .sf-res-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px;}
+    .sf-res-row:last-child{border-bottom:none;}
+    .sf-dir{font-size:10px;font-weight:700;padding:2px 8px;border-radius:99px;}
+    .sf-dir-up{background:#16A34A22;color:#16A34A;}
+    .sf-dir-dn{background:rgba(239,68,68,0.13);color:var(--red);}
+    .sf-form{display:flex;gap:7px;align-items:center;margin-bottom:12px;}
+    .sf-sel{flex:1;background:var(--surface);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:9px 10px;color:#f1f5f9;outline:none;font-size:12px;font-family:var(--sans);}
+    .sf-time{flex:1;background:var(--surface);border:1px solid rgba(255,255,255,0.25);border-radius:8px;padding:9px 8px;color:var(--gold);font-family:var(--mono);font-size:12px;outline:none;}
+    .sf-add{background:var(--red);border:none;border-radius:8px;padding:9px 15px;font-size:16px;font-weight:700;color:#fff;cursor:pointer;flex-shrink:0;}
+    .sf-ev{border-radius:9px;padding:10px 11px;margin-bottom:6px;}
+    .sf-ev.future{background:rgba(255,255,255,0.03);border:1px solid var(--border);}
+    .sf-ev.soonc{background:rgba(245,158,11,0.09);border:1px solid rgba(245,158,11,0.4);animation:sf-pulse 1.2s ease-in-out infinite;}
+    .sf-ev.active{background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.5);}
+    .sf-ev.past{background:rgba(255,255,255,0.02);border:1px solid var(--border);opacity:0.4;}
+    .sf-ev-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;}
+    .sf-ev-del{font-size:11px;color:var(--muted);background:none;border:none;cursor:pointer;padding:3px 6px;}
+    .sf-afect{font-size:10px;color:var(--muted);font-family:var(--mono);line-height:1.6;word-break:break-word;}
+    .sf-empty{text-align:center;color:var(--dim);font-size:12px;padding:18px 0;line-height:1.6;}
+  </style>
+
+  <div class="sf-hdr">
+    <div class="sf-leg">
+      <div class="sf-leg-i"><div class="sf-leg-dot" style="background:#16A34A"></div>Largo</div>
+      <div class="sf-leg-i"><div class="sf-leg-dot" style="background:var(--red)"></div>Corto</div>
+      <div class="sf-leg-i"><div class="sf-leg-dot" style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.3)"></div>No operar</div>
+      <div class="sf-leg-i"><div class="sf-leg-dot" style="background:rgba(245,158,11,0.15);border:1.5px solid var(--gold);border-radius:50%"></div>Bloqueado</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px">
+      <div class="sf-hora" id="sf-hdr-hora">--:--</div>
+      <button class="sf-btn-clear" onclick="sfLimpiarSem()">Limpiar semáforo</button>
+    </div>
+  </div>
+  <div class="sf-grid" id="sf-grid"></div>
+
+  <div class="sf-cols">
+    <div>
+      <div class="sf-panel-title">Mercados activos <span id="sf-count" style="color:var(--dim);font-weight:400"></span></div>
+      <div id="sf-res-rows"><div class="sf-empty">Sin sesgo marcado todavía</div></div>
+    </div>
+    <div>
+      <div class="sf-panel-title">Banderas de noticias <button class="sf-btn-clear" onclick="sfLimpiarBanderas()">Limpiar</button></div>
+      <div class="sf-form">
+        <select class="sf-sel" id="sf-cur">
+          <option value="USD">🇺🇸 USD</option><option value="EUR">🇪🇺 EUR</option>
+          <option value="GBP">🇬🇧 GBP</option><option value="JPY">🇯🇵 JPY</option>
+          <option value="AUD">🇦🇺 AUD</option><option value="CAD">🇨🇦 CAD</option>
+          <option value="CHF">🇨🇭 CHF</option><option value="NZD">🇳🇿 NZD</option>
+        </select>
+        <input type="time" class="sf-time" id="sf-hora-input">
+        <button class="sf-add" onclick="sfAgregarBandera()">+</button>
+      </div>
+      <div id="sf-ev-list"></div>
+    </div>
+  </div>
+</div>
+
 </div><!-- /main -->
+
 
 <script>
   function switchTab(id, btn) {
@@ -822,6 +908,150 @@
     const el = document.getElementById('pending-count');
     if (el) { el.textContent = total - checked; el.style.color = (total-checked) === 0 ? 'var(--ftmo)' : 'var(--gold)'; }
   }
+
+  // ── SEMÁFORO + BANDERAS ──────────────────────────────────────────────────
+  const SF_MERCADOS = [
+    {lbl:"INDEX US",sym:"USDX"},   {lbl:"DAX 40",  sym:"GER30"},
+    {lbl:"CAC 40", sym:"FRA40"},   {lbl:"UK 100",  sym:"UK100"},
+    {lbl:"NDQ 100",sym:"NDX100"},  {lbl:"S&P 500", sym:"SPX500"},
+    {lbl:"DJ 30",  sym:"US30"},
+    {lbl:"EUR USD",sym:"EURUSD"},  {lbl:"EUR CAD", sym:"EURCAD"},
+    {lbl:"EUR GBP",sym:"EURGBP"},  {lbl:"EUR AUD", sym:"EURAUD"},
+    {lbl:"USD JPY",sym:"USDJPY"},  {lbl:"USD CAD", sym:"USDCAD"},
+    {lbl:"AUD JPY",sym:"AUDJPY"},
+    {lbl:"GBP USD",sym:"GBPUSD"},  {lbl:"GBP JPY", sym:"GBPJPY"},
+    {lbl:"EUR JPY",sym:"EURJPY"},  {lbl:"CAD JPY", sym:"CADJPY"},
+    {lbl:"AUD CAD",sym:"AUDCAD"},  {lbl:"AUD NZD", sym:"AUDNZD"},
+    {lbl:"AUD USD",sym:"AUDUSD"},
+    {lbl:"NZD JPY",sym:"NZDJPY"},  {lbl:"NZD USD", sym:"NZDUSD"},
+    {lbl:"XAG USD",sym:"XAGUSD"},  {lbl:"AUX USD", sym:"XAUUSD"},
+    {lbl:"WTI",    sym:"USOUSD"},  {lbl:"BTC USD", sym:"BTCUSD"},
+    {lbl:"DASH USD",sym:"DASHUSD"},
+  ];
+  const SF_MAPA = {
+    USD:["USDX","XAUUSD","NDX100","SPX500","US30","USOUSD","XAGUSD","BTCUSD","USDCAD","AUDUSD","EURUSD","GBPUSD","NZDUSD","USDJPY"],
+    EUR:["FRA40","GER30","EURUSD","EURCAD","EURJPY","EURGBP","EURAUD","EURNZD"],
+    GBP:["UK100","GBPUSD","GBPAUD","GBPCAD","GBPJPY","GBPNZD","EURGBP"],
+    JPY:["AUDJPY","CADJPY","EURJPY","GBPJPY","NZDJPY","USDJPY"],
+    AUD:["XAUUSD","AUDCAD","AUDJPY","AUDNZD","AUDUSD","EURAUD","GBPAUD"],
+    CAD:["XAUUSD","AUDCAD","CADJPY","EURCAD","GBPCAD","NZDCAD","USDCAD"],
+    CHF:["USDCHF","EURCHF","GBPCHF","AUDCHF","CADCHF","NZDCHF","CHFJPY"],
+    NZD:["AUDNZD","EURNZD","GBPNZD","NZDCAD","NZDJPY","NZDUSD"],
+  };
+  const SF_FLAGS={USD:"🇺🇸",EUR:"🇪🇺",GBP:"🇬🇧",JPY:"🇯🇵",AUD:"🇦🇺",CAD:"🇨🇦",CHF:"🇨🇭",NZD:"🇳🇿"};
+  // Ventana corregida a ±5 min (la de FundedNext, la más amplia del portafolio — antes decía ±4 por error)
+  const SF_VENTANA = 5, SF_PREAVISO = 15, SF_KEY = "mesa_semaforo_v1";
+
+  let sfSem = {}, sfBanderas = [];
+
+  function sfGuardar(){ try{ localStorage.setItem(SF_KEY, JSON.stringify({sem:sfSem, banderas:sfBanderas})); }catch(e){} }
+  function sfCargar(){
+    try{ const d=JSON.parse(localStorage.getItem(SF_KEY)||"{}"); sfSem=d.sem||{}; sfBanderas=d.banderas||[]; }
+    catch(e){ sfSem={}; sfBanderas=[]; }
+  }
+  function sfAhoraMin(){ const d=new Date(); return d.getHours()*60+d.getMinutes(); }
+  function sfToMin(s){ if(!s)return 0; const[h,m]=s.split(":").map(Number); return h*60+m; }
+  function sfEstadoBandera(b){
+    const n=sfAhoraMin(), t=sfToMin(b.hora), dif=t-n;
+    if(dif<-SF_VENTANA) return "past";
+    if(dif<=SF_VENTANA) return "active";
+    if(dif<=SF_PREAVISO) return "soon";
+    return "future";
+  }
+  function sfBloqueadosSet(){
+    const bl=new Set(), soon=new Set();
+    sfBanderas.forEach(b=>{
+      const est=sfEstadoBandera(b);
+      if(est==="active") (SF_MAPA[b.cur]||[]).forEach(s=>bl.add(s));
+      if(est==="soon")   (SF_MAPA[b.cur]||[]).forEach(s=>soon.add(s));
+    });
+    return {bl,soon};
+  }
+  function sfRenderSem(){
+    const {bl,soon}=sfBloqueadosSet();
+    document.getElementById("sf-grid").innerHTML=SF_MERCADOS.map(m=>{
+      const st=sfSem[m.sym]||"";
+      const isbl=bl.has(m.sym), issoon=soon.has(m.sym)&&!isbl;
+      let extra = isbl?"blocked":(issoon?"soon":"");
+      return `<button class="sf-cell ${st} ${extra}" onclick="sfCiclo('${m.sym}')">
+        <span class="sf-lock">🔒</span><span>${m.lbl}</span>
+      </button>`;
+    }).join("");
+    sfRenderResumen(bl,soon);
+  }
+  function sfCiclo(sym){
+    const c=sfSem[sym]||"";
+    if(c==="") sfSem[sym]="up"; else if(c==="up") sfSem[sym]="dn"; else delete sfSem[sym];
+    sfGuardar(); sfRenderSem();
+  }
+  function sfLimpiarSem(){ sfSem={}; sfGuardar(); sfRenderSem(); }
+  function sfRenderResumen(bl,soon){
+    const activos=SF_MERCADOS.filter(m=>sfSem[m.sym]);
+    document.getElementById("sf-count").textContent=activos.length?activos.length+" activos":"";
+    const cont=document.getElementById("sf-res-rows");
+    if(!activos.length){ cont.innerHTML='<div class="sf-empty">Sin sesgo marcado todavía</div>'; return; }
+    cont.innerHTML=activos.map(m=>{
+      const isbl=bl.has(m.sym), issoon=soon.has(m.sym)&&!isbl;
+      const dir=sfSem[m.sym]==="up"?"LARGO":"CORTO";
+      const dc=sfSem[m.sym]==="up"?"sf-dir-up":"sf-dir-dn";
+      return `<div class="sf-res-row">
+        <span style="font-family:var(--mono);color:#f1f5f9">${m.lbl}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="sf-dir ${dc}">${dir}</span>
+          ${isbl?'<span style="font-size:10px;color:var(--gold)">🔒</span>':''}
+          ${issoon?'<span style="font-size:10px;color:var(--gold)">⚠ 15min</span>':''}
+        </div>
+      </div>`;
+    }).join("");
+  }
+  function sfAgregarBandera(){
+    const cur=document.getElementById("sf-cur").value;
+    const hora=document.getElementById("sf-hora-input").value;
+    if(!hora){ document.getElementById("sf-hora-input").focus(); return; }
+    sfBanderas.push({id:Date.now().toString(),cur,hora});
+    sfBanderas.sort((a,b)=>sfToMin(a.hora)-sfToMin(b.hora));
+    document.getElementById("sf-hora-input").value="";
+    sfGuardar(); sfRenderBanderas(); sfRenderSem();
+  }
+  function sfBorrarBandera(id){ sfBanderas=sfBanderas.filter(b=>b.id!==id); sfGuardar(); sfRenderBanderas(); sfRenderSem(); }
+  function sfLimpiarBanderas(){ sfBanderas=[]; sfGuardar(); sfRenderBanderas(); sfRenderSem(); }
+  function sfRenderBanderas(){
+    const cont=document.getElementById("sf-ev-list");
+    if(!sfBanderas.length){ cont.innerHTML='<div class="sf-empty">Sin banderas. Selecciona divisa y hora.</div>'; return; }
+    const n=sfAhoraMin();
+    cont.innerHTML=sfBanderas.map(b=>{
+      const est=sfEstadoBandera(b), t=sfToMin(b.hora), dif=t-n;
+      let cuando,color;
+      if(est==="active"&&dif>=0){cuando=`en ${dif}min`;color="var(--red)";}
+      else if(est==="active"){cuando=`+${-dif}min`;color="var(--red)";}
+      else if(est==="soon"){cuando=`en ${dif}min`;color="var(--gold)";}
+      else if(est==="past"){cuando=`+${-dif}min`;color="var(--muted)";}
+      else{const h=Math.floor(dif/60),mm=dif%60; cuando=h?`en ${h}h${mm}m`:`en ${dif}m`; color="var(--muted)";}
+      const afect=(SF_MAPA[b.cur]||[]).join(" · ");
+      const claseEv = est==="soon" ? "soonc" : est;
+      return `<div class="sf-ev ${claseEv}">
+        <div class="sf-ev-head">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:16px">${SF_FLAGS[b.cur]||""}</span>
+            <span style="font-weight:700;font-family:var(--mono)">${b.cur}</span>
+            <span style="font-size:10px;color:var(--muted);font-family:var(--mono)">${b.hora}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:5px">
+            <span style="font-size:11px;font-weight:700;color:${color}">${cuando}</span>
+            <button class="sf-ev-del" onclick="sfBorrarBandera('${b.id}')">✕</button>
+          </div>
+        </div>
+        <div class="sf-afect">${afect||"—"}</div>
+      </div>`;
+    }).join("");
+  }
+  function sfTick(){
+    const d=new Date();
+    const el=document.getElementById("sf-hdr-hora");
+    if(el) el.textContent=d.toLocaleTimeString("es-CO",{hour:"2-digit",minute:"2-digit",hour12:false});
+    sfRenderBanderas(); sfRenderSem();
+  }
+  sfCargar(); sfTick(); setInterval(sfTick, 20000);
 </script>
 </body>
 </html>
