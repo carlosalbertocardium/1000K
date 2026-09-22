@@ -169,12 +169,12 @@
       <div>
         <div class="header-label">MESA DE TRABAJO // MULTI-PROP FIRM — v4</div>
         <h1>Trading Dashboard</h1>
-        <p class="header-sub">Objetivo: $1,000,000 USD en capital fondeado simultáneo · 4 firmas activas en Fase 1</p>
+        <p class="header-sub">Objetivo: $1,000,000 USD en capital fondeado simultáneo · 5 firmas activas en Fase 1 + WSF Rapid</p>
       </div>
       <div class="stats">
         <div class="stat">
           <div class="stat-label">CAPITAL EN CHALLENGE</div>
-          <div class="stat-value" style="color:var(--ftmo)">$650K</div>
+          <div class="stat-value" style="color:var(--ftmo)">$655K</div>
         </div>
         <div class="stat">
           <div class="stat-label">TECHO MÁXIMO PLAN</div>
@@ -422,6 +422,49 @@
         <span class="tag" style="background:rgba(56,189,248,0.1);color:var(--fn);border:1px solid rgba(56,189,248,0.2)">5 días mínimo</span>
         <span class="tag" style="background:rgba(239,68,68,0.1);color:var(--red);border:1px solid rgba(239,68,68,0.2)">Quick Strike 🚫</span>
         <span class="tag" style="background:rgba(56,189,248,0.1);color:var(--fn);border:1px solid rgba(56,189,248,0.2)">Techo $4M</span>
+      </div>
+    </div>
+
+    <!-- WSF RAPID -->
+    <div class="card" style="border:1px solid rgba(244,63,94,0.25)">
+      <div class="card-glow" style="background:radial-gradient(circle,rgba(244,63,94,0.1) 0%,transparent 70%)"></div>
+      <div class="card-head">
+        <div>
+          <div class="card-name" style="color:#F43F5E">WSF Rapid <span class="card-badge" style="background:rgba(244,63,94,0.15);color:#F43F5E;border:1px solid rgba(244,63,94,0.3)">CHALLENGE · FASE ÚNICA</span></div>
+          <div class="card-capital">$5K · MT5 · obsequio</div>
+        </div>
+        <div><div class="card-risk-label">Stop diario personal</div><div class="card-risk-val">$100</div></div>
+      </div>
+      <div class="alert-box" style="background:rgba(244,63,94,0.07);border:1px solid rgba(244,63,94,0.2)">
+        <div class="alert-title" style="color:#F43F5E">🛑 MARGEN EXTREMO · SL 2 MIN · SÍMBOLOS CON SUFIJO 'c'</div>
+        <div class="alert-text">DD máximo estático $300 (6%) — 12 trades perdedores de $25 la cierran por completo. SL obligatorio en 2 min. Trades &lt;60 seg prohibidos. Leverage reducido (Forex 1:30) frente a WSF Ultra. EA en funded: conflicto abierto — no usar.</div>
+      </div>
+      <div class="mini-grid">
+        <div class="mini-cell"><div class="mc-label">Target (única fase)</div><div class="mc-val" style="color:#F43F5E">$500</div></div>
+        <div class="mini-cell"><div class="mc-label">DD máximo</div><div class="mc-val" style="color:var(--gold)">$300</div></div>
+        <div class="mini-cell"><div class="mc-label">Límite diario</div><div class="mc-val" style="color:var(--gold)">$200</div></div>
+        <div class="mini-cell"><div class="mc-label">Riesgo/trade</div><div class="mc-val" style="color:#F43F5E">$25</div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Progreso (fase única)</span><span class="prog-val" id="rp-prog-label" style="color:#F43F5E">$0 / $500</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="rp-f1-bar" style="width:0%;background:#F43F5E"></div></div>
+      </div>
+      <div>
+        <div class="prog-row"><span class="prog-label">Stop personal usado</span><span class="prog-val" id="rp-daily-pct" style="color:var(--muted)">0%</span></div>
+        <div class="prog-bar"><div class="prog-fill" id="rp-daily-bar" style="width:0%;background:var(--green)"></div></div>
+      </div>
+      <div class="pnl-label">P&L del día (USD)</div>
+      <input class="pnl-input" id="pnl-rp" type="number" value="0" style="border:1px solid rgba(244,63,94,0.3);color:#F43F5E" oninput="updatePnL('rp',this.value)">
+      <div class="best-label">MEJOR PARA</div>
+      <div class="best-item">Afinar disciplina en MT5 antes de escalar a una cuenta mayor en esa plataforma</div>
+      <div class="best-item">Sizing micro — margen para probar sin arriesgar capital de peso</div>
+      <div class="best-item">Verificar símbolos con sufijo 'c' (ej. EURUSDc) antes de operar</div>
+      <div class="strategy-text">Cuenta de obsequio, sin fee pagado, pero con la misma disciplina que las pagadas. 1 sola fase (no F1/F2). DD diario 4% ($200) y máximo estático 6% ($300) — reset 16:00 Bogotá confirmado fijo todo el año. Leverage reducido en todas las categorías frente a WSF Ultra. Copy con WSF Ultra: conflicto sin resolver, confirmar con soporte antes de replicar. Ventana de noticias en fondeada sin confirmar oficialmente.</div>
+      <div class="tags">
+        <span class="tag" style="background:rgba(244,63,94,0.1);color:#F43F5E;border:1px solid rgba(244,63,94,0.2)">SL obligatorio 🛑</span>
+        <span class="tag" style="background:rgba(244,63,94,0.1);color:#F43F5E;border:1px solid rgba(244,63,94,0.2)">MT5 — símbolos 'c'</span>
+        <span class="tag" style="background:rgba(245,158,11,0.12);color:var(--gold);border:1px solid rgba(245,158,11,0.25)">EA conflicto ⚠️</span>
+        <span class="tag" style="background:rgba(244,63,94,0.1);color:#F43F5E;border:1px solid rgba(244,63,94,0.2)">Margen extremo</span>
       </div>
     </div>
   </div>
@@ -696,34 +739,26 @@
 
 <!-- ══ CHECKLIST ══ -->
 <div id="panel-checklist" class="panel">
-  <p style="font-size:13px;color:var(--muted);margin-bottom:20px">Completa este checklist antes de abrir la primera posición del día.</p>
-  <div class="checklist">
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Revisé el calendario de noticias — FTMO calendar + Forex Factory (The5ers)</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Definí el bias del día (alcista / bajista / lateral) por instrumento</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Marqué niveles clave en todos los instrumentos activos de la sesión</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Calculé el sizing: FT-SW $1,000 · FT-SC $1,000 · The5%ers $1,000 · WSF $500 · FN $250 por trade</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FT Scalp: P&L neto del día (incluyendo comisiones) — parar si llega a −$4,500</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FT Scalp: el trade de hoy es claramente diferente al de FT Swing — no replicar mismo instrumento + dirección</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">Journal del día anterior completado — todas las cuentas</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FTMO: revisé equity actual — sin flotantes grandes sin SL ajustado</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FTMO: Max Loss estático $180K — recordar que NO es trailing y Best Day Rule NO aplica (solo 1-Step)</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">WSF: tengo el nivel de SL definido ANTES de cada entrada — máx 2 min para colocarlo</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">WSF: ningún trade durará menos de 60 segundos — esperar aunque el TP se toque antes</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">WSF: el DD del día reinicia a las 16:00 Bogotá — calcular margen disponible desde esa hora</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FundedNext: mis trades durarán más de 30 segundos — Quick Strike activo</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">FundedNext: riesgo simultáneo total no superará $1,500 (6 posiciones máx a $250)</span></div>
-    <div class="check-item" onclick="toggleCheck(this)"><div class="check-box"></div><span class="check-label">The5ers: revisar Forex Factory — en ±2 min de noticia roja NO abrir nuevas órdenes (soft breach deduce profit)</span></div>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Checklist corto de apertura — mismo que usa el Control Operativa. Es una guía rápida, no bloquea nada aquí.</p>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-size:11px;font-weight:700;color:#94a3b8;letter-spacing:0.5px">CHECKLIST CORTO (5 puntos)</span>
+    <span id="pt-short-count" style="font-size:11px;font-weight:700;color:var(--gold)">0/5</span>
+  </div>
+  <div class="checklist" style="margin-bottom:26px">
+    <div class="check-item" onclick="toggleCheck(this);ptShortUpdate()"><div class="check-box"></div><span class="check-label">Revisé los calendarios de noticias</span></div>
+    <div class="check-item" onclick="toggleCheck(this);ptShortUpdate()"><div class="check-box"></div><span class="check-label">Definí las direcciones del momento (semáforo)</span></div>
+    <div class="check-item" onclick="toggleCheck(this);ptShortUpdate()"><div class="check-box"></div><span class="check-label">FT Scalp y FT Swing no replicados en el mismo instrumento y dirección</span></div>
+    <div class="check-item" onclick="toggleCheck(this);ptShortUpdate()"><div class="check-box"></div><span class="check-label">WSF con SL montado desde antes y trades mayores de 60 segundos</span></div>
+    <div class="check-item" onclick="toggleCheck(this);ptShortUpdate()"><div class="check-box"></div><span class="check-label">FundedNext trades mayores de 30 segundos</span></div>
+  </div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;border-top:1px solid var(--border);padding-top:16px">
+    <span style="font-size:11px;font-weight:700;color:var(--red);letter-spacing:0.5px">🚨 PROTOCOLO DE PARADA</span>
   </div>
   <div class="stop-box">
-    <div class="stop-title">🚨 PROTOCOLO DE PARADA</div>
-    <div class="stop-item">3 pérdidas consecutivas → pausar el día en TODAS las cuentas</div>
-    <div class="stop-item">P&L llega al -50% del límite diario de cualquier cuenta → cerrar todo en esa cuenta</div>
-    <div class="stop-item">FTMO: equity flotante se acerca al límite → cerrar posiciones, no esperar</div>
-    <div class="stop-item">WSF: posición sin SL pasados 2 min → cerrar manualmente de inmediato</div>
-    <div class="stop-item">FundedNext: riesgo simultáneo supera $1,500 → cerrar la posición más reciente</div>
-    <div class="stop-item">Noticias de alto impacto inesperadas → reducir sizing o cerrar posiciones abiertas</div>
-    <div class="stop-item">FT Scalp: P&L neto (con comisiones) llega a −$4,500 → detener trading en esa cuenta</div>
-    <div class="stop-item">The5ers: no abrir órdenes en ±2 min de noticias Forex Factory rojas — soft breach deduce profit del ciclo</div>
+    <div class="stop-item">3 pérdidas consecutivas en tres mercados → pausar el día en TODAS las cuentas</div>
+    <div class="stop-item">Si se alcanza el límite diario de pérdida → congelar esa cuenta por hoy</div>
+    <div class="stop-item">Noticia de alto impacto inesperada → cerrar posiciones</div>
   </div>
 </div>
 
@@ -879,18 +914,29 @@
     el.classList.toggle('done');
     el.querySelector('.check-box').textContent = el.classList.contains('done') ? '✓' : '';
   }
+  function ptShortUpdate() {
+    const cont = document.querySelector('#panel-checklist .checklist');
+    if(!cont) return;
+    const items = Array.from(cont.querySelectorAll('.check-item')).slice(0,5);
+    const done = items.filter(i=>i.classList.contains('done')).length;
+    const el = document.getElementById('pt-short-count');
+    if(!el) return;
+    el.textContent = done + '/5' + (done===5 ? ' ✓' : '');
+    el.style.color = done===5 ? 'var(--ftmo)' : 'var(--gold)';
+  }
   const config = {
     ftsw: { target: 20000, dailyStop: 5000 },
     ftsc: { target: 20000, dailyStop: 5000 },
     the5: { target: 10000, dailyStop: 2500 },
     wsf:  { target: 10000, dailyStop: 2500 },
     fn:   { target: 4000,  dailyStop: 1250 },
+    rp:   { target: 500,   dailyStop: 100  },
   };
   function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
   function updatePnL(firm, rawVal) {
     const val = parseFloat(rawVal) || 0;
     const cfg = config[firm];
-    const colors = { ftsw: 'var(--ftmo)', ftsc: '#00B894', the5: 'var(--the5)', wsf: 'var(--wsf)', fn: 'var(--fn)' };
+    const colors = { ftsw: 'var(--ftmo)', ftsc: '#00B894', the5: 'var(--the5)', wsf: 'var(--wsf)', fn: 'var(--fn)', rp: '#F43F5E' };
     document.getElementById('pnl-' + firm).style.color = val >= 0 ? colors[firm] : 'var(--red)';
     const f1Pct = clamp((Math.max(0, val) / cfg.target) * 100, 0, 100);
     document.getElementById(firm + '-f1-bar').style.width = f1Pct + '%';
@@ -905,7 +951,7 @@
     updateTotal();
   }
   function updateTotal() {
-    const total = ['ftsw','ftsc','the5','wsf','fn'].reduce((acc, f) => acc + (parseFloat(document.getElementById('pnl-' + f).value) || 0), 0);
+    const total = ['ftsw','ftsc','the5','wsf','fn','rp'].reduce((acc, f) => acc + (parseFloat(document.getElementById('pnl-' + f).value) || 0), 0);
     const el = document.getElementById('total-pnl');
     el.textContent = (total >= 0 ? '+' : '') + '$' + total.toLocaleString();
     el.style.color = total >= 0 ? 'var(--green)' : 'var(--red)';
