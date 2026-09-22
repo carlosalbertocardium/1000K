@@ -44,7 +44,8 @@
         {"tipo": "danger", "txt": "Idea de trading: mismo activo + dirección + <30 min entre trades = una idea. Máx $2,500 acumulado"},
         {"tipo": "danger", "txt": "Trades <60 segundos PROHIBIDOS — aunque el TP se toque antes, esperar"},
         {"tipo": "danger", "txt": "Lotes máx por idea: Forex 35 · Metales/WTI 7 · Índices 70"},
-        {"tipo": "warning", "txt": "DD reinicia 16:00 Bogotá — trades tarde/noche acumulan contra el mismo límite diario"},
+        {"tipo": "warning", "txt": "DD reinicia 16:00 Bogotá — CONFIRMADO fijo todo el año, sin variación estacional"},
+        {"tipo": "warning", "txt": "EA en funded: CONFLICTO ABIERTO entre FAQ oficiales (uno lo permite, otro lo prohíbe) — no usar hasta confirmar con soporte WSF"},
         {"tipo": "warning", "txt": "Copy trading entre cuentas funded prohibido"},
         {"tipo": "warning", "txt": "Cuenta fondeada activa solo miércoles y domingos — planificar timing de cierre del challenge"}
       ],
@@ -72,12 +73,14 @@
       "stopPersonal": 2500, "ddDia": 5000, "riesgoTrade": 500,
       "flotante": false, "termina": false, "horaCorte": "18:00", "minDias": 3,
       "reglasCriticas": [
-        {"tipo": "danger", "txt": "DD diario 5% ($5,000) y DD overall 10% ($10,000) — absoluto desde $100K, sin trailing"},
+        {"tipo": "danger", "txt": "DD diario 5% ($5,000) confirmado. DD overall 10% ($10,000): CONFLICTO SIN RESOLVER entre 2 fuentes oficiales sobre si es absoluto o trailing — tratar como absoluto (más conservador) hasta confirmar con soporte"},
+        {"tipo": "warning", "txt": "SL en fondeada: sugerido, NO obligatorio. El sistema de 5 violaciones es de Bootcamp, no aplica a High Stakes"},
         {"tipo": "warning", "txt": "Soft breach noticias: trade abierto en ±2 min de noticia roja (Forex Factory) — deduce el profit pero NO termina la cuenta"},
         {"tipo": "warning", "txt": "Mantener un trade abierto que atraviesa una noticia SÍ está permitido — solo abrir nuevo en la ventana es soft breach"},
         {"tipo": "warning", "txt": "Mínimo 3 días rentables por fase — cada día necesita ≥$500 neto cerrado (0.5% del capital)"},
         {"tipo": "warning", "txt": "WTI leverage 1:5 también en F1/F2 — ajustar sizing en petróleo"},
-        {"tipo": "warning", "txt": "Rollover: 18:00 Colombia (verano GMT+3) — EOD, usa el mayor entre balance/equity del día anterior"}
+        {"tipo": "warning", "txt": "Rollover: 18:00 Colombia (verano GMT+3) — EOD, usa el mayor entre balance/equity del día anterior"},
+        {"tipo": "warning", "txt": "Prohibiciones nuevas (jul 2026): bulk trading, coordinación entre operadores, distribución artificial de días rentables, sobrecarga de servidor por EA, sobreapalancamiento/gambling-like"}
       ],
       "checks": {"sl": false, "idea": false, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": false, "bestDay": false, "newsSoftBreach": true}
     },
@@ -91,10 +94,10 @@
         {"tipo": "danger", "txt": "SL obligatorio en 2 min desde apertura"},
         {"tipo": "danger", "txt": "Trades <60 segundos PROHIBIDOS"},
         {"tipo": "danger", "txt": "Idea de trading: máx $100 acumulado (50% del DD diario $200) — sizing muy pequeño, verificar lote mínimo en MT5"},
-        {"tipo": "warning", "txt": "DD diario 4% ($200) — hora de reset sin confirmar oficialmente; se usa 16:00 Bogotá como referencia provisional (igual que WSF Ultra)"},
+        {"tipo": "warning", "txt": "DD diario 4% ($200) — reset 16:00 Bogotá CONFIRMADO fijo todo el año (igual que WSF Ultra)"},
         {"tipo": "warning", "txt": "Leverage reducido: Forex 1:30 · Índices/Oro 1:10 · Cripto 1:1 — mucho menor que WSF Ultra"},
         {"tipo": "warning", "txt": "Cuenta de obsequio (sin fee pagado) — tratar con la misma disciplina que las cuentas pagadas"},
-        {"tipo": "warning", "txt": "Copy manual permitido con WSF Ultra en evaluación (balances distintos) — prohibido en funded"},
+        {"tipo": "warning", "txt": "Copy con WSF Ultra: CONFLICTO SIN RESOLVER (la cuenta $100K está prohibida como receptora) — confirmar con soporte antes de replicar entradas entre ambas"},
         {"tipo": "warning", "txt": "Plataforma MT5 — símbolos con sufijo 'c' propio de este bróker (ej. EURUSDc), distintos a cTrader"}
       ],
       "checks": {"sl": true, "idea": true, "news": false, "zonaMuerta": false, "quickStrike": false, "duracion": true, "bestDay": false}
