@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Lotaje — WSF Rapid MT5</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=DM+Mono&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#070D1A;color:#E2E8F0;font-family:'DM Sans',sans-serif;
+     min-height:100vh;display:flex;align-items:flex-start;justify-content:center;
+     padding:24px 16px;}
+.card{background:rgba(255,255,255,0.03);border:1px solid rgba(244,63,94,0.25);
+      border-radius:16px;padding:24px;width:100%;max-width:480px;}
+.title{font-size:13px;font-weight:700;color:#F43F5E;letter-spacing:0.8px;
+       text-transform:uppercase;margin-bottom:4px;}
+.sub{font-size:11px;color:#64748B;margin-bottom:22px;}
+
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px;}
+.row.full{grid-template-columns:1fr;}
+.lbl{font-size:10px;font-weight:700;color:#64748B;letter-spacing:0.4px;
+     text-transform:uppercase;margin-bottom:5px;}
+select,input{width:100%;background:#0F172A;border:1px solid rgba(255,255,255,0.12);
+             border-radius:8px;padding:10px 12px;color:#F1F5F9;font-size:13px;
+             font-family:'DM Sans',sans-serif;outline:none;
+             -webkit-appearance:none;appearance:none;}
+select:focus,input:focus{border-color:rgba(244,63,94,0.5);}
+input[type=number]{font-family:'DM Mono',monospace;color:#F59E0B;}
+
+.divider{height:1px;background:rgba(255,255,255,0.07);margin:18px 0;}
+
+.result-box{background:rgba(244,63,94,0.06);border:1px solid rgba(244,63,94,0.3);
+            border-radius:12px;padding:18px;text-align:center;}
+.result-label{font-size:11px;color:#94A3B8;letter-spacing:0.4px;margin-bottom:8px;}
+.result-lotes{font-size:42px;font-weight:700;font-family:'DM Mono',monospace;
+              color:#F43F5E;line-height:1;}
+.result-unit{font-size:13px;color:#64748B;margin-top:4px;}
+.result-detail{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:16px;}
+.det{background:rgba(255,255,255,0.03);border-radius:8px;padding:10px;text-align:center;}
+.det-val{font-size:14px;font-weight:700;font-family:'DM Mono',monospace;color:#F1F5F9;}
+.det-lbl{font-size:9px;color:#64748B;margin-top:3px;text-transform:uppercase;letter-spacing:0.3px;}
+
+.warn{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.3);
+      border-radius:8px;padding:10px 12px;font-size:11px;color:#F59E0B;
+      line-height:1.5;margin-top:14px;display:none;}
+.warn.visible{display:block;}
+
+.pip-hint{font-size:10px;color:#475569;margin-top:5px;font-family:'DM Mono',monospace;}
+
+.info-row{display:flex;justify-content:space-between;font-size:11px;
+          color:#64748B;margin-top:12px;border-top:1px solid rgba(255,255,255,0.06);
+          padding-top:12px;}
+.info-fix{color:#94A3B8;font-weight:600;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="title">Calculadora de Lotaje</div>
+  <div class="sub">WSF Rapid MT5 · Capital $5,000 · Riesgo 0.5% = $25/trade</div>
+
+  <div class="row">
+    <div>
+      <div class="lbl">Instrumento</div>
+      <select id="instr" onchange="calcular()">
+        <optgroup label="Forex (valor pip a 1 lote std)">
+          <option value="forex_usd_5" data-pip="10">EURUSDc</option>
+          <option value="forex_usd_5" data-pip="10">GBPUSDc</option>
+          <option value="forex_usd_5" data-pip="10">AUDUSDc</option>
+          <option value="forex_usd_5" data-pip="10">NZDUSDc</option>
+          <option value="forex_jpy_5" data-pip="9.1">USDJPYc</option>
+          <option value="forex_cad_5" data-pip="7.5">USDCADc</option>
+          <option value="forex_usd_5" data-pip="10">EURCADc</option>
+          <option value="forex_jpy_5" data-pip="9.1">EURJPYc</option>
+          <option value="forex_jpy_5" data-pip="9.1">GBPJPYc</option>
+          <option value="forex_jpy_5" data-pip="9.1">AUDJPYc</option>
+          <option value="forex_jpy_5" data-pip="9.1">CADJPYc</option>
+          <option value="forex_usd_5" data-pip="10">AUDCADc</option>
+          <option value="forex_usd_5" data-pip="10">AUDNZDc</option>
+          <option value="forex_usd_5" data-pip="10">GBPAUDc</option>
+          <option value="forex_usd_5" data-pip="10">GBPCADc</option>
+          <option value="forex_usd_5" data-pip="10">EURGBPc</option>
+          <option value="forex_usd_5" data-pip="10">EURAUDc</option>
+          <option value="forex_usd_5" data-pip="10">NZDCADc</option>
+          <option value="forex_jpy_5" data-pip="9.1">NZDJPYc</option>
+          <option value="forex_usd_5" data-pip="10">NZDUSDc</option>
+        </optgroup>
+        <optgroup label="Metales">
+          <option value="xau" data-pip="1">XAUUSD (oro)</option>
+          <option value="xag" data-pip="0.5">XAGUSD (plata)</option>
+        </optgroup>
+        <optgroup label="Índices">
+          <option value="idx_de40" data-pip="1">DE40.c (DAX)</option>
+          <option value="idx_us" data-pip="1">US500.c</option>
+          <option value="idx_us" data-pip="1">USTEC.c (NDQ)</option>
+          <option value="idx_us" data-pip="1">DJ30.c</option>
+          <option value="idx_uk" data-pip="0.8">UK100.c</option>
+          <option value="idx_fr" data-pip="0.85">F40.c (CAC)</option>
+        </optgroup>
+        <optgroup label="Energía">
+          <option value="oil" data-pip="1">USOIL.c (WTI)</option>
+        </optgroup>
+        <optgroup label="Crypto (sin apalancamiento)">
+          <option value="btc" data-pip="1">BTCUSD</option>
+          <option value="eth" data-pip="0.1">ETHUSD</option>
+        </optgroup>
+      </select>
+    </div>
+    <div>
+      <div class="lbl">SL en pips / puntos</div>
+      <input type="number" id="sl-pips" min="0.1" step="0.1" value="20" oninput="calcular()" placeholder="ej: 20">
+      <div class="pip-hint" id="pip-hint">1 pip = 0.0001 · 5 dec. = 0.00001</div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div>
+      <div class="lbl">Capital cuenta</div>
+      <input type="number" id="capital" value="5000" oninput="calcular()">
+    </div>
+    <div>
+      <div class="lbl">Riesgo %</div>
+      <input type="number" id="riesgo-pct" value="0.5" step="0.1" min="0.1" max="5" oninput="calcular()">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="result-box">
+    <div class="result-label">LOTAJE A USAR</div>
+    <div class="result-lotes" id="res-lotes">—</div>
+    <div class="result-unit" id="res-unidad">lotes estándar</div>
+    <div class="result-detail">
+      <div class="det"><div class="det-val" id="det-riesgo">$—</div><div class="det-lbl">Riesgo $</div></div>
+      <div class="det"><div class="det-val" id="det-pip-val">$—</div><div class="det-lbl">Valor pip/lote</div></div>
+      <div class="det"><div class="det-val" id="det-lote-min">—</div><div class="det-lbl">Lote mínimo</div></div>
+    </div>
+  </div>
+
+  <div class="warn" id="warn-box" id="warn-box"></div>
+
+  <div class="info-row">
+    <span>Ventana SL obligatoria WSF:</span>
+    <span class="info-fix">2 minutos desde apertura 🛑</span>
+  </div>
+  <div class="info-row">
+    <span>Trades &lt;60 seg:</span>
+    <span class="info-fix">Prohibidos 🚫</span>
+  </div>
+</div>
+
+<script>
+// Valor del pip por lote estándar (1.0) en USD, aproximado por tipo de instrumento.
+// Para pares JPY: 1 pip = 0.01, valor ≈ $9.10 a USD/JPY ~110. Para XAU: 1 pip = $1.
+const PIP_INFO = {
+  forex_usd_5: { pipVal: 10,   pipSz: 0.0001, dec: 5, hint: "5 dec. (0.00001) · 1 pip = 0.0001", minLot: 0.01 },
+  forex_jpy_5: { pipVal: 9.1,  pipSz: 0.01,   dec: 3, hint: "3 dec. (0.001) · 1 pip = 0.01",    minLot: 0.01 },
+  forex_cad_5: { pipVal: 7.5,  pipSz: 0.0001, dec: 5, hint: "5 dec. (0.00001) · 1 pip = 0.0001", minLot: 0.01 },
+  xau:         { pipVal: 1,    pipSz: 0.01,   dec: 2, hint: "2 dec. · 1 pip = $0.01/oz → 1 lot = 100 oz", minLot: 0.01 },
+  xag:         { pipVal: 0.5,  pipSz: 0.001,  dec: 3, hint: "3 dec. · 1 pip = $0.001/oz → 1 lot = 5000 oz", minLot: 0.1 },
+  idx_de40:    { pipVal: 1,    pipSz: 0.1,    dec: 1, hint: "1 dec. · 1 punto = 1 eur (~$1.09)", minLot: 0.1 },
+  idx_us:      { pipVal: 1,    pipSz: 0.25,   dec: 2, hint: "2 dec. · 1 punto = $1 aprox.", minLot: 0.1 },
+  idx_uk:      { pipVal: 0.8,  pipSz: 1,      dec: 0, hint: "entero · 1 punto ≈ £0.80 (~$1)", minLot: 0.1 },
+  idx_fr:      { pipVal: 0.85, pipSz: 0.5,    dec: 1, hint: "1 dec. · 1 punto ≈ €0.85 (~$0.93)", minLot: 0.1 },
+  oil:         { pipVal: 1,    pipSz: 0.01,   dec: 2, hint: "2 dec. · 1 punto = $1 por barril (1 lot = 1000 bbl)", minLot: 0.1 },
+  btc:         { pipVal: 1,    pipSz: 1,      dec: 0, hint: "entero · 1 punto = $1 (cripto 1:1, sin apalancamiento)", minLot: 0.01 },
+  eth:         { pipVal: 0.1,  pipSz: 0.01,   dec: 2, hint: "2 dec. · 1 punto = $0.10", minLot: 0.01 },
+};
+
+// Lote estándar MT5 para este broker: WSF Rapid usa lotes de 100K unidades en forex.
+// Para crypto e índices el lote estándar varía — los valores de pip ya lo reflejan.
+
+function calcular() {
+  const sel    = document.getElementById('instr');
+  const tipo   = sel.value;
+  const info   = PIP_INFO[tipo];
+  const slPips = parseFloat(document.getElementById('sl-pips').value) || 0;
+  const cap    = parseFloat(document.getElementById('capital').value) || 5000;
+  const pct    = parseFloat(document.getElementById('riesgo-pct').value) || 0.5;
+
+  document.getElementById('pip-hint').textContent = info.hint;
+
+  const riesgoUSD = cap * pct / 100;
+  const pipVal    = info.pipVal;
+  const lotes     = slPips > 0 ? riesgoUSD / (slPips * pipVal) : 0;
+  const minLot    = info.minLot;
+  const lotesRed  = Math.floor(lotes / minLot) * minLot;
+  const lotesStr  = lotesRed.toFixed(minLot < 0.1 ? 2 : 1);
+  const riesgoReal = slPips > 0 ? lotesRed * slPips * pipVal : 0;
+
+  document.getElementById('res-lotes').textContent = slPips > 0 ? lotesStr : '—';
+  document.getElementById('det-riesgo').textContent = '$' + riesgoUSD.toFixed(2);
+  document.getElementById('det-pip-val').textContent = '$' + pipVal.toFixed(2);
+  document.getElementById('det-lote-min').textContent = minLot;
+
+  const warn = document.getElementById('warn-box');
+  warn.className = 'warn';
+  const msgs = [];
+
+  if(slPips <= 0) {
+    warn.textContent = 'Ingresa la distancia del SL en pips.';
+    warn.className = 'warn visible';
+    document.getElementById('res-lotes').textContent = '—';
+    return;
+  }
+  if(lotesRed < minLot) {
+    msgs.push(`⚠ El SL es muy amplio — el lote mínimo (${minLot}) arriesgaría $${(minLot*slPips*pipVal).toFixed(2)}, más que tu riesgo objetivo.`);
+  }
+  if(tipo === 'btc' || tipo === 'eth') {
+    msgs.push('🔒 Cripto en WSF Rapid: leverage 1:1 — el lote equivale a la cantidad real de la cripto, no a un contrato apalancado.');
+  }
+  if(pct > 0.5 && cap === 5000) {
+    msgs.push(`⚠ Riesgo ${pct}% = $${riesgoUSD.toFixed(0)} — superior al 0.5% recomendado para esta cuenta ($25).`);
+  }
+  if(lotesRed > 0 && riesgoReal < riesgoUSD * 0.7) {
+    msgs.push(`⚠ Por redondeo al lote mínimo el riesgo real baja a $${riesgoReal.toFixed(2)} (objetivo $${riesgoUSD.toFixed(2)}).`);
+  }
+  if(msgs.length > 0) {
+    warn.innerHTML = msgs.join('<br><br>');
+    warn.className = 'warn visible';
+  }
+}
+
+calcular();
+</script>
+</body>
+</html>
