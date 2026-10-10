@@ -33,7 +33,7 @@
         },
         {
           "tipo": "warning",
-          "txt": "Noticias: en challenge libres · en funded ±2 min restricción"
+          "txt": "Noticias: FT Swing está EXENTA — sin restricción en challenge ni en fondeada (tampoco fin de semana ni rollover)"
         },
         {
           "tipo": "warning",
@@ -580,5 +580,422 @@
     "FN": "15:45",
     "T5": "18:00",
     "RP": "16:00"
-  }
+  },
+  "TIPS_CONFIG": {
+    "inactividadMin": 45,
+    "lecturaSeg": 8,
+    "cantidad": 2
+  },
+  "TIPS": [
+    {
+      "id": 1,
+      "grupo": "Disciplina del día",
+      "firmas": [],
+      "dias": [],
+      "txt": "Cada entrada arriesga 0,5 %. Cinco posiciones perdedoras a la vez tocan tu stop personal (cuatro en Rapid). Las órdenes pendientes cuentan igual que las abiertas."
+    },
+    {
+      "id": 2,
+      "grupo": "Disciplina del día",
+      "firmas": [],
+      "dias": [],
+      "txt": "Tres pérdidas seguidas en tres mercados: pausa el día en todas las cuentas."
+    },
+    {
+      "id": 3,
+      "grupo": "Disciplina del día",
+      "firmas": [],
+      "dias": [],
+      "txt": "Si una cuenta alcanza su límite diario, congélala por hoy."
+    },
+    {
+      "id": 4,
+      "grupo": "Disciplina del día",
+      "firmas": [],
+      "dias": [],
+      "txt": "Noticia de alto impacto inesperada: cierra posiciones, no esperes."
+    },
+    {
+      "id": 5,
+      "grupo": "Disciplina del día",
+      "firmas": [],
+      "dias": [],
+      "txt": "Antes de replicar una entrada, confirma que su estilo (scalping o swing) encaja con esa cuenta."
+    },
+    {
+      "id": 6,
+      "grupo": "Noticias",
+      "firmas": [],
+      "dias": [],
+      "txt": "Los calendarios no siempre coinciden: el mismo evento puede ser \"alto\" en una firma y \"medio\" en otra. Cada firma se rige por su propia fuente."
+    },
+    {
+      "id": 7,
+      "grupo": "Noticias",
+      "firmas": [],
+      "dias": [],
+      "txt": "Fuentes: FTMO usa su calendario propio, The5%ers usa Forex Factory, FundedNext el suyo y WSF su portal."
+    },
+    {
+      "id": 8,
+      "grupo": "Noticias",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "FundedNext: ventana de ±5 min, solo en cuenta fondeada. Las ganancias dentro de ella cuentan al 40 % y las pérdidas al 100 %."
+    },
+    {
+      "id": 9,
+      "grupo": "Noticias",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "FundedNext: si cierras solo una parte de una orden dentro de la ventana, toda la orden queda sujeta al 40 %."
+    },
+    {
+      "id": 10,
+      "grupo": "Noticias",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "FundedNext: dos noticias a menos de 10 min una de otra encadenan sus ventanas en un bloque continuo."
+    },
+    {
+      "id": 11,
+      "grupo": "Noticias",
+      "firmas": [
+        "T5"
+      ],
+      "dias": [],
+      "txt": "The5%ers: abrir una orden nueva a ±2 min de una noticia roja es soft breach (te deduce el profit de ese trade, no termina la cuenta). Mantener una que ya estaba abierta está permitido."
+    },
+    {
+      "id": 12,
+      "grupo": "FTMO",
+      "firmas": [
+        "FS",
+        "FC"
+      ],
+      "dias": [],
+      "txt": "El flotante cuenta contra el drawdown al instante (equity en tiempo real)."
+    },
+    {
+      "id": 13,
+      "grupo": "FTMO",
+      "firmas": [
+        "FS",
+        "FC"
+      ],
+      "dias": [],
+      "txt": "Max Loss estático en $180,000, no trailing. La Best Day Rule no aplica al 2-Step."
+    },
+    {
+      "id": 14,
+      "grupo": "FTMO",
+      "firmas": [
+        "FS",
+        "FC"
+      ],
+      "dias": [],
+      "txt": "FT Scalp y FT Swing: no repliques el mismo instrumento y dirección en ambas."
+    },
+    {
+      "id": 15,
+      "grupo": "FTMO",
+      "firmas": [
+        "FC"
+      ],
+      "dias": [],
+      "txt": "FT Scalp: las comisiones cuentan contra el drawdown. Detente cuando el neto llegue a −$4,500."
+    },
+    {
+      "id": 16,
+      "grupo": "FTMO",
+      "firmas": [
+        "FC"
+      ],
+      "dias": [],
+      "txt": "FT Scalp en fondeada: no dejes posiciones abiertas el viernes."
+    },
+    {
+      "id": 17,
+      "grupo": "FTMO",
+      "firmas": [
+        "FS",
+        "FC"
+      ],
+      "dias": [],
+      "txt": "FTMO: cualquier trade abierto reinicia los 30 días de inactividad; no hace falta cerrarlo."
+    },
+    {
+      "id": 18,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [],
+      "txt": "Pon el SL antes de entrar. Tienes 2 minutos desde la apertura, y tres softbreaches eliminan la cuenta."
+    },
+    {
+      "id": 19,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [],
+      "txt": "Un trade de menos de 60 segundos está prohibido aunque el TP se toque antes. Espera."
+    },
+    {
+      "id": 20,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [],
+      "txt": "Una \"idea\" es el mismo activo y dirección con menos de 30 min entre trades. Tope: $2,500 acumulados."
+    },
+    {
+      "id": 21,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [],
+      "txt": "Lotes máximos por idea: forex 35, metales y WTI 7, índices 70."
+    },
+    {
+      "id": 22,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [],
+      "txt": "El día reinicia a las 16:00 Bogotá, todo el año. Operar después acumula contra el mismo límite diario."
+    },
+    {
+      "id": 23,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [],
+      "txt": "EA en fondeada: las FAQ oficiales se contradicen. No uses EA hasta confirmar con soporte."
+    },
+    {
+      "id": 24,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [],
+      "txt": "No copies trades entre cuentas fondeadas."
+    },
+    {
+      "id": 25,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [
+        3,
+        0
+      ],
+      "txt": "La cuenta fondeada se activa solo miércoles y domingos. Planifica cuándo cierras el challenge."
+    },
+    {
+      "id": 26,
+      "grupo": "WSF Rapid",
+      "firmas": [
+        "RP"
+      ],
+      "dias": [],
+      "txt": "Drawdown máximo estático de $300: doce trades perdedores de $25 la cierran."
+    },
+    {
+      "id": 27,
+      "grupo": "WSF Rapid",
+      "firmas": [
+        "RP"
+      ],
+      "dias": [],
+      "txt": "Idea de trading: máximo $100 acumulados, o sea cuatro trades de $25."
+    },
+    {
+      "id": 28,
+      "grupo": "WSF Rapid",
+      "firmas": [
+        "RP"
+      ],
+      "dias": [],
+      "txt": "Rapid prohíbe \"software de IA\" por nombre. No conectes nada automático a esa cuenta."
+    },
+    {
+      "id": 29,
+      "grupo": "WSF Rapid",
+      "firmas": [
+        "RP"
+      ],
+      "dias": [],
+      "txt": "Símbolos con sufijo c (EURUSDc). Verifica en MT5 antes de ordenar."
+    },
+    {
+      "id": 30,
+      "grupo": "WSF Rapid",
+      "firmas": [
+        "RP",
+        "WS"
+      ],
+      "dias": [],
+      "txt": "Copiar entre Rapid y WSF Ultra es un conflicto sin resolver. Confirma con soporte antes de replicar."
+    },
+    {
+      "id": 31,
+      "grupo": "The5%ers",
+      "firmas": [
+        "T5"
+      ],
+      "dias": [],
+      "txt": "Mínimo 3 días rentables por fase, cada uno con al menos $500 netos cerrados."
+    },
+    {
+      "id": 32,
+      "grupo": "The5%ers",
+      "firmas": [
+        "T5"
+      ],
+      "dias": [],
+      "txt": "Drawdown general de 10 %: dos fuentes oficiales se contradicen (absoluto o trailing). Trátalo como absoluto."
+    },
+    {
+      "id": 33,
+      "grupo": "The5%ers",
+      "firmas": [
+        "T5"
+      ],
+      "dias": [],
+      "txt": "SL en fondeada: sugerido, no obligatorio."
+    },
+    {
+      "id": 34,
+      "grupo": "The5%ers",
+      "firmas": [
+        "T5"
+      ],
+      "dias": [],
+      "txt": "WTI opera con apalancamiento 1:5, también en el challenge. Ajusta el sizing."
+    },
+    {
+      "id": 35,
+      "grupo": "The5%ers",
+      "firmas": [
+        "T5"
+      ],
+      "dias": [],
+      "txt": "Prohibido desde julio 2026: bulk trading, coordinar con otros operadores, repartir días rentables artificialmente y el sobreapalancamiento tipo apuesta."
+    },
+    {
+      "id": 36,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "Quick Strike: los trades de menos de 30 s no pueden ser el 30 % o más del profit del ciclo."
+    },
+    {
+      "id": 37,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "Zona muerta 22:00–23:00 Colombia: no operar."
+    },
+    {
+      "id": 38,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "Riesgo simultáneo máximo de 3 % ($1,500), solo en cuenta fondeada. La primera violación deduce el 100 % del profit de ese trade."
+    },
+    {
+      "id": 39,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "EA prohibido en cuentas de $50K o más, en cualquier plataforma, incluso herramientas que solo modifican SL o TP."
+    },
+    {
+      "id": 40,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "Máximo 2,000 mensajes por día al servidor; cada modificación de SL o TP cuenta."
+    },
+    {
+      "id": 41,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [
+        3,
+        5
+      ],
+      "txt": "Swap triple: miércoles (oro, WTI, forex) y viernes (índices, cripto) descuenta del límite diario."
+    },
+    {
+      "id": 42,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "KYC: empiézalo el mismo día que apruebas la fase 2. Plazo máximo de 30 días."
+    },
+    {
+      "id": 43,
+      "grupo": "Inactividad y uso del Control",
+      "firmas": [],
+      "dias": [],
+      "txt": "Perdiste una cuenta por 30 días sin operar. Mira en el dashboard de cada firma cuántos días lleva cada cuenta sin actividad."
+    },
+    {
+      "id": 44,
+      "grupo": "Inactividad y uso del Control",
+      "firmas": [],
+      "dias": [],
+      "txt": "Órdenes que dejas de noche: sin vencimiento. Al despertar elige: no entró (cancelar), sigue abierta (activar) o ya cerró (cerrar con resultado)."
+    },
+    {
+      "id": 45,
+      "grupo": "Inactividad y uso del Control",
+      "firmas": [],
+      "dias": [],
+      "txt": "Marca \"¿Siguió a favor?\" en las vencidas; es tu medida de oportunidad perdida."
+    },
+    {
+      "id": 46,
+      "grupo": "Inactividad y uso del Control",
+      "firmas": [],
+      "dias": [],
+      "txt": "iOS puede borrar los datos del Control sin aviso. Genera el respaldo diario."
+    },
+    {
+      "id": 47,
+      "grupo": "Inactividad y uso del Control",
+      "firmas": [],
+      "dias": [],
+      "txt": "Tras el cierre de NY (15:00), revisa qué órdenes persisten y verifica su vencimiento y su protección de equilibrio en el broker."
+    }
+  ]
 }
