@@ -20,7 +20,7 @@
       "riesgoTrade": 1000,
       "flotante": true,
       "termina": false,
-      "horaCorte": "19:00",
+      "horaCorte": "18:00",
       "minDias": 4,
       "reglasCriticas": [
         {
@@ -42,6 +42,10 @@
         {
           "tipo": "warning",
           "txt": "Consistencia de lotaje: no cambiar drásticamente el sizing entre días"
+        },
+        {
+          "tipo": "warning",
+          "txt": "Drawdown diario de FTMO: reinicia a medianoche de Praga — hoy {reinicio:FS} Bogotá (cambia con el horario europeo)"
         }
       ],
       "checks": {
@@ -66,7 +70,7 @@
       "riesgoTrade": 1000,
       "flotante": true,
       "termina": false,
-      "horaCorte": "19:00",
+      "horaCorte": "18:00",
       "minDias": 4,
       "reglasCriticas": [
         {
@@ -104,6 +108,10 @@
         {
           "tipo": "warning",
           "txt": "Cap FTMO combinado: $400K de capital INICIAL (antes de scaling) entre ambas cuentas — ya alcanzado. El capital escalado no cuenta para este límite"
+        },
+        {
+          "tipo": "warning",
+          "txt": "Drawdown diario de FTMO: reinicia a medianoche de Praga — hoy {reinicio:FC} Bogotá (cambia con el horario europeo)"
         }
       ],
       "checks": {
@@ -128,7 +136,7 @@
       "riesgoTrade": 500,
       "flotante": true,
       "termina": false,
-      "horaCorte": "16:00",
+      "horaCorte": "17:00",
       "minDias": 4,
       "reglasCriticas": [
         {
@@ -149,7 +157,7 @@
         },
         {
           "tipo": "warning",
-          "txt": "DD reinicia 16:00 Bogotá — CONFIRMADO fijo todo el año, sin variación estacional"
+          "txt": "DD reinicia con el cierre de NY (17:00 ET): hoy {reinicio:WS} Bogotá"
         },
         {
           "tipo": "warning",
@@ -162,6 +170,10 @@
         {
           "tipo": "warning",
           "txt": "Cuenta fondeada activa solo miércoles y domingos — planificar timing de cierre del challenge"
+        },
+        {
+          "tipo": "warning",
+          "txt": "Tres cuentas Ultra (WSF A, B y C): ideas distintas entre ellas — copiar entre cuentas de $100K está prohibido, incluso en challenge"
         }
       ],
       "checks": {
@@ -172,7 +184,8 @@
         "quickStrike": false,
         "duracion": true,
         "bestDay": false
-      }
+      },
+      "nombre_reglas": "WSF Ultra (A · B · C)"
     },
     "FN": {
       "name": "FundedNext",
@@ -186,7 +199,7 @@
       "riesgoTrade": 250,
       "flotante": false,
       "termina": false,
-      "horaCorte": "15:45",
+      "horaCorte": "17:00",
       "minDias": 0,
       "reglasCriticas": [
         {
@@ -195,7 +208,7 @@
         },
         {
           "tipo": "danger",
-          "txt": "No operar 22:00–23:00 Colombia (zona muerta US→Asia)"
+          "txt": "Ventana de liquidación 00:00–02:00 del servidor: hoy {ventana:FN} Bogotá — no explotarla de forma sistemática"
         },
         {
           "tipo": "danger",
@@ -216,6 +229,10 @@
         {
           "tipo": "warning",
           "txt": "KYC: iniciar el mismo día que se aprueba F2 — plazo máximo 30 días. Entrega de cuenta fondeada: 48-72h tras aprobación (no 24-48h)"
+        },
+        {
+          "tipo": "warning",
+          "txt": "Copiar entre tus challenges FundedNext: permitido (VPS local, capital combinado ≤ $300K). Con una cuenta FundedNext fondeada: prohibido, manual o automático"
         }
       ],
       "checks": {
@@ -240,7 +257,7 @@
       "riesgoTrade": 500,
       "flotante": false,
       "termina": false,
-      "horaCorte": "18:00",
+      "horaCorte": "17:00",
       "minDias": 3,
       "reglasCriticas": [
         {
@@ -269,11 +286,15 @@
         },
         {
           "tipo": "warning",
-          "txt": "Rollover: 18:00 Colombia (verano GMT+3) — EOD, usa el mayor entre balance/equity del día anterior"
+          "txt": "Rollover = medianoche del servidor: hoy {reinicio:T5} Bogotá — EOD, usa el mayor entre balance/equity del día anterior"
         },
         {
           "tipo": "warning",
           "txt": "Prohibiciones nuevas (jul 2026): bulk trading, coordinación entre operadores, distribución artificial de días rentables, sobrecarga de servidor por EA, sobreapalancamiento/gambling-like"
+        },
+        {
+          "tipo": "warning",
+          "txt": "The5%ers New: hasta 11 cuentas simultáneas (3×$2,5K, 3×$5K, 3×$10K, 1×$25K y 1×$50K o $100K); tu cupo de $100K ya está usado"
         }
       ],
       "checks": {
@@ -299,7 +320,7 @@
       "riesgoTrade": 25,
       "flotante": true,
       "termina": true,
-      "horaCorte": "16:00",
+      "horaCorte": "17:00",
       "minDias": 4,
       "reglasCriticas": [
         {
@@ -320,7 +341,7 @@
         },
         {
           "tipo": "warning",
-          "txt": "DD diario 4% ($200) — reset 16:00 Bogotá CONFIRMADO fijo todo el año (igual que WSF Ultra)"
+          "txt": "DD diario 4% ($200) — reinicia con el cierre de NY (17:00 ET): hoy {reinicio:RP} Bogotá"
         },
         {
           "tipo": "warning",
@@ -574,12 +595,12 @@
     ]
   },
   "ROLLOVER_HHMM": {
-    "FS": "19:00",
-    "FC": "19:00",
-    "WS": "16:00",
-    "FN": "15:45",
-    "T5": "18:00",
-    "RP": "16:00"
+    "FS": "18:00",
+    "FC": "18:00",
+    "WS": "17:00",
+    "FN": "17:00",
+    "T5": "17:00",
+    "RP": "17:00"
   },
   "TIPS_CONFIG": {
     "inactividadMin": 45,
@@ -773,7 +794,7 @@
         "WS"
       ],
       "dias": [],
-      "txt": "El día reinicia a las 16:00 Bogotá, todo el año. Operar después acumula contra el mismo límite diario."
+      "txt": "El día de WSF reinicia con el cierre de NY (17:00 ET): hoy {reinicio:WS} hora Bogotá. Las pérdidas de la tarde y la noche anteriores cuentan contra el mismo límite diario de tu sesión de la mañana."
     },
     {
       "id": 23,
@@ -912,7 +933,7 @@
         "FN"
       ],
       "dias": [],
-      "txt": "Zona muerta 22:00–23:00 Colombia: no operar."
+      "txt": "Ventana de liquidación de FundedNext (00:00–02:00 del servidor): hoy {ventana:FN} hora Bogotá. No la explotes de forma sistemática."
     },
     {
       "id": 38,
@@ -995,7 +1016,1024 @@
       "grupo": "Inactividad y uso del Control",
       "firmas": [],
       "dias": [],
-      "txt": "Tras el cierre de NY (15:00), revisa qué órdenes persisten y verifica su vencimiento y su protección de equilibrio en el broker."
+      "txt": "Después del cierre de NY (las órdenes UBF vencen a las {ny_aviso} de Bogotá hoy), revisa qué órdenes persisten y verifica su vencimiento y su protección de equilibrio en el broker."
+    },
+    {
+      "id": 48,
+      "grupo": "Grupos",
+      "firmas": [],
+      "dias": [],
+      "txt": "Cada grupo lleva ideas distintas: si dos grupos tienen el mismo mercado y dirección a la vez, el Control te avisa. Revisa el aviso antes de entrar."
+    },
+    {
+      "id": 49,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [],
+      "txt": "Las tres WSF Ultra son de $100K: copiar entre ellas está prohibido, incluso en challenge. Cada una va en un grupo distinto, con ideas distintas."
+    },
+    {
+      "id": 50,
+      "grupo": "WSF Ultra",
+      "firmas": [
+        "WS"
+      ],
+      "dias": [],
+      "txt": "El stop personal, el drawdown y el reinicio de cada WSF se siguen por separado: una pérdida en WSF A no gasta el margen de WSF B."
+    },
+    {
+      "id": 51,
+      "grupo": "The5%ers",
+      "firmas": [
+        "T5"
+      ],
+      "dias": [],
+      "txt": "The5%ers New permite hasta 11 cuentas simultáneas (3×$2,5K, 3×$5K, 3×$10K, 1×$25K y 1×$50K o $100K). Tu cupo de $100K ya está usado."
+    },
+    {
+      "id": 52,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "FundedNext: el tope de $300K aplica solo a cuentas fondeadas; no hay tope de cuentas en challenge. Las que sobren quedan en pausa hasta que una se viole."
+    },
+    {
+      "id": 53,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "Copiar entre tus challenges de FundedNext está permitido (VPS local, capital combinado ≤ $300K). Con una cuenta FundedNext fondeada está prohibido, manual o automático."
+    },
+    {
+      "id": 54,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "FundedNext detecta copia por mismo precio de entrada, de salida, lote, símbolo u hora. No abras en dos cuentas FundedNext con parámetros idénticos al mismo tiempo."
+    },
+    {
+      "id": 55,
+      "grupo": "FundedNext",
+      "firmas": [
+        "FN"
+      ],
+      "dias": [],
+      "txt": "FundedNext reinicia el límite diario a las 00:00 del servidor: hoy {reinicio:FN} hora Bogotá."
+    },
+    {
+      "id": 56,
+      "grupo": "FTMO",
+      "firmas": [
+        "FS",
+        "FC"
+      ],
+      "dias": [],
+      "txt": "FTMO reinicia el drawdown diario a medianoche de Praga: hoy {reinicio:FS} hora Bogotá. Esa hora cambia dos veces al año con el horario europeo."
+    },
+    {
+      "id": 57,
+      "grupo": "WSF Rapid",
+      "firmas": [
+        "RP"
+      ],
+      "dias": [],
+      "txt": "WSF Rapid reinicia el límite diario con el cierre de NY: hoy {reinicio:RP} hora Bogotá. El drawdown máximo de $300 no se reinicia nunca."
+    },
+    {
+      "id": 58,
+      "grupo": "WSF Rapid",
+      "firmas": [
+        "RP"
+      ],
+      "dias": [],
+      "txt": "Con la plata en Rapid, el SL máximo para no pasar de $25 con el lote mínimo (0,01) es de unos $0,50 (499 puntos). Más lejos, no operes ese símbolo."
+    },
+    {
+      "id": 59,
+      "grupo": "Disciplina del día",
+      "firmas": [],
+      "dias": [],
+      "txt": "El protocolo de parada cuenta ideas, no operaciones: una idea replicada en tres cuentas que pierde cuenta como una sola pérdida. Tres ideas perdedoras seguidas en tres mercados pausan el día."
+    },
+    {
+      "id": 60,
+      "grupo": "Disciplina del día",
+      "firmas": [],
+      "dias": [],
+      "txt": "Una cuenta que llega a su stop del día se congela hasta su próximo reinicio; las demás cuentas siguen operando."
+    },
+    {
+      "id": 61,
+      "grupo": "Inactividad",
+      "firmas": [],
+      "dias": [],
+      "txt": "Plazos de inactividad: FTMO y WSF, 30 días sin operar; The5%ers, 30 días desde el registro de cada cuenta; FundedNext, 60 días en challenge y 30 en fondeada."
+    },
+    {
+      "id": 62,
+      "grupo": "Inactividad",
+      "firmas": [],
+      "dias": [],
+      "txt": "Cada cuenta nueva necesita una orden dentro de su plazo de inactividad; una cuenta activa no cubre a otra inactiva."
+    },
+    {
+      "id": 63,
+      "grupo": "Retiros",
+      "firmas": [],
+      "dias": [],
+      "txt": "Un retiro baja el saldo de la cuenta y, con él, el colchón sobre el piso de drawdown. No es una pérdida, pero cambia cuánto margen te queda."
+    },
+    {
+      "id": 64,
+      "grupo": "Noticias",
+      "firmas": [],
+      "dias": [],
+      "txt": "Las ventanas de noticias de fondeo también rigen en challenge, porque el challenge es entrenamiento: FTMO Scalp ±2, WSF ±4, FundedNext ±5 y The5%ers ±2 min. FT Swing está exenta."
     }
-  ]
+  ],
+  "HORARIOS": {
+    "nota": "Cada regla va en la zona de su firma; la hora de Bogotá se calcula sola, así que el cambio de hora de marzo y octubre no exige tocar nada. Para ajustar una firma, edita solo su bloque.",
+    "zona_usuario": "America/Bogota",
+    "actualizado": "2026-11-05",
+    "firmas": {
+      "FS": {
+        "reinicio": {
+          "zona": "Europe/Prague",
+          "hora": "00:00"
+        },
+        "fuente": "FTMO Trading Update (5-mar-2026): el drawdown diario se reinicia a medianoche de Praga",
+        "certeza": "alta"
+      },
+      "FC": {
+        "reinicio": {
+          "zona": "Europe/Prague",
+          "hora": "00:00"
+        },
+        "fuente": "FTMO Trading Update (5-mar-2026): el drawdown diario se reinicia a medianoche de Praga",
+        "certeza": "alta"
+      },
+      "WS": {
+        "reinicio": {
+          "zona": "America/New_York",
+          "hora": "17:00"
+        },
+        "fuente": "faq.wsfunded.com artículo 8812839 (10-abr-2026): cierre de NY, 17:00 ET",
+        "certeza": "confirmada por el trader: 17:00 Bogotá desde el 1-nov-2026 (cierre de NY, 17:00 ET)"
+      },
+      "RP": {
+        "reinicio": {
+          "zona": "America/New_York",
+          "hora": "17:00"
+        },
+        "fuente": "faq.wsfunded.com artículo 8812839 (10-abr-2026): cierre de NY, 17:00 ET",
+        "certeza": "confirmada por el trader: 17:00 Bogotá desde el 1-nov-2026 (cierre de NY, 17:00 ET)"
+      },
+      "FN": {
+        "reinicio": {
+          "zona": "America/New_York",
+          "hora": "17:00"
+        },
+        "ventana_liquidacion": {
+          "zona": "America/New_York",
+          "desde": "17:00",
+          "hasta": "19:00",
+          "regla": "00:00–02:00 hora del servidor; solo está prohibido explotarla de forma sistemática"
+        },
+        "fuente": "Centro de ayuda de FundedNext: reinicio a las 00:00 del servidor (GMT+3 con horario de verano, GMT+2 el resto del año)",
+        "certeza": "alta desde el 1-nov; supone que el servidor sigue el calendario de EE.UU. (verificar del 14 al 28 de marzo de 2027)"
+      },
+      "T5": {
+        "reinicio": {
+          "zona": "America/New_York",
+          "hora": "17:00"
+        },
+        "fuente": "Base de conocimiento de The5%ers: medianoche del servidor (GMT+2/GMT+3)",
+        "certeza": "media-alta; mismo supuesto de calendario que FundedNext"
+      }
+    },
+    "ny": {
+      "aviso_cierre": {
+        "zona": "America/New_York",
+        "hora": "15:45",
+        "uso": "vencimiento de órdenes UBF y aviso de órdenes persistentes"
+      },
+      "cierre_bolsa": {
+        "zona": "America/New_York",
+        "hora": "16:00"
+      },
+      "apertura_bolsa": {
+        "zona": "America/New_York",
+        "hora": "09:30"
+      }
+    }
+  },
+  "CONFIG_VERSION": "2026-11-06",
+  "INSTRUMENTOS": [
+    {
+      "id": "DAX",
+      "nombre": "DAX 40",
+      "clase": "indice",
+      "listas": {
+        "FP": "#Germany40",
+        "FT": "GER40",
+        "WS": "DAX",
+        "T5": "DAX40",
+        "FN": "GER40",
+        "RP": "DE40.c"
+      }
+    },
+    {
+      "id": "CAC",
+      "nombre": "CAC 40",
+      "clase": "indice",
+      "listas": {
+        "FP": "#France40",
+        "FT": "FRA40",
+        "WS": "CAC",
+        "T5": "CAC40",
+        "FN": "FRA40",
+        "RP": "F40.c"
+      }
+    },
+    {
+      "id": "FTSE",
+      "nombre": "FTSE 100",
+      "clase": "indice",
+      "listas": {
+        "FP": "#UK100",
+        "FT": "UK100",
+        "WS": "FTSE",
+        "T5": "UK100",
+        "FN": "UK100",
+        "RP": "UK100.c"
+      }
+    },
+    {
+      "id": "NASDAQ",
+      "nombre": "Nasdaq 100",
+      "clase": "indice",
+      "listas": {
+        "FP": "#USNDAQ100",
+        "FT": "US100",
+        "WS": "NSDQ",
+        "T5": "NAS100",
+        "FN": "NDX100",
+        "RP": "USTEC.c"
+      }
+    },
+    {
+      "id": "SP500",
+      "nombre": "S&P 500",
+      "clase": "indice",
+      "listas": {
+        "FP": "#USSPX500",
+        "FT": "US500",
+        "WS": "SP",
+        "T5": "SP500",
+        "FN": "SPX500",
+        "RP": "US500.c"
+      }
+    },
+    {
+      "id": "DOW",
+      "nombre": "Dow Jones 30",
+      "clase": "indice",
+      "listas": {
+        "FP": "#US30",
+        "FT": "US30",
+        "WS": "DOW",
+        "T5": "US30",
+        "FN": "US30",
+        "RP": "DJ30.c"
+      }
+    },
+    {
+      "id": "US2000",
+      "nombre": "Russell 2000",
+      "clase": "indice",
+      "listas": {
+        "FP": "#us2000",
+        "FT": "US2000",
+        "FN": "US2000"
+      }
+    },
+    {
+      "id": "HK50",
+      "nombre": "Hang Seng 50",
+      "clase": "indice",
+      "listas": {
+        "FP": "#HongKong50",
+        "WS": "HK50",
+        "FN": "HK50",
+        "RP": "HK50.c"
+      }
+    },
+    {
+      "id": "NIKKEI",
+      "nombre": "Nikkei 225",
+      "clase": "indice",
+      "listas": {
+        "FP": "#Japan225",
+        "FT": "JP225",
+        "WS": "NIKEY",
+        "T5": "JPN225",
+        "FN": "JPN225",
+        "RP": "JP225.c"
+      }
+    },
+    {
+      "id": "DXY",
+      "nombre": "Índice dólar",
+      "clase": "indice",
+      "listas": {
+        "FT": "DXY"
+      }
+    },
+    {
+      "id": "XAUUSD",
+      "nombre": "Oro",
+      "clase": "metal",
+      "listas": {
+        "FP": "XAUUSD",
+        "FT": "XAUUSD",
+        "WS": "XAUUSD",
+        "T5": "XAUUSD",
+        "FN": "XAUUSD",
+        "RP": "XAUUSD"
+      }
+    },
+    {
+      "id": "XAGUSD",
+      "nombre": "Plata",
+      "clase": "metal",
+      "listas": {
+        "FP": "XAGUSD",
+        "FT": "XAGUSD",
+        "WS": "XAGUSD",
+        "T5": "XAGUSD",
+        "FN": "XAGUSD",
+        "RP": "XAGUSD"
+      }
+    },
+    {
+      "id": "WTI",
+      "nombre": "Petróleo WTI",
+      "clase": "energia",
+      "listas": {
+        "FP": "WTI",
+        "FT": "USOIL",
+        "WS": "CL",
+        "T5": "WTI",
+        "FN": "USOUSD",
+        "RP": "USOIL.c"
+      }
+    },
+    {
+      "id": "BTC",
+      "nombre": "Bitcoin",
+      "clase": "cripto",
+      "listas": {
+        "FP": "BITCOIN",
+        "FT": "BTCUSD",
+        "WS": "BTCUSD",
+        "T5": "BTCUSD",
+        "FN": "BTCUSD",
+        "RP": "BTCUSD"
+      }
+    },
+    {
+      "id": "ETH",
+      "nombre": "Ethereum",
+      "clase": "cripto",
+      "listas": {
+        "FP": "ETHEREUM",
+        "FT": "ETHUSD",
+        "WS": "ETHEREUM",
+        "T5": "ETHUSD",
+        "FN": "ETHUSD",
+        "RP": "ETHUSD"
+      }
+    },
+    {
+      "id": "DASH",
+      "nombre": "Dash",
+      "clase": "cripto",
+      "listas": {
+        "FP": "DASH",
+        "FT": "DASHUSD"
+      }
+    },
+    {
+      "id": "EURUSD",
+      "nombre": "EURUSD",
+      "clase": "forex",
+      "listas": {
+        "FP": "EURUSD",
+        "FT": "EURUSD",
+        "WS": "EURUSD",
+        "T5": "EURUSD",
+        "FN": "EURUSD",
+        "RP": "EURUSDc"
+      }
+    },
+    {
+      "id": "EURCAD",
+      "nombre": "EURCAD",
+      "clase": "forex",
+      "listas": {
+        "FP": "EURCAD",
+        "FT": "EURCAD",
+        "WS": "EURCAD",
+        "T5": "EURCAD",
+        "FN": "EURCAD",
+        "RP": "EURCADc"
+      }
+    },
+    {
+      "id": "EURGBP",
+      "nombre": "EURGBP",
+      "clase": "forex",
+      "listas": {
+        "FP": "EURGBP",
+        "FT": "EURGBP",
+        "WS": "EURGBP",
+        "T5": "EURGBP",
+        "FN": "EURGBP",
+        "RP": "EURGBPc"
+      }
+    },
+    {
+      "id": "EURAUD",
+      "nombre": "EURAUD",
+      "clase": "forex",
+      "listas": {
+        "FP": "EURAUD",
+        "FT": "EURAUD",
+        "WS": "EURAUD",
+        "T5": "EURAUD",
+        "FN": "EURAUD",
+        "RP": "EURAUDc"
+      }
+    },
+    {
+      "id": "USDJPY",
+      "nombre": "USDJPY",
+      "clase": "forex",
+      "listas": {
+        "FP": "USDJPY",
+        "FT": "USDJPY",
+        "WS": "USDJPY",
+        "T5": "USDJPY",
+        "FN": "USDJPY",
+        "RP": "USDJPYc"
+      }
+    },
+    {
+      "id": "USDCAD",
+      "nombre": "USDCAD",
+      "clase": "forex",
+      "listas": {
+        "FP": "USDCAD",
+        "FT": "USDCAD",
+        "WS": "USDCAD",
+        "T5": "USDCAD",
+        "FN": "USDCAD",
+        "RP": "USDCADc"
+      }
+    },
+    {
+      "id": "AUDJPY",
+      "nombre": "AUDJPY",
+      "clase": "forex",
+      "listas": {
+        "FP": "AUDJPY",
+        "FT": "AUDJPY",
+        "WS": "AUDJPY",
+        "T5": "AUDJPY",
+        "FN": "AUDJPY",
+        "RP": "AUDJPYc"
+      }
+    },
+    {
+      "id": "GBPUSD",
+      "nombre": "GBPUSD",
+      "clase": "forex",
+      "listas": {
+        "FP": "GBPUSD",
+        "FT": "GBPUSD",
+        "WS": "GBPUSD",
+        "T5": "GBPUSD",
+        "FN": "GBPUSD",
+        "RP": "GBPUSDc"
+      }
+    },
+    {
+      "id": "GBPJPY",
+      "nombre": "GBPJPY",
+      "clase": "forex",
+      "listas": {
+        "FP": "GBPJPY",
+        "FT": "GBPJPY",
+        "WS": "GBPJPY",
+        "T5": "GBPJPY",
+        "FN": "GBPJPY",
+        "RP": "GBPJPYc"
+      }
+    },
+    {
+      "id": "EURJPY",
+      "nombre": "EURJPY",
+      "clase": "forex",
+      "listas": {
+        "FP": "EURJPY",
+        "FT": "EURJPY",
+        "WS": "EURJPY",
+        "T5": "EURJPY",
+        "FN": "EURJPY",
+        "RP": "EURJPYc"
+      }
+    },
+    {
+      "id": "CADJPY",
+      "nombre": "CADJPY",
+      "clase": "forex",
+      "listas": {
+        "FP": "CADJPY",
+        "FT": "CADJPY",
+        "WS": "CADJPY",
+        "T5": "CADJPY",
+        "FN": "CADJPY",
+        "RP": "CADJPYc"
+      }
+    },
+    {
+      "id": "AUDCAD",
+      "nombre": "AUDCAD",
+      "clase": "forex",
+      "listas": {
+        "FP": "AUDCAD",
+        "FT": "AUDCAD",
+        "WS": "AUDCAD",
+        "T5": "AUDCAD",
+        "FN": "AUDCAD",
+        "RP": "AUDCADc"
+      }
+    },
+    {
+      "id": "AUDNZD",
+      "nombre": "AUDNZD",
+      "clase": "forex",
+      "listas": {
+        "FP": "AUDNZD",
+        "FT": "AUDNZD",
+        "WS": "AUDNZD",
+        "T5": "AUDNZD",
+        "FN": "AUDNZD",
+        "RP": "AUDNZDc"
+      }
+    },
+    {
+      "id": "AUDUSD",
+      "nombre": "AUDUSD",
+      "clase": "forex",
+      "listas": {
+        "FP": "AUDUSD",
+        "FT": "AUDUSD",
+        "WS": "AUDUSD",
+        "T5": "AUDUSD",
+        "FN": "AUDUSD",
+        "RP": "AUDUSDc"
+      }
+    },
+    {
+      "id": "NZDJPY",
+      "nombre": "NZDJPY",
+      "clase": "forex",
+      "listas": {
+        "FP": "NZDJPY",
+        "FT": "NZDJPY",
+        "WS": "NZDJPY",
+        "T5": "NZDJPY",
+        "FN": "NZDJPY",
+        "RP": "NZDJPYc"
+      }
+    },
+    {
+      "id": "NZDUSD",
+      "nombre": "NZDUSD",
+      "clase": "forex",
+      "listas": {
+        "FP": "NZDUSD",
+        "FT": "NZDUSD",
+        "WS": "NZDUSD",
+        "T5": "NZDUSD",
+        "FN": "NZDUSD",
+        "RP": "NZDUSDc"
+      }
+    },
+    {
+      "id": "GBPCAD",
+      "nombre": "GBPCAD",
+      "clase": "forex",
+      "listas": {
+        "FP": "GBPCAD",
+        "FT": "GBPCAD",
+        "WS": "GBPCAD",
+        "T5": "GBPCAD",
+        "FN": "GBPCAD",
+        "RP": "GBPCADc"
+      }
+    },
+    {
+      "id": "GBPAUD",
+      "nombre": "GBPAUD",
+      "clase": "forex",
+      "listas": {
+        "FP": "GBPAUD",
+        "FT": "GBPAUD",
+        "WS": "GBPAUD",
+        "T5": "GBPAUD",
+        "FN": "GBPAUD",
+        "RP": "GBPAUDc"
+      }
+    },
+    {
+      "id": "NZDCAD",
+      "nombre": "NZDCAD",
+      "clase": "forex",
+      "listas": {
+        "FP": "NZDCAD",
+        "FT": "NZDCAD",
+        "WS": "NZDCAD",
+        "T5": "NZDCAD",
+        "FN": "NZDCAD",
+        "RP": "NZDCADc"
+      }
+    },
+    {
+      "id": "GBPNZD",
+      "nombre": "GBPNZD",
+      "clase": "forex",
+      "listas": {
+        "FT": "GBPNZD",
+        "T5": "GBPNZD",
+        "FN": "GBPNZD"
+      }
+    },
+    {
+      "id": "EURNZD",
+      "nombre": "EURNZD",
+      "clase": "forex",
+      "listas": {
+        "FT": "EURNZD",
+        "T5": "EURNZD",
+        "FN": "EURNZD"
+      }
+    }
+  ],
+  "LISTAS": {
+    "FT": [
+      "EURAUD",
+      "XAUUSD",
+      "XAGUSD",
+      "BTC",
+      "DASH",
+      "ETH",
+      "EURUSD",
+      "CADJPY",
+      "USDJPY",
+      "USDCAD",
+      "AUDUSD",
+      "GBPUSD",
+      "EURCAD",
+      "AUDJPY",
+      "GBPJPY",
+      "EURJPY",
+      "EURGBP",
+      "GBPCAD",
+      "GBPNZD",
+      "GBPAUD",
+      "AUDCAD",
+      "US2000",
+      "DOW",
+      "DAX",
+      "CAC",
+      "SP500",
+      "NASDAQ",
+      "FTSE",
+      "WTI",
+      "DXY",
+      "NZDUSD",
+      "EURNZD",
+      "NZDCAD",
+      "NZDJPY",
+      "AUDNZD",
+      "NIKKEI"
+    ],
+    "WS": [
+      "DAX",
+      "CAC",
+      "FTSE",
+      "NASDAQ",
+      "SP500",
+      "DOW",
+      "EURUSD",
+      "EURCAD",
+      "EURGBP",
+      "EURAUD",
+      "USDJPY",
+      "USDCAD",
+      "AUDJPY",
+      "GBPUSD",
+      "GBPJPY",
+      "EURJPY",
+      "CADJPY",
+      "AUDCAD",
+      "AUDNZD",
+      "AUDUSD",
+      "NZDJPY",
+      "NZDUSD",
+      "XAGUSD",
+      "XAUUSD",
+      "WTI",
+      "BTC",
+      "ETH",
+      "HK50",
+      "GBPCAD",
+      "GBPAUD",
+      "NZDCAD",
+      "NIKKEI"
+    ],
+    "FN": [
+      "DAX",
+      "CAC",
+      "FTSE",
+      "NASDAQ",
+      "SP500",
+      "DOW",
+      "EURUSD",
+      "EURCAD",
+      "EURGBP",
+      "EURAUD",
+      "USDJPY",
+      "USDCAD",
+      "AUDJPY",
+      "GBPUSD",
+      "GBPJPY",
+      "EURJPY",
+      "CADJPY",
+      "AUDCAD",
+      "AUDNZD",
+      "AUDUSD",
+      "NZDJPY",
+      "NZDUSD",
+      "XAGUSD",
+      "XAUUSD",
+      "BTC",
+      "ETH",
+      "GBPAUD",
+      "GBPCAD",
+      "GBPNZD",
+      "EURNZD",
+      "HK50",
+      "NIKKEI",
+      "US2000",
+      "WTI"
+    ],
+    "T5": [
+      "DAX",
+      "CAC",
+      "FTSE",
+      "NASDAQ",
+      "SP500",
+      "DOW",
+      "EURUSD",
+      "EURCAD",
+      "EURGBP",
+      "EURAUD",
+      "USDJPY",
+      "USDCAD",
+      "AUDJPY",
+      "GBPUSD",
+      "GBPJPY",
+      "EURJPY",
+      "CADJPY",
+      "AUDCAD",
+      "AUDNZD",
+      "AUDUSD",
+      "NZDJPY",
+      "NZDUSD",
+      "XAGUSD",
+      "XAUUSD",
+      "WTI",
+      "BTC",
+      "ETH",
+      "GBPAUD",
+      "GBPCAD",
+      "GBPNZD",
+      "EURNZD",
+      "NZDCAD",
+      "NIKKEI"
+    ],
+    "RP": [
+      "AUDUSD",
+      "USDCAD",
+      "EURUSD",
+      "GBPUSD",
+      "USDJPY",
+      "AUDCAD",
+      "AUDJPY",
+      "AUDNZD",
+      "CADJPY",
+      "XAUUSD",
+      "XAGUSD",
+      "DAX",
+      "WTI",
+      "SP500",
+      "NASDAQ",
+      "DOW",
+      "CAC",
+      "FTSE",
+      "HK50",
+      "NIKKEI",
+      "BTC",
+      "ETH",
+      "EURCAD",
+      "EURGBP",
+      "EURJPY",
+      "EURAUD",
+      "NZDCAD",
+      "NZDJPY",
+      "NZDUSD",
+      "GBPAUD",
+      "GBPCAD",
+      "GBPJPY"
+    ]
+  },
+  "CUENTAS": [
+    {
+      "id": "FS",
+      "plantilla": "FS",
+      "nombre": "FT Swing",
+      "corto": "FS",
+      "color": "#00D4AA",
+      "lista": "FT",
+      "horario": "FS",
+      "grupo": "A",
+      "plataforma": "cTrader",
+      "fase": "challenge",
+      "inicio": null
+    },
+    {
+      "id": "FC",
+      "plantilla": "FC",
+      "nombre": "FT Scalp",
+      "corto": "FC",
+      "color": "#00B894",
+      "lista": "FT",
+      "horario": "FC",
+      "grupo": "B",
+      "plataforma": "cTrader",
+      "fase": "challenge",
+      "inicio": null
+    },
+    {
+      "id": "WA",
+      "plantilla": "WS",
+      "nombre": "WSF A",
+      "corto": "WA",
+      "color": "#F97316",
+      "lista": "WS",
+      "horario": "WS",
+      "grupo": "A",
+      "plataforma": "cTrader",
+      "fase": "challenge",
+      "inicio": null
+    },
+    {
+      "id": "WB",
+      "plantilla": "WS",
+      "nombre": "WSF B",
+      "corto": "WB",
+      "color": "#FB923C",
+      "lista": "WS",
+      "horario": "WS",
+      "grupo": "B",
+      "plataforma": "cTrader",
+      "fase": "challenge",
+      "inicio": null
+    },
+    {
+      "id": "WC",
+      "plantilla": "WS",
+      "nombre": "WSF C",
+      "corto": "WC",
+      "color": "#FDBA74",
+      "lista": "WS",
+      "horario": "WS",
+      "grupo": "C",
+      "plataforma": "cTrader",
+      "fase": "challenge",
+      "inicio": null
+    },
+    {
+      "id": "FN",
+      "plantilla": "FN",
+      "nombre": "FundedNext",
+      "corto": "FN",
+      "color": "#22D3EE",
+      "lista": "FN",
+      "horario": "FN",
+      "grupo": "C",
+      "plataforma": "cTrader",
+      "fase": "challenge",
+      "inicio": null
+    },
+    {
+      "id": "T5",
+      "plantilla": "T5",
+      "nombre": "The5%ers",
+      "corto": "T5",
+      "color": "#818CF8",
+      "lista": "T5",
+      "horario": "T5",
+      "grupo": "C",
+      "plataforma": "cTrader",
+      "fase": "challenge",
+      "inicio": null
+    },
+    {
+      "id": "RP",
+      "plantilla": "RP",
+      "nombre": "WSF Rapid",
+      "corto": "RP",
+      "color": "#F43F5E",
+      "lista": "RP",
+      "horario": "RP",
+      "grupo": null,
+      "plataforma": "MT5",
+      "fase": "challenge",
+      "inicio": null
+    }
+  ],
+  "GRUPOS": {
+    "A": {
+      "nombre": "Grupo A",
+      "cuentas": [
+        "WA",
+        "FS"
+      ]
+    },
+    "B": {
+      "nombre": "Grupo B",
+      "cuentas": [
+        "WB",
+        "FC"
+      ]
+    },
+    "C": {
+      "nombre": "Grupo C",
+      "cuentas": [
+        "WC",
+        "FN",
+        "T5"
+      ]
+    }
+  },
+  "NOTICIAS": {
+    "nota": "Las mismas ventanas rigen en challenge y en fondeo (el challenge es entrenamiento). ventana_min = minutos antes y después de una noticia de alto impacto.",
+    "plantillas": {
+      "FS": {
+        "ventana_min": null,
+        "nota": "FT Swing está exenta"
+      },
+      "FC": {
+        "ventana_min": 2
+      },
+      "WS": {
+        "ventana_min": 4
+      },
+      "RP": {
+        "ventana_min": 2,
+        "nota": "sin confirmar oficialmente"
+      },
+      "FN": {
+        "ventana_min": 5,
+        "nota": "regla 40/60 sobre el profit"
+      },
+      "T5": {
+        "ventana_min": 2,
+        "nota": "soft breach: deduce el profit del trade"
+      }
+    }
+  },
+  "SCHEMA_VERSION": 2
 }

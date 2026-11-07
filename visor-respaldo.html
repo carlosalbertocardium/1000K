@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Visor de Respaldos</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:#070D1A;color:#E2E8F0;font-family:'DM Sans',sans-serif;min-height:100vh;padding:14px 14px 60px;}
+  ::-webkit-scrollbar{width:3px;}
+  ::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:99px;}
+
+  .header{padding:8px 0 18px;}
+  .header-title{font-size:16px;font-weight:700;color:#00D4AA;letter-spacing:0.5px;}
+  .header-sub{font-size:12px;color:#64748B;margin-top:4px;}
+
+  .drop-zone{border:1.5px dashed rgba(0,212,170,0.35);border-radius:14px;padding:32px 16px;text-align:center;cursor:pointer;background:rgba(0,212,170,0.04);transition:all 0.2s;}
+  .drop-zone.dragover{background:rgba(0,212,170,0.1);border-color:#00D4AA;}
+  .drop-zone-icon{font-size:28px;margin-bottom:8px;}
+  .drop-zone-txt{font-size:13px;color:#94A3B8;}
+  .drop-zone-sub{font-size:11px;color:#475569;margin-top:6px;}
+  #file-input{display:none;}
+
+  .resumen-card{background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;margin-bottom:14px;}
+  .resumen-fecha{font-size:11px;color:#64748B;margin-bottom:10px;}
+  .resumen-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .resumen-firm{text-align:center;padding:8px 4px;background:rgba(255,255,255,0.02);border-radius:8px;}
+  .resumen-firm-name{font-size:10px;font-weight:700;margin-bottom:4px;}
+  .resumen-firm-val{font-size:13px;font-weight:700;font-family:monospace;}
+
+  .section-title{font-size:12px;font-weight:700;color:#94A3B8;letter-spacing:0.4px;margin:18px 0 10px;text-transform:uppercase;}
+
+  .op-item{background:rgba(255,255,255,0.03);border-radius:10px;padding:10px 12px;margin-bottom:6px;}
+  .op-top{display:flex;align-items:center;gap:7px;flex-wrap:wrap;}
+  .op-par{font-size:12px;font-weight:700;color:#F1F5F9;font-family:monospace;}
+  .op-dir{font-size:11px;font-weight:700;}
+  .badge{font-size:9px;padding:1px 6px;border-radius:99px;font-weight:600;}
+  .op-hora{font-size:10px;color:#475569;margin-top:4px;}
+  .op-result{font-size:13px;font-weight:700;font-family:monospace;margin-left:auto;}
+  .siguio-favor{font-size:10px;color:#64748B;margin-top:4px;}
+
+  .empty-msg{text-align:center;color:#475569;font-size:13px;padding:30px 10px;}
+
+  .btn-limpiar{width:100%;margin-top:20px;padding:10px;font-size:12px;color:#94A3B8;background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;cursor:pointer;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">📂 VISOR DE RESPALDOS</div>
+  <div class="header-sub">Abre cualquier archivo respaldo-control-operativa-FECHA.json (incluye los de antes de WSF A, B y C) y míralo organizado, sin código.</div>
+</div>
+
+<div id="drop-zone" class="drop-zone" onclick="document.getElementById('file-input').click()">
+  <div class="drop-zone-icon">⬆</div>
+  <div class="drop-zone-txt">Toca para elegir el archivo, o arrástralo aquí</div>
+  <div class="drop-zone-sub">Formato .json exportado desde Control Operativa</div>
+</div>
+<input type="file" id="file-input" accept=".json,application/json">
+
+<div id="contenido" style="display:none"></div>
+
+<script>
+// Cuentas: valores de respaldo; si config.json está disponible se toman de ahí (CUENTAS)
+const COLORES_BASE = { FS:"#00D4AA", FC:"#00B894", WA:"#F97316", WB:"#FB923C", WC:"#FDBA74", FN:"#22D3EE", T5:"#818CF8", RP:"#F43F5E" };
+const NOMBRES_BASE = { FS:"FT Swing", FC:"FT Scalp", WA:"WSF A", WB:"WSF B", WC:"WSF C", FN:"FundedNext", T5:"The5%ers", RP:"WSF Rapid" };
+let COLORES = {...COLORES_BASE}, NOMBRES = {...NOMBRES_BASE}, ORDEN = Object.keys(NOMBRES_BASE);
+fetch("./config.json",{cache:"no-cache"}).then(r=>r.ok?r.json():Promise.reject()).then(cfg=>{
+  if(cfg.CUENTAS){ COLORES={}; NOMBRES={}; ORDEN=[]; cfg.CUENTAS.forEach(c=>{ COLORES[c.id]=c.color; NOMBRES[c.id]=c.nombre; ORDEN.push(c.id); }); }
+}).catch(()=>{});
+const ESTADO_COLOR = { "Cerrado":"#1D9E75", "Vencida":"#F59E0B", "Cancelada":"#64748B", "Abierto":"#1D9E75", "Orden":"#F59E0B" };
+// Esquema: valores del Control v7 en adelante (sistema1, bollinger, no_tocado = UBF) y el antiguo «gestionado»
+const ESQUEMAS = { sistema1:"Sistema 1", bollinger:"Bollinger", no_tocado:"UBF", gestionado:"Clásico (antiguo)" };
+// Respaldos anteriores a las tres WSF Ultra: la cuenta «WS» pasa a ser WSF A
+function clave(k){ return (k==="WS" && !(k in NOMBRES)) ? "WA" : k; }
+const usd = n => (n<0?'-':'+')+'$'+Math.abs(n).toLocaleString('es-CO');   // −$120, +$150
+const nombre = k => NOMBRES[k]||k;
+const color  = k => COLORES[k]||"#94A3B8";
+
+document.getElementById("file-input").addEventListener("change", e => {
+  if(e.target.files[0]) leerArchivo(e.target.files[0]);
+});
+const dropZone = document.getElementById("drop-zone");
+dropZone.addEventListener("dragover", e => { e.preventDefault(); dropZone.classList.add("dragover"); });
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("dragover"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault(); dropZone.classList.remove("dragover");
+  if(e.dataTransfer.files[0]) leerArchivo(e.dataTransfer.files[0]);
+});
+function leerArchivo(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try { renderRespaldo(JSON.parse(e.target.result), file.name); }
+    catch(err) { alert("Este archivo no es un respaldo válido de Control Operativa."); }
+  };
+  reader.readAsText(file);
+}
+function limpiarVisor() {
+  document.getElementById("contenido").style.display = "none";
+  document.getElementById("drop-zone").style.display = "block";
+  document.getElementById("file-input").value = "";
+}
+function fmtFecha(iso) {
+  if(!iso) return "Fecha no registrada";
+  try { return new Date(iso).toLocaleString("es-CO", {dateStyle:"long", timeStyle:"short"}); } catch(e) { return iso; }
+}
+function pillOp(op, f) {
+  const esq = op.esquema ? `<span class="badge" style="background:rgba(34,211,238,0.15);color:#22D3EE">${ESQUEMAS[op.esquema]||op.esquema}</span>` : "";
+  const gr  = op.grupo ? `<span class="badge" style="background:rgba(255,255,255,0.08);color:#CBD5E1">G${op.grupo}</span>` : "";
+  return `<span class="badge" style="background:${f}22;color:${f}">${nombre(op.firmKey)}</span>${gr}${esq}`;
+}
+
+function renderRespaldo(data, filename) {
+  document.getElementById("drop-zone").style.display = "none";
+  const cont = document.getElementById("contenido");
+  cont.style.display = "block";
+
+  const legacy = !(data.esquema>=2);
+  const norm = o => ({...o, firmKey: clave(o.firmKey)});
+  const ops = (data.ops||[]).map(norm), historico = (data.historico||[]).map(norm);
+  const pnlDia = {}; Object.keys(data.pnlDia||{}).forEach(k=>{ const kk = clave(k); pnlDia[kk] = (pnlDia[kk]||0) + (data.pnlDia[k]||0); });
+  const keys = Object.keys(pnlDia).sort((a,b)=>{ const ia=ORDEN.indexOf(a), ib=ORDEN.indexOf(b); return (ia<0?99:ia)-(ib<0?99:ib); });
+
+  let html = `
+    <div class="resumen-card">
+      <div class="resumen-fecha">📄 ${filename}<br>Exportado: ${fmtFecha(data.exportadoEn)}<br>${legacy?"Respaldo anterior a las tres WSF Ultra: la cuenta «WS» se muestra como WSF A.":"Respaldo del Control con cuentas WSF A, B y C."}</div>
+      <div class="resumen-grid">
+        ${keys.map(k => {
+          const tot = pnlDia[k]||0;
+          return `<div class="resumen-firm">
+            <div class="resumen-firm-name" style="color:${color(k)}">${nombre(k)}</div>
+            <div class="resumen-firm-val" style="color:${tot>=0?'#1D9E75':'#EF4444'}">${usd(tot)}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </div>`;
+
+  html += `<div class="section-title">Operaciones activas al momento del respaldo (${ops.length})</div>`;
+  if(ops.length===0) html += `<div class="empty-msg">Sin operaciones abiertas en este respaldo.</div>`;
+  else ops.forEach(op => {
+    const f = color(op.firmKey);
+    html += `
+        <div class="op-item" style="border-left:3px solid ${f}">
+          <div class="op-top">
+            <span class="op-par">${op.par}</span>
+            <span class="op-dir" style="color:${op.dir==='BUY'?'#1D9E75':'#EF4444'}">${op.dir}</span>
+            <span class="badge" style="background:${ESTADO_COLOR[op.estado]}22;color:${ESTADO_COLOR[op.estado]}">${op.estado}</span>
+            ${pillOp(op,f)}
+          </div>
+          <div class="op-hora">${op.hora}${op.vencimiento?' · vence '+op.vencimiento:''}${op.omitidas&&op.omitidas.length?' · sin replicar en: '+op.omitidas.map(nombre).join(', '):''}</div>
+        </div>`;
+  });
+
+  html += `<div class="section-title">Historial de trades (${historico.length})</div>`;
+  if(historico.length===0) html += `<div class="empty-msg">Sin trades registrados en este respaldo.</div>`;
+  else historico.forEach(op => {
+    const f = color(op.firmKey);
+    const estadoFinal = op.estadoFinal || "Cerrado";
+    const tieneResultado = op.resultado!==null && op.resultado!==undefined;
+    const pos = tieneResultado && op.resultado>=0;
+    let siguioTxt = "";
+    if("siguioFavor" in op && op.siguioFavor!==null) siguioTxt = `<div class="siguio-favor">¿Siguió a favor? ${op.siguioFavor?'<span style="color:#1D9E75">Sí</span>':'<span style="color:#EF4444">No</span>'}</div>`;
+    html += `
+        <div class="op-item" style="border-left:3px solid ${f}">
+          <div class="op-top">
+            <span class="op-par">${op.par}</span>
+            <span class="op-dir" style="color:${op.dir==='BUY'?'#1D9E75':'#EF4444'}">${op.dir}</span>
+            <span class="badge" style="background:${ESTADO_COLOR[estadoFinal]}22;color:${ESTADO_COLOR[estadoFinal]}">${estadoFinal}</span>
+            ${pillOp(op,f)}
+            ${tieneResultado?`<span class="op-result" style="color:${pos?'#1D9E75':'#EF4444'}">${usd(op.resultado)}</span>`:'<span class="op-result" style="color:#64748B">—</span>'}
+          </div>
+          <div class="op-hora">${op.hora} → ${op.horaClose||'—'}</div>
+          ${siguioTxt}
+        </div>`;
+  });
+  cont.innerHTML = html + `<button class="btn-limpiar" onclick="limpiarVisor()">Abrir otro archivo</button>`;
+}
+</script>
+</body>
+</html>

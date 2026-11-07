@@ -81,6 +81,7 @@ details[open] summary{margin-bottom:10px;}
     <div id="wrap-entry2"><div class="lbl">Precio de entrada (para el margen)</div><input type="number" id="entry2" step="any" oninput="calcular()"></div>
   </div>
   <div class="hint" id="modo-hint" style="margin:-6px 0 12px"></div>
+  <div class="hint oculto" id="restaurado" style="margin:-6px 0 12px;color:#4ADE80"><span id="restaurado-txt"></span> <a href="#" onclick="limpiarPrecios();return false" style="color:#F43F5E">Limpiar precios</a></div>
 
   <details>
     <summary id="cot-resumen">Cotizaciones de referencia (para convertir a dólares)</summary>
@@ -117,6 +118,7 @@ details[open] summary{margin-bottom:10px;}
 
   <div class="info-row"><span>SL obligatorio en WSF:</span><span class="info-fix">2 minutos desde la apertura 🛑</span></div>
   <div class="info-row"><span>Trades de menos de 60 segundos:</span><span class="info-fix">prohibidos 🚫</span></div>
+  <div class="hint" style="margin-top:14px;text-align:center">Datos de símbolos verificados en el MT5 de WSF (nov-2026). Para una cuenta MT5 de otra firma, verifica contrato, dígitos, margen y comisión antes de usarla.</div>
 </div>
 
 <script>
@@ -221,13 +223,13 @@ function guardarCot(){
   const o={}; Object.keys(COT_DEFECTO).forEach(k=>{ const v=parseFloat($('r-'+k).value); if(v>0) o[k]=v; });
   cotFecha=hoyISO(); escribirLS(LS_COT,{vals:o,fecha:cotFecha}); resumenCot();
 }
-function cambiarSimbolo(){
+function cambiarSimbolo(noLimpiar){
   const s=$('instr').value, b=infoSimbolo(s), bd=$('badge');
   if(b.verif){ bd.className='badge ok'; bd.textContent='✔ verificado en WSF MT5 · '+VERIF_FECHA; }
   else { bd.className='badge no'; bd.textContent='⚠ inferido de 6 pares verificados (misma estructura), no verificado en este par'; }
   $('op-pips').disabled=(b.cls!=='fx'); if(b.cls!=='fx' && $('modo').value==='pips') $('modo').value='precio';
   $('wrap-entry2').classList.toggle('oculto',b.cls==='fx');
-  $('entry').value=''; $('slprice').value=''; $('dist').value=''; $('entry2').value='';
+  if(!noLimpiar){ $('entry').value=''; $('slprice').value=''; $('dist').value=''; $('entry2').value=''; }
   cambiarModo();
 }
 function cambiarModo(){
@@ -242,6 +244,7 @@ function cambiarModo(){
 const f$=x=>isFinite(x)?'$'+x.toFixed(2):'—';
 const dec=(x,n)=>isFinite(x)?x.toFixed(n):'—';
 function calcular(){
+  if(!restaurando){ guardarUltimo(); $('restaurado').classList.add('oculto'); }
   const s=$('instr').value, b=infoSimbolo(s), modo=$('modo').value;
   const entry = modo==='precio' ? (parseFloat($('entry').value)||0) : (parseFloat($('entry2').value)||0);
   const dist = distanciaPrecio(modo,{digits:b.digits,entry:parseFloat($('entry').value)||0,slprice:parseFloat($('slprice').value)||0,dist:parseFloat($('dist').value)||0});
@@ -276,7 +279,37 @@ function calcular(){
   if(p.riesgoPct>0.5 && p.capital===5000) amb.push('⚠ Riesgo '+p.riesgoPct+' % = '+f$(r.riesgo)+', superior al 0,5 % definido para esta cuenta ($25).');
   if(rojo.length||amb.length){ w.className='warn '+(rojo.length?'rojo':'amb')+' visible'; w.innerHTML=rojo.concat(amb).join('<br><br>'); }
 }
-construirSelect(); cargarCot(); cambiarSimbolo();
+// ── ÚLTIMO CÁLCULO: se conserva (capital, riesgo %, símbolo, modo y valores) y se restaura al abrir ──
+const LS_ULT='calc_lotaje_v4_ultimo';
+let restaurando=false;
+const CAMPOS_ULT=['entry','slprice','dist','entry2'];
+function guardarUltimo(){
+  const o={capital:$('capital').value,riesgo:$('riesgo-pct').value,instr:$('instr').value,modo:$('modo').value,ts:Date.now()};
+  CAMPOS_ULT.forEach(id=>{ o[id]=$(id).value; }); escribirLS(LS_ULT,o);
+}
+function haceCuanto(ts){
+  const m=Math.round((Date.now()-ts)/60000); if(m<1) return 'hace un momento'; if(m<60) return 'hace '+m+' min';
+  const h=Math.round(m/60); if(h<48) return 'hace '+h+' h'; return 'hace '+Math.round(h/24)+' días';
+}
+function limpiarPrecios(){ CAMPOS_ULT.forEach(id=>{ $(id).value=''; }); $('restaurado').classList.add('oculto'); calcular(); }
+function restaurarUltimo(){
+  const g=leerLS(LS_ULT);
+  if(!g.instr || !(CFD[g.instr] || FX.includes(g.instr))) return false;
+  restaurando=true;
+  $('capital').value=(parseFloat(g.capital)>0)?g.capital:5000; $('riesgo-pct').value=(parseFloat(g.riesgo)>0)?g.riesgo:0.5;
+  $('instr').value=g.instr; cambiarSimbolo(true);
+  const m=(g.modo==='pips' && infoSimbolo(g.instr).cls!=='fx') ? 'precio' : (['precio','puntos','pips'].includes(g.modo)?g.modo:'precio');
+  $('modo').value=m; cambiarModo();
+  CAMPOS_ULT.forEach(id=>{ if(g[id]!==undefined) $(id).value=g[id]; });
+  calcular(); restaurando=false;
+  if(CAMPOS_ULT.some(id=>g[id])){
+    const viejo=g.ts && (Date.now()-g.ts>86400000);
+    $('restaurado-txt').textContent='Último cálculo restaurado ('+haceCuanto(g.ts||Date.now())+').'+(viejo?' Los precios tienen más de un día: revísalos.':'');
+    $('restaurado').classList.remove('oculto');
+  }
+  return true;
+}
+construirSelect(); cargarCot(); if(!restaurarUltimo()) cambiarSimbolo();
 </script>
 </body>
 </html>
